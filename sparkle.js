@@ -63,7 +63,7 @@ PlugAPI.getAuth({
         //TODO: replace with modular command files
         if (data.message == 'ping') {
             bot.chat('You\'re still here, ' + data.from);
-        } else if (data.message == 'hugs ' + botname || data.message == ' hugs ' + botname) {
+        } else if (data.message == 'hugs ' + config.botinfo.botname || data.message == ' hugs ' + config.botinfo.botname) {
             bot.chat('/me hugs ' + data.from);
         }
     }
