@@ -1,0 +1,23 @@
+{
+  "name": "sparklebot",
+  "description": "A customizable plug.dj room bot.",
+  "version": "2.0.0",
+  "keywords": ["turntable.fm", "turntable", "plug.dj", "plug"],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sharedferret/SparkleBot.git"
+  },
+  "author": "Kate Wellington <sharedferret@gmail.com>",
+  "main": "sparkle.js",
+  "directories": {
+    "commands": "commands"
+  },
+  "engines": {
+    "node": ">= 0.6.0"
+  },
+  "dependencies" : {
+	"sqlite3": "*"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {}
+}
