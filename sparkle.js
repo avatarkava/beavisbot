@@ -17,48 +17,50 @@ PlugAPI.getAuth({
     
     initializeModules();
     
-    var context = require('./context.js')({auth: auth, updateCode: UPDATECODE, config: config});
-    context.bot.connect(config.roomName);
+    // load context
+    require('./context.js')({auth: auth, updateCode: UPDATECODE, config: config});
+    
+    bot.connect(config.roomName);
 
-    context.bot.on('roomJoin', function(data) {
+    bot.on('roomJoin', function(data) {
         // data object has information on the room - list of users, song currently playing, etc.
         console.log("Joined " + config.roomName + ": ", data);
 
-        context.bot.chat('Hi! :cat:');
+        bot.chat('Hi! :cat:');
     });
 
-    context.bot.on('chat', function(data) {
+    bot.on('chat', function(data) {
         console.log('Chat: ', data); 
         
         handleCommand(data);
     });
     
-    context.bot.on('emote', function(data) {
+    bot.on('emote', function(data) {
         console.log('Emote: ', data);
         handleCommand(data);
     });
     
-    context.bot.on('userJoin', function(data) {
+    bot.on('userJoin', function(data) {
         console.log('User Joined: ', data);
     })
     
-    context.bot.on('userLeave', function(data) {
+    bot.on('userLeave', function(data) {
         console.log('User left: ', data);
     });
     
-    context.bot.on('userUpdate', function(data) {
+    bot.on('userUpdate', function(data) {
         console.log('User update: ', data);
     });
     
-    context.bot.on('curateUpdate', function(data) {
+    bot.on('curateUpdate', function(data) {
         console.log('Snagged: ', data);
     });
     
-    context.bot.on('djAdvance', function(data) {
+    bot.on('djAdvance', function(data) {
         console.log('New song: ', data);
     });
     
-    context.bot.on('djUpdate', function(data) {
+    bot.on('djUpdate', function(data) {
         console.log('DJ update', data);
     });
     
@@ -84,7 +86,7 @@ PlugAPI.getAuth({
         
         if (command) {
             //run command
-            command.handler(context, data);
+            command.handler(data);
         }
     }
 });
