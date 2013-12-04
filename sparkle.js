@@ -82,9 +82,17 @@ PlugAPI.getAuth({
     }
     
     function handleCommand(data) {
-        var command = commands.filter(function(cmd) { return cmd.names.indexOf(data.message) > -1; })[0];
+        var command = commands.filter(function(cmd) { 
+            var found = false;
+            for (i = 0; i < cmd.names.length; i++) {
+                if (!found) {
+                    found = (cmd.names[i] == data.message.toLowerCase() || (cmd.startsWith && cmd.names[i].indexOf(data.message.toLowerCase()) == 0));
+                }
+            }
+            return found;
+        })[0];
         
-        if (command) {
+        if (command && command.enabled) {
             //run command
             command.handler(data);
         }

@@ -1,6 +1,6 @@
 // ping command
 
-exports.names = ['ping'];
+exports.names = ['ping', '.ping'];
 exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = false;
