@@ -16,7 +16,9 @@
     "node": ">= 0.6.0"
   },
   "dependencies" : {
-	"sqlite3": "*"
+    "request": "*",
+	"sqlite3": "*",
+    "underscore": "*"
   },
   "devDependencies": {},
   "optionalDependencies": {}

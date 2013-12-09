@@ -1,6 +1,6 @@
 // cat facts!
 
-exports.names = ['catfact', '.catfact', '.catfacts'];
+exports.names = ['.catfact', 'catfact', '.catfacts'];
 exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = false;
