@@ -1,4 +1,6 @@
 // commands
+// TODO: this needs to split itself over multiple chat messages to get
+// around plug's chat size limit
 
 exports.names = ['.commands'];
 exports.hidden = false;
