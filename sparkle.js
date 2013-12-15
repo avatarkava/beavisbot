@@ -2,9 +2,8 @@ var PlugAPI = require('plugapi');
 var fs = require('fs');
 var config = require('./config.json');
 
-var UPDATECODE = '$&2h72=^^@jdBf_n!`-38UHs'; // We're not quite sure what this is yet, but the API doesn't work without it. It's possible that a future Plug update will change this, so check back here to see if this has changed, and set appropriately, if it has. You can omit using it if you wish - the value as of writing needs to be 'fe940c', and is hardcoded into the bot in the event it is not specified below.
+var UPDATECODE = '$&2h72=^^@jdBf_n!`-38UHs'; // We're not quite sure what this is yet, but the API doesn't work without it. It's possible that a future Plug update will change this, so check back here to see if this has changed, and set appropriately, if it has.
 
-// Instead of providing the AUTH, you can use this static method to get the AUTH cookie via twitter login credentials:
 PlugAPI.getAuth({
     username: config.botinfo.twitterUsername,
     password: config.botinfo.twitterPassword
@@ -129,6 +128,10 @@ PlugAPI.getAuth({
     function initializeModules() {
         // load context
         require('./context.js')({auth: auth, updateCode: UPDATECODE, config: config});
+        
+        // Allow bot to perform multi-line chat
+        bot.multiLine = true;
+        bot.multiLineLimit = 3;
         
         // Load commands
         try {
