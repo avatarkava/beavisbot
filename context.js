@@ -8,6 +8,7 @@ module.exports = function(options) {
     package = require('./package.json');
     request = require('request');
     _ = require('underscore');
+    S = require('string');
     commands = [];
     uptime = new Date();
     

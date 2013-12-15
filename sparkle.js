@@ -72,7 +72,7 @@ PlugAPI.getAuth({
         console.log('New song: ', data);
         
         // Write previous song data to DB
-        db.run('INSERT OR REPLACE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)', [room.media.id, room.media.title, room.media.format, room.media.author, room.media.cid, room.media.duration]);
+        db.run('INSERT OR IGNORE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)', [room.media.id, room.media.title, room.media.format, room.media.author, room.media.cid, room.media.duration]);
         
         db.run('INSERT INTO PLAYS (userid, songid, upvotes, downvotes, snags, started, listeners) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)',
         [room.currentDJ, 
@@ -162,11 +162,14 @@ PlugAPI.getAuth({
     }
     
     function handleCommand(data) {
+        // unescape message
+        data.message = S(data.message).unescapeHTML().s;
+        
         var command = commands.filter(function(cmd) { 
             var found = false;
             for (i = 0; i < cmd.names.length; i++) {
                 if (!found) {
-                    found = (cmd.names[i] == data.message.toLowerCase() || (cmd.startsWith && cmd.names[i].indexOf(data.message.toLowerCase()) == 0));
+                    found = (cmd.names[i] == data.message.toLowerCase() || (cmd.matchStart && data.message.toLowerCase().indexOf(cmd.names[i]) == 0));
                 }
             }
             return found;
