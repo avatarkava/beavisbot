@@ -1,6 +1,7 @@
 var PlugAPI = require('plugapi');
 var fs = require('fs');
-var config = require('./config.json');
+path = require('path')
+var config = require(path.resolve(__dirname, 'config.json'));
 
 var UPDATECODE = '$&2h72=^^@jdBf_n!`-38UHs'; // We're not quite sure what this is yet, but the API doesn't work without it. It's possible that a future Plug update will change this, so check back here to see if this has changed, and set appropriately, if it has.
 
@@ -136,7 +137,7 @@ PlugAPI.getAuth({
     
     function initializeModules() {
         // load context
-        require('./context.js')({auth: auth, updateCode: UPDATECODE, config: config});
+        require(path.resolve(__dirname, 'context.js'))({auth: auth, updateCode: UPDATECODE, config: config});
         
         // Allow bot to perform multi-line chat
         bot.multiLine = true;
@@ -144,8 +145,8 @@ PlugAPI.getAuth({
         
         // Load commands
         try {
-            fs.readdirSync('./commands').forEach(function(file) {
-                var command = require('./commands/' + file);
+            fs.readdirSync(path.resolve(__dirname, 'commands')).forEach(function(file) {
+                var command = require(path.resolve(__dirname, 'commands/' + file));
                 commands.push({names: command.names,
                     handler: command.handler,
                     hidden: command.hidden,
