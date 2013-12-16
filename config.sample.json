@@ -5,4 +5,8 @@
         "botname": "meow"
     },
     "roomName": "room-name"
+    "apiKeys": {
+            "echoNest": "###"
+        },
+    "autoSuggestCorrections": false
 }

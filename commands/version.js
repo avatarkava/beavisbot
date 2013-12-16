@@ -9,7 +9,7 @@ exports.handler = function(data) {
         var currentVersion = JSON.parse(body).version;
         if (package.version < currentVersion) {
             setTimeout(function() {
-                bot.chat('Your version of sparklebot is out of date! Update through npm or at http://git.io/meow', 1000);
+                bot.chat('Your version of sparklebot is out of date! Update through npm or at http://git.io/sparkle', 1000);
             });
         }
         bot.chat('[Sparkle] ' + package.version + ' (Latest version: ' + currentVersion + ')');

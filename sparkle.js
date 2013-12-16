@@ -72,15 +72,18 @@ PlugAPI.getAuth({
         console.log('New song: ', data);
         
         // Write previous song data to DB
-        db.run('INSERT OR IGNORE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)', [room.media.id, room.media.title, room.media.format, room.media.author, room.media.cid, room.media.duration]);
-        
-        db.run('INSERT INTO PLAYS (userid, songid, upvotes, downvotes, snags, started, listeners) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)',
-        [room.currentDJ, 
-        room.media.id, 
-        _.values(room.votes).filter(function(vote) { return vote == 1; }).length, 
-        _.values(room.votes).filter(function(vote) { return vote == -1; }).length, 
-        _.values(room.curates).length, 
-        room.users.length]);
+        // But only if the last song actually existed
+        if (room.media != null) {
+            db.run('INSERT OR IGNORE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)', [room.media.id, room.media.title, room.media.format, room.media.author, room.media.cid, room.media.duration]);
+                    
+            db.run('INSERT INTO PLAYS (userid, songid, upvotes, downvotes, snags, started, listeners) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)',
+                [room.currentDJ, 
+                room.media.id, 
+                _.values(room.votes).filter(function(vote) { return vote == 1; }).length, 
+                _.values(room.votes).filter(function(vote) { return vote == -1; }).length, 
+                _.values(room.curates).length, 
+                room.users.length]);
+        }
         
         // Update room object
         room.media = data.data.media;
@@ -91,6 +94,12 @@ PlugAPI.getAuth({
         room.playlistID = data.data.playlistID;
         room.historyID = data.data.historyID;
         room.curates = {}; 
+        room.suggested = {};
+        
+        // Perform automatic song metadata correction
+        if (room.media != null && config.autoSuggestCorrections) {
+            correctMetadata();
+        }
     });
     
     bot.on('djUpdate', function(data) {
@@ -179,5 +188,53 @@ PlugAPI.getAuth({
             //run command
             command.handler(data);
         }
+    }
+    
+    function correctMetadata() {
+        // first, see if the song exists in the db
+        db.get('SELECT id FROM SONGS WHERE id = ?', [room.media.id], function(error, row) {
+            if (row == null) {
+                // if the song isn't in the db yet, check it for suspicious strings
+                artistTitlePair = S((room.media.author + ' ' + room.media.title).toLowerCase());
+                if (artistTitlePair.contains('official music video')
+                  || artistTitlePair.contains('lyrics')
+                  || artistTitlePair.contains('|')
+                  || artistTitlePair.contains('official video')
+                  || artistTitlePair.contains('[')
+                  || artistTitlePair.contains('"')
+                  || artistTitlePair.contains('*')
+                  || artistTitlePair.contains('(HD)')
+                  || artistTitlePair.contains('(HQ)')
+                  || artistTitlePair.contains('1080p')
+                  || artistTitlePair.contains('720p')
+                  || artistTitlePair.contains(' - ')) {
+                    suggestNewSongMetadata(room.media.author + ' ' + room.media.title);
+                }
+            }
+        });
+    }
+    
+    function suggestNewSongMetadata(valueToCorrect) {
+        request('http://developer.echonest.com/api/v4/song/search?api_key=' + config.apiKeys.echoNest + '&format=json&results=1&combined=' + S(valueToCorrect).escapeHTML().stripPunctuation().s, function(error, response, body) {
+            console.log('echonest body', body);
+            if (error) {
+                bot.chat('An error occurred while connecting to EchoNest.');
+                console.log('EchoNest error', error);
+            } else {
+                response = JSON.parse(body).response;
+                    
+                room.media.suggested = {
+                    author: response.songs[0].artist_name,
+                    title: response.songs[0].title
+                };
+                
+                // log
+                console.log('[EchoNest] Original: "' + room.media.author + '" - "' + room.media.title + '". Suggestion: "' + room.media.suggested.author + '" - "' + room.media.suggested.title);
+                
+                if (room.media.author != room.media.suggested.author || room.media.title != room.media.suggested.title) {
+                    bot.chat('Hey, the metadata for this song looks wrong! Suggested Artist: "' + room.media.suggested.author + '". Title: "' + room.media.suggested.title + '". Type ".fixsong yes" to use the suggested tags.');
+                }
+            }
+        });
     }
 });

@@ -3,7 +3,15 @@ exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function(data) {
-    var songId = data.message.length > 10 ? data.message.substring(10) : room.media.id;
+    var songId;
+    if (data.message.length > 10) {
+        songId = data.message.substring(10);
+    } else if (room.media != null) {
+        songId = room.media.id;
+    } else {
+        bot.chat('No song playing.');
+        return;
+    }
     
     db.get('SELECT author, title FROM SONGS where id = ?', songId, function(err, row) {
         if (row != null) {
