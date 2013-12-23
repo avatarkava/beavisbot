@@ -3,8 +3,6 @@ var fs = require('fs');
 path = require('path')
 var config = require(path.resolve(__dirname, 'config.json'));
 
-var UPDATECODE = '$&2h72=^^@jdBf_n!`-38UHs'; // We're not quite sure what this is yet, but the API doesn't work without it. It's possible that a future Plug update will change this, so check back here to see if this has changed, and set appropriately, if it has.
-
 PlugAPI.getAuth({
     username: config.botinfo.twitterUsername,
     password: config.botinfo.twitterPassword
@@ -14,7 +12,18 @@ PlugAPI.getAuth({
         return;
     }
     
-    initializeModules();
+    PlugAPI.getUpdateCode(auth, config.roomName, function(err, updateCode) {
+        runBot(err, auth, updateCode);
+    });
+});
+    
+function runBot(error, auth, updateCode) {
+    if(error) {
+        console.log("An error occurred: " + err);
+        return;
+    } 
+    
+    initializeModules(auth, updateCode);
     
     bot.connect(config.roomName);
 
@@ -135,9 +144,9 @@ PlugAPI.getAuth({
         user.avatarID]);
     }
     
-    function initializeModules() {
+    function initializeModules(auth, updateCode) {
         // load context
-        require(path.resolve(__dirname, 'context.js'))({auth: auth, updateCode: UPDATECODE, config: config});
+        require(path.resolve(__dirname, 'context.js'))({auth: auth, updateCode: updateCode, config: config});
         
         // Allow bot to perform multi-line chat
         bot.multiLine = true;
@@ -208,7 +217,9 @@ PlugAPI.getAuth({
                   || artistTitlePair.contains('(HQ)')
                   || artistTitlePair.contains('1080p')
                   || artistTitlePair.contains('720p')
-                  || artistTitlePair.contains(' - ')) {
+                  || artistTitlePair.contains(' - ')
+                  || artistTitlePair.contains('full version')
+                  || artistTitlePair.contains('album version')) {
                     suggestNewSongMetadata(room.media.author + ' ' + room.media.title);
                 }
             }
@@ -238,4 +249,4 @@ PlugAPI.getAuth({
             }
         });
     }
-});
+}
