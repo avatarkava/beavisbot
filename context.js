@@ -11,6 +11,7 @@ module.exports = function(options) {
     S = require('string');
     commands = [];
     uptime = new Date();
+    lastRpcMessage = new Date();
     
     room = {
         users: [],

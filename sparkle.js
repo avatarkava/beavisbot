@@ -35,7 +35,7 @@ function runBot(error, auth, updateCode) {
         
         room.users.forEach(function(user) { addUserToDb(user); });
 
-        //bot.chat('Hi! :cat:');
+        lastRpcMessage = new Date();
     });
 
     bot.on('chat', function(data) {
@@ -55,6 +55,8 @@ function runBot(error, auth, updateCode) {
         addUserToDb(data);
         
         room.users.push(data);
+        
+        lastRpcMessage = new Date();
     })
     
     bot.on('user_leave', function(data) {
@@ -66,16 +68,21 @@ function runBot(error, auth, updateCode) {
         // Remove user from users list
         room.users.splice(_.pluck(room.users, 'id').indexOf(data.id), 1);
         
+        lastRpcMessage = new Date();
     });
     
     bot.on('userUpdate', function(data) {
         console.log('User update: ', data);
+        
+        lastRpcMessage = new Date();
     });
     
     bot.on('curateUpdate', function(data) {
         console.log('[SNAG] ' + room.users.filter(function(user) { return user.id == data.id; })[0].username + ' snagged this song');
         
         room.curates[data.id] = true;
+        
+        lastRpcMessage = new Date();
     });
     
     bot.on('dj_advance', function(data) {
@@ -110,11 +117,15 @@ function runBot(error, auth, updateCode) {
         if (room.media != null && config.autoSuggestCorrections) {
             correctMetadata();
         }
+        
+        lastRpcMessage = new Date();
     });
     
     bot.on('djUpdate', function(data) {
         console.log('DJ update', data);
         room.djs = data.djs;
+        
+        lastRpcMessage = new Date();
     });
     
     bot.on('update_votes', function(data) {
@@ -133,6 +144,8 @@ function runBot(error, auth, updateCode) {
                 bot.upvote();
             }
         }
+        
+        lastRpcMessage = new Date();
     });
     
     function addUserToDb(user) {
@@ -248,5 +261,29 @@ function runBot(error, auth, updateCode) {
                 }
             }
         });
+    }
+    
+    // Hack to make sure bot stays connected to plug
+    // Every 15 seconds, check how much time has elapsed since the most recent RPC message.
+    // If a song is playing and more than 15 seconds has passed since the expected end
+    // of the song, stop the bot. If no song is playing and more than 30 minutes have passed
+    // since an RPC event, stop the bot.
+    if (config.stopBotOnConnectionLoss) {
+        setInterval(function() {
+            if (room.media != null) {
+                console.log('checking ' + (new Date().getTime() - lastRpcMessage.getTime()) + ' < '
+                    + ((room.media.duration * 1000) + 15000));
+                if (new Date().getTime() - lastRpcMessage.getTime() > 15000 + (room.media.duration * 1000)) {
+                    console.log('Suspected connection loss at ' + new Date());
+                    process.exit(1);
+                }
+            } else {
+                if (new Date().getTime() - lastRpcMessage > 1800000) {
+                    console.log('Suspected connection loss at ' + new Date());
+                    console.log('No song playing.');
+                    process.exit(1);
+                }
+            }
+        }, 15000);
     }
 }

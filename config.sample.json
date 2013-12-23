@@ -8,5 +8,6 @@
     "apiKeys": {
             "echoNest": "###"
         },
-    "autoSuggestCorrections": false
+    "autoSuggestCorrections": false,
+    "stopBotOnConnectionLoss": false
 }
