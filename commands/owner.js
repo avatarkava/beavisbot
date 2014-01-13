@@ -1,7 +1,7 @@
-exports.names = ['.owner'];
-exports.hidden = true;
+exports.names = ['.owner', '.feedback'];
+exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = false;
-exports.handler = function(data) {
-    bot.chat('sharedferret made me!');
+exports.handler = function (data) {
+    bot.chat('AvatarKava owns the BeavisBot fork of SparkleBot. Make bug reports and requests here, please: https://github.com/AvatarKava/SparkleBot/issues');
 };

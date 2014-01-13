@@ -1,26 +1,28 @@
 {
-  "name": "sparklebot",
-  "description": "A customizable plug.dj room bot.",
-  "version": "2.1.0",
-  "keywords": ["turntable.fm", "turntable", "plug.dj", "plug"],
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/sharedferret/SparkleBot.git"
-  },
-  "author": "Kate Wellington <sharedferret@gmail.com>",
-  "main": "sparkle.js",
-  "directories": {
-    "commands": "commands"
-  },
-  "engines": {
-    "node": ">= 0.6.0"
-  },
-  "dependencies" : {
-    "request": "*",
-    "sqlite3": "*",
-    "string": "*",
-    "underscore": "*"
-  },
-  "devDependencies": {},
-  "optionalDependencies": {}
+    "name": "sparklebot",
+    "description": "A customizable plug.dj room bot.",
+    "version": "2.1.0",
+    "keywords": ["turntable.fm", "turntable", "plug.dj", "plug"],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/sharedferret/SparkleBot.git"
+    },
+    "author": "Kate Wellington <sharedferret@gmail.com>",
+    "main": "sparkle.js",
+    "directories": {
+        "commands": "commands"
+    },
+    "engines": {
+        "node": ">= 0.6.0"
+    },
+    "dependencies": {
+        "plugapi": "*",
+        "plug-dj-login": "*",
+        "request": "*",
+        "sqlite3": "*",
+        "string": "*",
+        "underscore": "*"
+    },
+    "devDependencies": {},
+    "optionalDependencies": {}
 }

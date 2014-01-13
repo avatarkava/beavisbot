@@ -1,7 +1,7 @@
 exports.names = ['.hodor', 'hodor', 'hodor?'];
-exports.hidden = false;
+exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;
-exports.handler = function(data) {
+exports.handler = function (data) {
     bot.chat('Hodor!');
 };

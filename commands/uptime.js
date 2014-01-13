@@ -1,8 +1,8 @@
 exports.names = ['.uptime'];
-exports.hidden = true;
+exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = false;
-exports.handler = function(data) {
+exports.handler = function (data) {
     var cur = new Date().getTime() - uptime.getTime();
     var days = Math.floor(cur / 86400000);
     cur = cur % 86400000;
@@ -15,6 +15,6 @@ exports.handler = function(data) {
         response += days + ' days, ';
     }
     response += (hours + ' hours, ' + minutes + ' minutes, '
-        + Math.floor(cur/1000) + ' seconds.');
+        + Math.floor(cur / 1000) + ' seconds.');
     bot.chat(response);
 };

@@ -1,8 +1,8 @@
-exports.names = ['.reptar', 'reptar'];
-exports.hidden = false;
+exports.names = ['.reptar'];
+exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;
-exports.handler = function(data) {
+exports.handler = function (data) {
     var rand = Math.random();
     if (rand < 0.05) {
         bot.chat('That band is pretty awesome.');

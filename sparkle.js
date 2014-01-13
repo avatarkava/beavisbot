@@ -3,20 +3,27 @@ var fs = require('fs');
 path = require('path')
 var config = require(path.resolve(__dirname, 'config.json'));
 
-PlugAPI.getAuth({
-    username: config.botinfo.twitterUsername,
-    password: config.botinfo.twitterPassword
-}, function(err, auth) { // if err is defined, an error occurred, most likely incorrect login
-    if(err) {
-        console.log("An error occurred: " + err);
-        return;
-    }
-    
-    PlugAPI.getUpdateCode(auth, config.roomName, function(err, updateCode) {
-        runBot(err, auth, updateCode);
+if (config.botinfo.auth != "") {
+    PlugAPI.getUpdateCode(config.botinfo.auth, config.roomName, function (err, updateCode) {
+        runBot(err, config.botinfo.auth, updateCode);
     });
-});
-    
+}
+else {
+    PlugAPI.getAuth({
+        username: config.botinfo.twitterUsername,
+        password: config.botinfo.twitterPassword
+    }, function (err, auth) { // if err is defined, an error occurred, most likely incorrect login
+        if (err) {
+            console.log("An error occurred: " + err);
+            return;
+        }
+
+        PlugAPI.getUpdateCode(auth, config.roomName, function (err, updateCode) {
+            runBot(err, auth, updateCode);
+        });
+    });
+}
+
 function runBot(error, auth, updateCode) {
     if(error) {
         console.log("An error occurred: " + err);
@@ -32,7 +39,11 @@ function runBot(error, auth, updateCode) {
         room = data.room;
         
         console.log('Joined room', room);
-        
+
+        if (config.responses.botConnect !== "") {
+            bot.chat(config.responses.botConnect);
+        }
+
         room.users.forEach(function(user) { addUserToDb(user); });
 
         lastRpcMessage = new Date();
@@ -50,7 +61,38 @@ function runBot(error, auth, updateCode) {
     
     bot.on('user_join', function(data) {
         console.log('[JOIN] ' + data.username);
-        
+
+        doWelcomeMessage = false;
+
+        if (data.username == config.botinfo.botname) {
+            doWelcomeMessage = false;
+        }
+        else {
+            getUserFromDb(data, function (dbUser) {
+
+                if (dbUser == undefined) {
+                    message = config.responses.welcome.newUser.replace('{username}', data.username);
+                    if (config.friendNewUsers && data.relationship < 2) {
+                        fanUser(data.id);
+                    }
+                }
+                else {
+                    message = config.responses.welcome.oldUser.replace('{username}', data.username);
+
+                }
+
+                if (config.welcomeUsers == "ALL") {
+                    doWelcomeMessage = true;
+                } else if (config.welcomeUsers == "NEW" && newUser) {
+                    doWelcomeMessage = true;
+                }
+
+                if (doWelcomeMessage && message != "") {
+                    bot.chat(message);
+                }
+            });
+        }
+
         // Add to DB
         addUserToDb(data);
         
@@ -86,8 +128,8 @@ function runBot(error, auth, updateCode) {
     });
     
     bot.on('dj_advance', function(data) {
-        console.log('New song: ', data);
-        
+        console.log('New song: ', JSON.stringify(data, null, 2));
+
         // Write previous song data to DB
         // But only if the last song actually existed
         if (room.media != null) {
@@ -112,7 +154,13 @@ function runBot(error, auth, updateCode) {
         room.historyID = data.data.historyID;
         room.curates = {}; 
         room.suggested = {};
-        
+
+        // Woot if it's set on ALL
+        // @todo: Add support for other settings.
+        if (room.media != null && config.wootSongs == 'ALL') {
+            bot.upvote();
+        }
+
         // Perform automatic song metadata correction
         if (room.media != null && config.autoSuggestCorrections) {
             correctMetadata();
@@ -122,7 +170,7 @@ function runBot(error, auth, updateCode) {
     });
     
     bot.on('djUpdate', function(data) {
-        console.log('DJ update', data);
+        console.log('DJ update', JSON.stringify(data, null, 2));
         room.djs = data.djs;
         
         lastRpcMessage = new Date();
@@ -134,7 +182,7 @@ function runBot(error, auth, updateCode) {
         
         // Log vote
         room.votes[data.id] = data.vote;
-        
+
         // Check if bot needs to bop
         if (room.votes[bot.getSelf().id] == null) {
             
@@ -147,7 +195,13 @@ function runBot(error, auth, updateCode) {
         
         lastRpcMessage = new Date();
     });
-    
+
+    if (config.requireWootInLine || config.requireNoAfkInLine) {
+        setInterval(function () {
+            monitorDJList();
+        }, 5000);
+    }
+
     function addUserToDb(user) {
         db.run('INSERT OR REPLACE INTO USERS VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)', 
         [user.id,
@@ -155,8 +209,65 @@ function runBot(error, auth, updateCode) {
         user.language,
         user.dateJoined.replace('T', ' '),
         user.avatarID]);
+        db.run('INSERT OR IGNORE INTO DISCIPLINE VALUES(?, 0, 0, CURRENT_TIMESTAMP)', [user.id]);
     }
-    
+
+    function getUserFromDb(user, callback) {
+        db.get('SELECT * FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE userid = ?', [user.id], function (error, row) {
+            callback(row);
+        });
+    }
+
+    function monitorDJList() {
+        //console.log(JSON.stringify(room.votes, null, 2));
+
+        if (room.mediaStartTime) {
+
+            startTime = new Date(room.mediaStartTime + ' GMT').getTime() / 1000;
+            nowTime = new Date().getTime() / 1000;
+            endTime = startTime + room.media.duration;
+            remaining = endTime - nowTime;
+            notWooting = [];
+
+            // @todo - Add in flagging system so we warn one time but it can be *any* time < 60s
+            if (remaining <= 60 && remaining >= 55) {
+                // Start at slot 1 (skip the current DJ)
+                for (i = 1; i < room.djs.length; i++) {
+                    dj = room.djs[i].user;
+                    if (config.requireWootInLine && (room.votes[dj.id] == undefined || room.votes[dj.id] != '1')) {
+                        //db.get('SELECT * FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE userid = ?(dj, function(result) {
+                        //    console.log(result);
+                        //if(result['warns'] == 0) {
+                        //db.run('UPDATE DISCIPLINE SET warns = warns + 1 WHERE userid = ?', [dj.id]);
+                        notWooting.push(dj.username);
+                    }
+                }
+                if (notWooting.length > 0) {
+                    notWootingList = notWooting.join(' @');
+                    console.log('Not wooting: @' + notWootingList);
+                    bot.chat('@' + notWootingList + ' ' + config.responses.wootReminder);
+                }
+            }
+        }
+
+        return notWooting;
+
+    }
+
+    function fanUser(user) {
+        var request = require('request');
+        request({
+            uri: "http://plug.dj/_/gateway/user.follow",
+            method: 'POST',
+            form: {
+                service: "user.follow",
+                body: [user.id]
+            }
+        }, function (error, response, body) {
+            console.log('[FAN] Added ' + user.username);
+        });
+    }
+
     function initializeModules(auth, updateCode) {
         // load context
         require(path.resolve(__dirname, 'context.js'))({auth: auth, updateCode: updateCode, config: config});
@@ -191,6 +302,10 @@ function runBot(error, auth, updateCode) {
         db.run('CREATE TABLE IF NOT EXISTS PLAYS (id INTEGER PRIMARY KEY AUTOINCREMENT, userid VARCHAR(255), songid VARCHAR(255), upvotes INTEGER, downvotes INTEGER, snags INTEGER, started TIMESTAMP, listeners INTEGER)');
         
         db.run('CREATE TABLE IF NOT EXISTS CHAT (id INTEGER PRIMARY KEY AUTOINCREMENT, message VARCHAR(255), userid VARCHAR(255), timestamp TIMESTAMP)');
+
+        db.run('CREATE TABLE IF NOT EXISTS GIFTS (id INTEGER PRIMARY KEY AUTOINCREMENT, category VARCHAR(255), name VARCHAR(255), chat TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)');
+
+        db.run('CREATE TABLE IF NOT EXISTS DISCIPLINE (userid VARCHAR(255) PRIMARY KEY, warns INTEGER, removes INTEGER, lastAction TIMESTAMP DEFAULT CURRENT_TIMESTAMP)');
     }
     
     function handleCommand(data) {
@@ -271,16 +386,18 @@ function runBot(error, auth, updateCode) {
     if (config.stopBotOnConnectionLoss) {
         setInterval(function() {
             if (room.media != null) {
-                console.log('checking ' + (new Date().getTime() - lastRpcMessage.getTime()) + ' < '
-                    + ((room.media.duration * 1000) + 15000));
                 if (new Date().getTime() - lastRpcMessage.getTime() > 15000 + (room.media.duration * 1000)) {
-                    console.log('Suspected connection loss at ' + new Date());
+                    console.log('[IDLE] checking ' + (new Date().getTime() - lastRpcMessage.getTime()) + ' < '
+                        + ((room.media.duration * 1000) + 15000));
+                    console.log('[IDLE] Suspected connection loss at ' + new Date());
                     process.exit(1);
                 }
             } else {
                 if (new Date().getTime() - lastRpcMessage > 1800000) {
-                    console.log('Suspected connection loss at ' + new Date());
-                    console.log('No song playing.');
+                    console.log('[IDLE] checking ' + (new Date().getTime() - lastRpcMessage.getTime()) + ' < '
+                        + ((room.media.duration * 1000) + 15000));
+                    console.log('[IDLE] Suspected connection loss at ' + new Date());
+                    console.log('[IDLE] No song playing.');
                     process.exit(1);
                 }
             }
