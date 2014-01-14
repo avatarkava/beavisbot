@@ -72,7 +72,7 @@ function runBot(error, auth, updateCode) {
 
                 if (dbUser == undefined) {
                     message = config.responses.welcome.newUser.replace('{username}', data.username);
-                    if (config.friendNewUsers && data.relationship < 2) {
+                    if (config.fanNewUsers && data.relationship < 2) {
                         fanUser(data.id);
                     }
                 }
