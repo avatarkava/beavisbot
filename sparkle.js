@@ -218,6 +218,12 @@ function runBot(error, auth, updateCode) {
         });
     }
 
+    function getUserFromUsername(username, callback) {
+        db.get('SELECT * FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE username = ?', [username], function (error, row) {
+            callback(row);
+        });
+    }
+
     function monitorDJList() {
         //console.log(JSON.stringify(room.votes, null, 2));
 
