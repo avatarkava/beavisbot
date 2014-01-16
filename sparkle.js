@@ -241,10 +241,6 @@ function runBot(error, auth, updateCode) {
                 for (i = 1; i < room.djs.length; i++) {
                     dj = room.djs[i].user;
                     if (config.requireWootInLine && (room.votes[dj.id] == undefined || room.votes[dj.id] != '1')) {
-                        //db.get('SELECT * FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE userid = ?(dj, function(result) {
-                        //    console.log(result);
-                        //if(result['warns'] == 0) {
-                        //db.run('UPDATE DISCIPLINE SET warns = warns + 1 WHERE userid = ?', [dj.id]);
                         notWooting.push(dj.username);
                     }
                 }
@@ -255,8 +251,6 @@ function runBot(error, auth, updateCode) {
                 }
             }
         }
-
-        return notWooting;
 
     }
 
