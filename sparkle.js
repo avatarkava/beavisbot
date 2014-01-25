@@ -50,6 +50,9 @@ function runBot(error, auth, updateCode) {
         if (config.responses.botConnect !== "") {
             bot.chat(config.responses.botConnect);
         }
+        if (room.media != null && config.wootSongs == 'ALL') {
+            bot.upvote();
+        }
 
         room.users.forEach(function(user) { addUserToDb(user); });
 
