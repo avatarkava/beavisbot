@@ -3,11 +3,15 @@ var fs = require('fs');
 path = require('path')
 var config = require(path.resolve(__dirname, 'config.json'));
 
+// Temporarily broken by plug.dj method change in updateCode, so hard code it
+/*
 if (config.botinfo.auth != "") {
+    console.log("Using auth key: " + config.botinfo.auth);
     PlugAPI.getUpdateCode(config.botinfo.auth, config.roomName, function (err, updateCode) {
         runBot(err, config.botinfo.auth, updateCode);
     });
 }
+*//*
 else {
     PlugAPI.getAuth({
         username: config.botinfo.twitterUsername,
@@ -23,6 +27,9 @@ else {
         });
     });
 }
+*/
+
+runBot(false, config.botinfo.auth, 'p9R*');
 
 function runBot(error, auth, updateCode) {
     if(error) {
