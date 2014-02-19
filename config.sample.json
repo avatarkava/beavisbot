@@ -8,6 +8,7 @@
         "auth": "somereallylongstringofabout128chars-getfromyourbrowserasthe'usr'cookie"
     },
     "roomName": "yourroom-name",
+    "updateCode": "",
     "apiKeys": {
         "echoNest": "###",
         "lastFm": "lastFmApiKey",
