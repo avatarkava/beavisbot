@@ -1,7 +1,15 @@
 exports.names = ['.rules'];
 exports.hidden = false;
 exports.enabled = true;
-exports.matchStart = false;
+exports.matchStart = true;
 exports.handler = function (data) {
-    bot.chat(config.responses.rules);
+
+    var message = "";
+    var input = smartSplit(data.message, ' ', 1);
+    if (input.length > 1) {
+        message = input[1] + ' ';
+    }
+
+    message += config.responses.rules;
+    bot.chat(message);
 };
