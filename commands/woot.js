@@ -1,9 +1,17 @@
 exports.names = ['.woot'];
 exports.hidden = false;
 exports.enabled = true;
-exports.matchStart = false;
+exports.matchStart = true;
 exports.handler = function (data) {
     if (room.staff[data.fromID] > 0) {
-        bot.chat(config.responses.wootReminder);
+
+        var message = "";
+        var input = smartSplit(data.message, ' ', 1);
+        if (input.length > 1) {
+            message = input[1] + ' ';
+        }
+
+        message += config.responses.wootReminder;
+        bot.chat(message);
     }
 };

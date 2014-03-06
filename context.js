@@ -84,4 +84,46 @@ module.exports = function(options) {
         'zh': 'Chinese',
         'zu': 'Zulu'
     };
+
+    /**
+     * Annoying custom functionality
+     * @todo roll this into the core
+     */
+    timeSince = function(unixTimestamp) {
+
+        var seconds = Math.floor((new Date() - new Date(unixTimestamp*1000)) / 1000);
+
+        var interval = Math.floor(seconds / 31536000);
+
+        if (interval > 1) {
+            return interval + " years";
+        }
+        interval = Math.floor(seconds / 2592000);
+        if (interval > 1) {
+            return interval + " months";
+        }
+        interval = Math.floor(seconds / 86400);
+        if (interval > 1) {
+            return interval + " days";
+        }
+        interval = Math.floor(seconds / 3600);
+        if (interval > 1) {
+            return interval + " hours";
+        }
+        interval = Math.floor(seconds / 60);
+        if (interval > 1) {
+            return interval + " minutes";
+        }
+        return Math.floor(seconds) + " seconds";
+    }
+
+    smartSplit = function(str, separator, limit) {
+        str = str.split(separator);
+        if(str.length <= limit) return str;
+
+        var ret = str.splice(0, limit);
+        ret.push(str.join(separator));
+
+        return ret;
+    }
 };
