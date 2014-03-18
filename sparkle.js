@@ -1,4 +1,5 @@
 var PlugAPI = require('plugapi');
+var rateLimit = require('function-rate-limit');
 var fs = require('fs');
 path = require('path')
 var config = require(path.resolve(__dirname, 'config.json'));
@@ -96,8 +97,12 @@ function runBot(error, auth, updateCode) {
                     doWelcomeMessage = true;
                 }
 
+                var welcomeUser = rateLimit(1, 5000, function(message) {
+                    setTimeout(bot.chat(message), 5000);
+                })
+
                 if (doWelcomeMessage && message != "") {
-                    bot.chat(message);
+                    welcomeUser(message);
                 }
             });
         }

@@ -18,6 +18,7 @@
     "dependencies": {
         "plugapi": "*",
         "plug-dj-login": "*",
+        "function-rate-limit": "*",
         "request": "*",
         "sqlite3": "*",
         "string": "*",
