@@ -175,6 +175,13 @@ function runBot(error, auth, updateCode) {
             bot.upvote();
         }
 
+        // DOL Checks
+        if (room.media.author == 'U2') {
+            bot.chat(':boom:');
+        } else if (room.media.author == 'Extreme' || room.media.title == 'Winds of Change' || room.media.title == 'Under the Bridge') {
+            bot.chat('What is this dreck?');
+        }
+
         // Perform automatic song metadata correction
         if (room.media != null && config.autoSuggestCorrections) {
             correctMetadata();
