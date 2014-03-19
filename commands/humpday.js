@@ -1,4 +1,4 @@
-exports.names = ['.freespin'];
+exports.names = ['.humpday'];
 exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = false;
