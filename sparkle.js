@@ -98,7 +98,7 @@ function runBot(error, auth, updateCode) {
                 }
 
                 var welcomeUser = rateLimit(1, 5000, function(message) {
-                    setTimeout(bot.chat(message), 5000);
+                    setTimeout(function(){bot.chat(message)}, 5000);
                 })
 
                 if (doWelcomeMessage && message != "") {
@@ -142,7 +142,7 @@ function runBot(error, auth, updateCode) {
     });
     
     bot.on('dj_advance', function(data) {
-        console.log('New song: ', JSON.stringify(data, null, 2));
+        //console.log('New song: ', JSON.stringify(data, null, 2));
 
         // Write previous song data to DB
         // But only if the last song actually existed
@@ -184,7 +184,7 @@ function runBot(error, auth, updateCode) {
     });
     
     bot.on('djUpdate', function(data) {
-        console.log('DJ update', JSON.stringify(data, null, 2));
+        //console.log('DJ update', JSON.stringify(data, null, 2));
         room.djs = data.djs;
         
         lastRpcMessage = new Date();
