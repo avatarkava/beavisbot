@@ -1,4 +1,5 @@
 var PlugAPI = require('plugapi');
+var rateLimit = require('function-rate-limit');
 var fs = require('fs');
 path = require('path')
 var config = require(path.resolve(__dirname, 'config.json'));
@@ -96,8 +97,12 @@ function runBot(error, auth, updateCode) {
                     doWelcomeMessage = true;
                 }
 
+                var welcomeUser = rateLimit(1, 5000, function(message) {
+                    setTimeout(function(){bot.chat(message)}, 5000);
+                })
+
                 if (doWelcomeMessage && message != "") {
-                    bot.chat(message);
+                    welcomeUser(message);
                 }
             });
         }
@@ -137,7 +142,7 @@ function runBot(error, auth, updateCode) {
     });
     
     bot.on('dj_advance', function(data) {
-        console.log('New song: ', JSON.stringify(data, null, 2));
+        //console.log('New song: ', JSON.stringify(data, null, 2));
 
         // Write previous song data to DB
         // But only if the last song actually existed
@@ -179,7 +184,7 @@ function runBot(error, auth, updateCode) {
     });
     
     bot.on('djUpdate', function(data) {
-        console.log('DJ update', JSON.stringify(data, null, 2));
+        //console.log('DJ update', JSON.stringify(data, null, 2));
         room.djs = data.djs;
         
         lastRpcMessage = new Date();

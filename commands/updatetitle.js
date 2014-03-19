@@ -7,7 +7,7 @@ exports.handler = function(data) {
         var input = data.message.split(' ');
         var title = decodeURI(_.rest(input, 2).join(' '));
     
-        db.run('UPDATE SONGS SET title = ? WHERE id = ?', [title, input[1]],
+        db.run('UPDATE THEME SET title = ? WHERE id = ?', [title, input[1]],
             function(error) {
                 if (error) {
                     bot.chat('An error occurred.');
