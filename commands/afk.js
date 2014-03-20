@@ -10,7 +10,7 @@ exports.handler = function(data) {
 
         for (i = 0; i < room.djs.length; i++) {
             var dj = room.djs[i].user;
-            db.get("SELECT strftime('%s', 'now')-strftime('%s', lastSeen) AS 'secondsSinceLastVisit', lastSeen, username FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
+            db.get("SELECT strftime('%s', 'now')-strftime('%s', lastSeen) AS 'secondsSinceLastVisit', strftime('%s', lastSeen) AS 'lastSeen', username FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
                 if (row != null) {
                     if(row.secondsSinceLastVisit >= maxIdleTime) {
                         console.log('[IDLE] ' + row.username + ' visited '+ timeSince(row.lastSeen) + ' ago');
