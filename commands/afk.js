@@ -13,11 +13,11 @@ exports.handler = function(data) {
             db.get("SELECT strftime('%s', 'now')-strftime('%s', lastSeen) AS 'secondsSinceLastVisit', strftime('%s', lastSeen) AS 'lastSeen', username FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
                 if (row != null) {
                     if(row.secondsSinceLastVisit >= maxIdleTime) {
-                        console.log('[IDLE] ' + row.username + ' visited '+ timeSince(row.lastSeen) + ' ago');
+                        console.log('[IDLE] ' + row.username + ' last active '+ timeSince(row.lastSeen) + ' ago');
                         idleDJs.push(row.username + ' (' + timeSince(row.lastSeen) + ')');
                     }
                     else {
-                        console.log('[ACTIVE] ' + row.username + ' visited '+ timeSince(row.lastSeen) + ' ago');
+                        console.log('[ACTIVE] ' + row.username + ' last active '+ timeSince(row.lastSeen) + ' ago');
                     }
                 }
             });

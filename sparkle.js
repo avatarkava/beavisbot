@@ -99,7 +99,7 @@ function runBot(error, auth, updateCode) {
                     db.get("SELECT strftime('%s', 'now')-strftime('%s', lastSeen) AS 'secondsSinceLastVisit', lastSeen FROM USERS WHERE userid = ?", [data.id] , function (error, row) {
                         if (row != null) {
                             console.log('[JOIN] ' + data.username + ' visited '+ row.secondsSinceLastVisit + ' seconds ago (' + row.lastSeen + ')');
-                            if(row.secondsSinceLastVisit >= 300) {
+                            if(parseInt(row.secondsSinceLastVisit, 10) >= 300) {
                                 doWelcomeMessage = true;
                             }
                         }
