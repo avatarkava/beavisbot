@@ -92,14 +92,14 @@ function runBot(error, auth, updateCode) {
                 }
 
                 if (newUser && message && (config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
-                    bot.chat(message);
+                    setTimeout(function(){ bot.chat(message) }, 5000);
                 } else if (config.welcomeUsers == "ALL") {
                     // Don't welcome people repeatedly if they're throttling in and out of the room
                     db.get("SELECT strftime('%s', 'now')-strftime('%s', lastSeen) AS 'secondsSinceLastVisit', lastSeen FROM USERS WHERE userid = ?", [data.id] , function (error, row) {
                         if (row != null) {
                             console.log('[JOIN] ' + data.username + ' visited '+ row.secondsSinceLastVisit + ' seconds ago (' + row.lastSeen + ')');
                             if(row.secondsSinceLastVisit >= 300 && message) {
-                                bot.chat(message);
+                                setTimeout(function(){ bot.chat(message) }, 5000);
                             }
                         }
                     });
