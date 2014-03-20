@@ -9,13 +9,13 @@ exports.handler = function(data) {
         // Start at slot 1 (skip the current DJ)
         for (i = 1; i < room.djs.length; i++) {
             dj = room.djs[i].user;
-            db.get("SELECT strftime('%s', 'now')-strftime('%s', lastSeen) AS 'secondsSinceLastVisit', lastSeen FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
+            db.get("SELECT strftime('%s', 'now')-strftime('%s', lastSeen) AS 'secondsSinceLastVisit', lastSeen, username FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
                 if (row != null) {
                     if(row.secondsSinceLastVisit >= maxIdleTime) {
-                        console.log('[IDLE] ' + dj.username + ' visited '+ row.secondsSinceLastVisit + ' seconds ago (' + row.lastSeen + ')');
+                        console.log('[IDLE] ' + row.username + ' visited '+ row.secondsSinceLastVisit + ' seconds ago (' + row.lastSeen + ')');
                     }
                     else {
-                        console.log('[ACTIVE] ' + dj.username + ' visited '+ row.secondsSinceLastVisit + ' seconds ago (' + row.lastSeen + ')');
+                        console.log('[ACTIVE] ' + row.username + ' visited '+ row.secondsSinceLastVisit + ' seconds ago (' + row.lastSeen + ')');
                     }
                 }
             });

@@ -74,8 +74,9 @@ function runBot(error, auth, updateCode) {
     bot.on('user_join', function(data) {
         console.log('[JOIN] ' + data.username);
 
-        doWelcomeMessage = false;
-        newUser = false;
+        var doWelcomeMessage = false;
+        var newUser = false;
+        var message = "";
 
         if (data.username != config.botinfo.botname) {
             getUserFromDb(data, function (dbUser) {
