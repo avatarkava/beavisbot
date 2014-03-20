@@ -28,6 +28,10 @@ exports.handler = function(data) {
             var idleDJsList = idleDJs.join(' @');
             bot.chat('@' + idleDJsList + config.responses.activeDJReminder);
         }
+        else {
+            bot.chat('Everyone\'s currently active! :thumbsup:');
+        }
+
 
     }
 };
