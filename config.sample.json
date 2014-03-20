@@ -33,6 +33,7 @@
     "welcomeUsers": "ALL",
     "fanNewUsers": true,
     "wootSongs": "ALL",
-    "requireWootInLine": true,
-    "requireNoAfkInLine": false
+    "requireWootInLine": false,
+    "prohibitMehInLine": false,
+    "activeDJTimeoutMins": 60
 }
