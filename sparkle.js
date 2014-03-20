@@ -286,6 +286,31 @@ function runBot(error, auth, updateCode) {
                     bot.chat('@' + notWootingList + ' ' + config.responses.wootReminder);
                 }
             }
+
+            if (config.activeDJTimeoutMins > 0 && remaining <= 5) {
+                var maxIdleTime = config.activeDJTimeoutMins * 60;
+                var idleDJs = [];
+
+                for (i = 0; i < room.djs.length; i++) {
+                    var dj = room.djs[i].user;
+                    db.get("SELECT strftime('%s', 'now')-strftime('%s', lastSeen) AS 'secondsSinceLastVisit', strftime('%s', lastSeen) AS 'lastSeen', username FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
+                        if (row != null) {
+                            if(row.secondsSinceLastVisit >= maxIdleTime) {
+                                console.log('[IDLE] ' + row.username + ' last active '+ timeSince(row.lastSeen) + ' ago');
+                                idleDJs.push(row.username + ' (' + timeSince(row.lastSeen) + ')');
+                            }
+                            else {
+                                console.log('[ACTIVE] ' + row.username + ' last active '+ timeSince(row.lastSeen) + ' ago');
+                            }
+                        }
+                    });
+                }
+
+                if (idleDJs.length > 0) {
+                    var idleDJsList = idleDJs.join(' @');
+                    bot.chat('@' + idleDJsList + config.responses.activeDJReminder);
+                }
+            }
         }
 
     }
