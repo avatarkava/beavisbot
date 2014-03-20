@@ -1,6 +1,6 @@
 exports.names = ['.woot'];
 exports.hidden = false;
-exports.enabled = true;
+exports.enabled = false;
 exports.matchStart = true;
 exports.handler = function (data) {
     if (room.staff[data.fromID] > 1) {

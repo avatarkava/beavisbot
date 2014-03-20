@@ -25,8 +25,8 @@ exports.handler = function(data) {
         }
 
         if (idleDJs.length > 0) {
-            var idleDJsList = idleDJs.join(', ');
-            bot.chat('Currently idle: ' + idleDJsList);
+            var idleDJsList = idleDJs.join(' @');
+            bot.chat('@' + idleDJsList + config.responses.activeDJReminder);
         }
 
     }
