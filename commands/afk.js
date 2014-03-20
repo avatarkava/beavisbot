@@ -12,10 +12,10 @@ exports.handler = function(data) {
             db.get("SELECT strftime('%s', 'now')-strftime('%s', lastSeen) AS 'secondsSinceLastVisit', lastSeen FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
                 if (row != null) {
                     if(row.secondsSinceLastVisit >= maxIdleTime) {
-                        console.log('[IDLE] ' + data.username + ' visited '+ row.secondsSinceLastVisit + ' seconds ago (' + row.lastSeen + ')');
+                        console.log('[IDLE] ' + dj.username + ' visited '+ row.secondsSinceLastVisit + ' seconds ago (' + row.lastSeen + ')');
                     }
                     else {
-                        console.log('[ACTIVE] ' + data.username + ' visited '+ row.secondsSinceLastVisit + ' seconds ago (' + row.lastSeen + ')');
+                        console.log('[ACTIVE] ' + dj.username + ' visited '+ row.secondsSinceLastVisit + ' seconds ago (' + row.lastSeen + ')');
                     }
                 }
             });
