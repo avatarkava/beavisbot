@@ -1,8 +1,8 @@
 var PlugAPI = require('plugapi');
-var rateLimit = require('function-rate-limit');
 var fs = require('fs');
 path = require('path')
 var config = require(path.resolve(__dirname, 'config.json'));
+var runCount = 0;
 
 // Allow for hard-coding of the updateCode in case other methods are broken
 if (config.updateCode != "") {
@@ -62,53 +62,59 @@ function runBot(error, auth, updateCode) {
     bot.on('chat', function(data) {
         console.log('[CHAT] ' + data.from + ': ' + data.message);
         handleCommand(data);
+        db.run('UPDATE USERS SET lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [data.fromID]);
     });
     
     bot.on('emote', function(data) {
         console.log('[EMTE] ' + data.from + ': ' + data.from + ' ' + data.message);
         handleCommand(data);
+        db.run('UPDATE USERS SET lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [data.fromID]);
     });
     
     bot.on('user_join', function(data) {
         console.log('[JOIN] ' + data.username);
 
         doWelcomeMessage = false;
+        newUser = false;
 
-        if (data.username == config.botinfo.botname) {
-            doWelcomeMessage = false;
-        }
-        else {
+        if (data.username != config.botinfo.botname) {
             getUserFromDb(data, function (dbUser) {
 
                 if (dbUser == undefined) {
                     message = config.responses.welcome.newUser.replace('{username}', data.username);
+                    newUser = true;
                     if (config.fanNewUsers && data.relationship < 2) {
                         fanUser(data.id);
                     }
                 }
                 else {
                     message = config.responses.welcome.oldUser.replace('{username}', data.username);
-
                 }
 
-                if (config.welcomeUsers == "ALL") {
+                if (newUser && (config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
                     doWelcomeMessage = true;
-                } else if (config.welcomeUsers == "NEW" && newUser) {
-                    doWelcomeMessage = true;
+                } else if (config.welcomeUsers == "ALL") {
+                    // Don't welcome people repeatedly if they're throttling in and out of the room
+                    db.get("SELECT strftime('%s', 'now')-strftime('%s', lastSeen) AS 'secondsSinceLastVisit', lastSeen FROM USERS WHERE userid = ?", [data.id] , function (error, row) {
+                        if (row != null) {
+                            console.log('[JOIN] ' + data.username + ' visited '+ row.secondsSinceLastVisit + ' seconds ago (' + row.lastSeen + ')');
+                            if(row.secondsSinceLastVisit >= 300) {
+                                doWelcomeMessage = true;
+                            }
+                        }
+                    });
                 }
-
-                var welcomeUser = rateLimit(1, 5000, function(message) {
-                    setTimeout(function(){bot.chat(message)}, 5000);
-                })
 
                 if (doWelcomeMessage && message != "") {
-                    welcomeUser(message);
+                    bot.chat(message);
                 }
+
+                addUserToDb(data);
             });
         }
-
-        // Add to DB
-        addUserToDb(data);
+        else {
+            addUserToDb(data);
+        }
         
         room.users.push(data);
         
@@ -213,11 +219,24 @@ function runBot(error, auth, updateCode) {
                 bot.upvote();
             }
         }
+
+        // Check if we prohibit mehing for DJs in Line
+        if (config.prohibitMehInLine)
+        for (i = 1; i < room.djs.length; i++) {
+            dj = room.djs[i].user;
+            if (room.votes[dj.id] == '-1') {
+                bot.moderateRemoveDJ(dj.id);
+                getUserFromDb(dj, function (dbUser) {
+                    bot.chat('@' + dbUser.username + ', voting MEH while in line is prohibited.  Please check .rules for more info.');
+                });
+
+            }
+        }
         
         lastRpcMessage = new Date();
     });
 
-    if (config.requireWootInLine || config.requireNoAfkInLine) {
+    if (config.requireWootInLine || config.activeDJTimeoutMins > 0) {
         setInterval(function () {
             monitorDJList();
         }, 5000);
@@ -257,11 +276,11 @@ function runBot(error, auth, updateCode) {
             notWooting = [];
 
             // @todo - Add in flagging system so we warn one time but it can be *any* time < 60s
-            if (remaining <= 60 && remaining >= 55) {
+            if (config.requireWootInLine  && remaining <= 60 && remaining >= 55) {
                 // Start at slot 1 (skip the current DJ)
                 for (i = 1; i < room.djs.length; i++) {
                     dj = room.djs[i].user;
-                    if (config.requireWootInLine && (room.votes[dj.id] == undefined || room.votes[dj.id] != '1')) {
+                    if (room.votes[dj.id] != '1') {
                         notWooting.push(dj.username);
                     }
                 }
@@ -322,13 +341,18 @@ function runBot(error, auth, updateCode) {
         
         db.run('CREATE TABLE IF NOT EXISTS PLAYS (id INTEGER PRIMARY KEY AUTOINCREMENT, userid VARCHAR(255), songid VARCHAR(255), upvotes INTEGER, downvotes INTEGER, snags INTEGER, started TIMESTAMP, listeners INTEGER)');
 
-        db.run('CREATE TABLE IF NOT EXISTS THEMES (id INTEGER PRIMARY KEY AUTOINCREMENT, theme TEXT, userid VARCHAR(255), timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP);')
+        db.run('CREATE TABLE IF NOT EXISTS THEMES (id INTEGER PRIMARY KEY AUTOINCREMENT, theme TEXT, userid VARCHAR(255), timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP);');
         
         db.run('CREATE TABLE IF NOT EXISTS CHAT (id INTEGER PRIMARY KEY AUTOINCREMENT, message VARCHAR(255), userid VARCHAR(255), timestamp TIMESTAMP)');
 
         db.run('CREATE TABLE IF NOT EXISTS GIFTS (id INTEGER PRIMARY KEY AUTOINCREMENT, category VARCHAR(255), name VARCHAR(255), chat TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)');
 
         db.run('CREATE TABLE IF NOT EXISTS DISCIPLINE (userid VARCHAR(255) PRIMARY KEY, warns INTEGER, removes INTEGER, lastAction TIMESTAMP DEFAULT CURRENT_TIMESTAMP)');
+
+        db.run('CREATE TABLE IF NOT EXISTS CATFACTS (id integer PRIMARY KEY AUTOINCREMENT, fact varchar(255) NULL);');
+
+        db.run('CREATE TABLE IF NOT EXISTS SCOTT_PILGRIM (id integer PRIMARY KEY AUTOINCREMENT, quote varchar(255) NULL);');
+
     }
     
     function handleCommand(data) {
@@ -408,7 +432,7 @@ function runBot(error, auth, updateCode) {
     // since an RPC event, stop the bot.
     if (config.stopBotOnConnectionLoss) {
         setInterval(function() {
-            if (room.media != null) {
+            if (room.media != null && room.media.duration > 0) {
                 if (new Date().getTime() - lastRpcMessage.getTime() > 15000 + (room.media.duration * 1000)) {
                     console.log('[IDLE] checking ' + (new Date().getTime() - lastRpcMessage.getTime()) + ' < '
                         + ((room.media.duration * 1000) + 15000));
