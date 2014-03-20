@@ -241,7 +241,7 @@ function runBot(error, auth, updateCode) {
     function addUserToDb(user) {
         db.run('INSERT OR IGNORE INTO USERS VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
         [user.id, user.username, user.language, user.dateJoined.replace('T', ' '), user.avatarID]);
-        db.run('UPDATE USERS SET username = ?, language = ?, lastSeen = CURRENT_TIMESTAMP WHERE userid = ?' [user.username, user.language, user.id]);
+        db.run('UPDATE USERS SET username = ?, language = ?, lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [user.username, user.language, user.id]);
         db.run('INSERT OR IGNORE INTO DISCIPLINE VALUES(?, 0, 0, CURRENT_TIMESTAMP)', [user.id]);
 
     }
