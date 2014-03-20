@@ -62,13 +62,13 @@ function runBot(error, auth, updateCode) {
     bot.on('chat', function(data) {
         console.log('[CHAT] ' + data.from + ': ' + data.message);
         handleCommand(data);
-        db.run('UPDATE USERS SET lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [data.fromID]);
+        db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.fromID]);
     });
     
     bot.on('emote', function(data) {
         console.log('[EMTE] ' + data.from + ': ' + data.from + ' ' + data.message);
         handleCommand(data);
-        db.run('UPDATE USERS SET lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [data.fromID]);
+        db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.fromID]);
     });
     
     bot.on('user_join', function(data) {
@@ -95,10 +95,10 @@ function runBot(error, auth, updateCode) {
                     setTimeout(function(){ bot.chat(message) }, 5000);
                 } else if (config.welcomeUsers == "ALL") {
                     // Don't welcome people repeatedly if they're throttling in and out of the room
-                    db.get("SELECT strftime('%s', 'now')-strftime('%s', lastSeen) AS 'secondsSinceLastVisit', lastSeen FROM USERS WHERE userid = ?", [data.id] , function (error, row) {
+                    db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', lastActive FROM USERS WHERE userid = ?", [data.id] , function (error, row) {
                         if (row != null) {
-                            console.log('[JOIN] ' + data.username + ' visited '+ row.secondsSinceLastVisit + ' seconds ago (' + row.lastSeen + ')');
-                            if(row.secondsSinceLastVisit >= 300 && message) {
+                            console.log('[JOIN] ' + data.username + ' visited '+ row.secondsSinceLastActive + ' seconds ago (' + row.lastActive + ')');
+                            if(row.secondsSinceLastActive >= 300 && message) {
                                 setTimeout(function(){ bot.chat(message) }, 5000);
                             }
                         }
@@ -239,13 +239,11 @@ function runBot(error, auth, updateCode) {
     }
 
     function addUserToDb(user) {
-        db.run('INSERT OR REPLACE INTO USERS VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)', 
-        [user.id,
-        user.username,
-        user.language,
-        user.dateJoined.replace('T', ' '),
-        user.avatarID]);
+        db.run('INSERT OR IGNORE INTO USERS VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
+        [user.id, user.username, user.language, user.dateJoined.replace('T', ' '), user.avatarID]);
+        db.run('UPDATE USERS SET username = ?, language = ?, lastSeen = CURRENT_TIMESTAMP WHERE userid = ?' [user.username, user.language, user.id]);
         db.run('INSERT OR IGNORE INTO DISCIPLINE VALUES(?, 0, 0, CURRENT_TIMESTAMP)', [user.id]);
+
     }
 
     function getUserFromDb(user, callback) {
@@ -293,14 +291,14 @@ function runBot(error, auth, updateCode) {
 
                 for (i = 0; i < room.djs.length; i++) {
                     var dj = room.djs[i].user;
-                    db.get("SELECT strftime('%s', 'now')-strftime('%s', lastSeen) AS 'secondsSinceLastVisit', strftime('%s', lastSeen) AS 'lastSeen', username FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
+                    db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', strftime('%s', lastActive) AS 'lastActive', username FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
                         if (row != null) {
-                            if(row.secondsSinceLastVisit >= maxIdleTime) {
-                                console.log('[IDLE] ' + row.username + ' last active '+ timeSince(row.lastSeen) + ' ago');
-                                idleDJs.push(row.username + ' (' + timeSince(row.lastSeen) + ')');
+                            if(row.secondsSinceLastActive >= maxIdleTime) {
+                                console.log('[IDLE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
+                                idleDJs.push(row.username + ' (' + timeSince(row.lastActive) + ')');
                             }
                             else {
-                                console.log('[ACTIVE] ' + row.username + ' last active '+ timeSince(row.lastSeen) + ' ago');
+                                console.log('[ACTIVE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
                             }
                         }
                     });
@@ -356,7 +354,7 @@ function runBot(error, auth, updateCode) {
     }
     
     function initializeDatabase() {
-        db.run('CREATE TABLE IF NOT EXISTS USERS (userid VARCHAR(255) PRIMARY KEY, username VARCHAR(255), language VARCHAR(10), dateJoined TIMESTAMP, avatarID VARCHAR(255), lastSeen TIMESTAMP)');
+        db.run('CREATE TABLE IF NOT EXISTS USERS (userid VARCHAR(255) PRIMARY KEY, username VARCHAR(255), language VARCHAR(10), dateJoined TIMESTAMP, avatarID VARCHAR(255), lastSeen TIMESTAMP, lastActive TIMESTAMP)');
         
         db.run('CREATE TABLE IF NOT EXISTS SONGS (id VARCHAR(255) PRIMARY KEY, title VARCHAR(255), format VARCHAR(255), author VARCHAR(255), cid VARCHAR(255), duration DOUBLE)');
         
