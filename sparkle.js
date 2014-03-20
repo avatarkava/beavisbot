@@ -74,7 +74,6 @@ function runBot(error, auth, updateCode) {
     bot.on('user_join', function(data) {
         console.log('[JOIN] ' + data.username);
 
-        var doWelcomeMessage = false;
         var newUser = false;
         var message = "";
 
@@ -92,22 +91,18 @@ function runBot(error, auth, updateCode) {
                     message = config.responses.welcome.oldUser.replace('{username}', data.username);
                 }
 
-                if (newUser && (config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
-                    doWelcomeMessage = true;
+                if (newUser && message && (config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
+                    bot.chat(message);
                 } else if (config.welcomeUsers == "ALL") {
                     // Don't welcome people repeatedly if they're throttling in and out of the room
                     db.get("SELECT strftime('%s', 'now')-strftime('%s', lastSeen) AS 'secondsSinceLastVisit', lastSeen FROM USERS WHERE userid = ?", [data.id] , function (error, row) {
                         if (row != null) {
                             console.log('[JOIN] ' + data.username + ' visited '+ row.secondsSinceLastVisit + ' seconds ago (' + row.lastSeen + ')');
-                            if(parseInt(row.secondsSinceLastVisit, 10) >= 300) {
-                                doWelcomeMessage = true;
+                            if(row.secondsSinceLastVisit >= 300 && message) {
+                                bot.chat(message);
                             }
                         }
                     });
-                }
-
-                if (doWelcomeMessage && message != "") {
-                    bot.chat(message);
                 }
 
                 addUserToDb(data);
