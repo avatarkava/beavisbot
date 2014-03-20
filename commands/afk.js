@@ -12,7 +12,7 @@ exports.handler = function(data) {
             var dj = room.djs[i].user;
             db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', strftime('%s', lastActive) AS 'lastActive', username FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
                 if (row != null) {
-                    if(row.secondsSinceLastVisit >= maxIdleTime) {
+                    if(row.secondsSinceLastActive >= maxIdleTime) {
                         console.log('[IDLE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
                         idleDJs.push(row.username + ' (' + timeSince(row.lastActive) + ')');
                     }
