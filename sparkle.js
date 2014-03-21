@@ -302,11 +302,11 @@ function runBot(error, auth, updateCode) {
                             }
                         }
                     });
-                }
 
-                if (idleDJs.length > 0) {
-                    var idleDJsList = idleDJs.join(' @');
-                    bot.chat('@' + idleDJsList + config.responses.activeDJReminder);
+                    if (i == room.djs.length && idleDJs.length > 0) {
+                        var idleDJsList = idleDJs.join(' @');
+                        bot.chat('@' + idleDJsList + config.responses.activeDJReminder);
+                    }
                 }
             }
         }
