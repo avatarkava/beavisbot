@@ -188,6 +188,33 @@ function runBot(error, auth, updateCode) {
         if (room.media != null && config.autoSuggestCorrections) {
             correctMetadata();
         }
+
+        if (config.activeDJTimeoutMins > 0) {
+            var maxIdleTime = config.activeDJTimeoutMins * 60;
+            var idleDJs = [];
+            var z = 0;
+
+            for (i = 0; i < room.djs.length; i++) {
+                var dj = room.djs[i].user;
+                db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', strftime('%s', lastActive) AS 'lastActive', username FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
+                    z++;
+                    if (row != null) {
+                        if(row.secondsSinceLastActive >= maxIdleTime) {
+                            console.log('[IDLE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
+                            idleDJs.push(row.username);
+                        }
+                        else {
+                            console.log('[ACTIVE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
+                        }
+
+                        if (z == room.djs.length && idleDJs.length > 0) {
+                            var idleDJsList = idleDJs.join(' @');
+                            bot.chat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
+                        }
+                    }
+                });
+            }
+        }
         
         lastRpcMessage = new Date();
     });
@@ -282,33 +309,6 @@ function runBot(error, auth, updateCode) {
                     notWootingList = notWooting.join(' @');
                     console.log('Not wooting: @' + notWootingList);
                     bot.chat('@' + notWootingList + ' ' + config.responses.wootReminder);
-                }
-            }
-
-            if (config.activeDJTimeoutMins > 0 && remaining <= 5) {
-                var maxIdleTime = config.activeDJTimeoutMins * 60;
-                var idleDJs = [];
-                z = 0;
-
-                for (i = 0; i < room.djs.length; i++) {
-                    var dj = room.djs[i].user;
-                    db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', strftime('%s', lastActive) AS 'lastActive', username FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
-                        z++;
-                        if (row != null) {
-                            if(row.secondsSinceLastActive >= maxIdleTime) {
-                                console.log('[IDLE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
-                                idleDJs.push(row.username);
-                            }
-                            else {
-                                console.log('[ACTIVE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
-                            }
-
-                            if (z == room.djs.length && idleDJs.length > 0) {
-                                var idleDJsList = idleDJs.join(' @');
-                                bot.chat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
-                            }
-                        }
-                    });
                 }
             }
 
