@@ -288,27 +288,30 @@ function runBot(error, auth, updateCode) {
             if (config.activeDJTimeoutMins > 0 && remaining <= 5) {
                 var maxIdleTime = config.activeDJTimeoutMins * 60;
                 var idleDJs = [];
+                z = 0;
 
                 for (i = 0; i < room.djs.length; i++) {
                     var dj = room.djs[i].user;
                     db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', strftime('%s', lastActive) AS 'lastActive', username FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
+                        z++;
                         if (row != null) {
                             if(row.secondsSinceLastActive >= maxIdleTime) {
                                 console.log('[IDLE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
-                                idleDJs.push(row.username + ' (' + timeSince(row.lastActive) + ')');
+                                idleDJs.push(row.username);
                             }
                             else {
                                 console.log('[ACTIVE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
                             }
+
+                            if (z == room.djs.length && idleDJs.length > 0) {
+                                var idleDJsList = idleDJs.join(' @');
+                                bot.chat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
+                            }
                         }
                     });
-
-                    if (i == room.djs.length && idleDJs.length > 0) {
-                        var idleDJsList = idleDJs.join(' @');
-                        bot.chat('@' + idleDJsList + config.responses.activeDJReminder);
-                    }
                 }
             }
+
         }
 
     }
