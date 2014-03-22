@@ -100,6 +100,7 @@ function runBot(error, auth, updateCode) {
                             console.log('[JOIN] ' + data.username + ' visited '+ row.secondsSinceLastActive + ' seconds ago (' + row.lastActive + ')');
                             if(row.secondsSinceLastActive >= 300 && message) {
                                 setTimeout(function(){ bot.chat(message) }, 5000);
+                                db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
                             }
                         }
                     });

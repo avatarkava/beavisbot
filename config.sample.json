@@ -26,6 +26,8 @@
         },
         "rules": "Rules: http://someurl.com.",
         "theme": "No current theme. Spin any track released from 1978-2002 under 7 mins.  See .rules for more.",
+        "activeDJReminder": "Are you still here?  Looks like you've been AFK for more than an hour.  We require DJs in the wait list be active participants in chat. :smile:",
+        "activeDJRemoveMessage": "Everyone is welcome to AFK and listen to the music but we ask that if you wish to DJ you must be able to at the very least respond to an @ mention in chat.",
         "wootReminder": "Help us maintain an active, positive environment! Wooting all songs while in line to DJ is required. For auto-woot info, click the music note at the top left of the page."
     },
     "autoSuggestCorrections": false,
