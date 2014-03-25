@@ -9,7 +9,7 @@ exports.handler = function(data) {
             username = input[1].substring(1);
             db.get('SELECT * FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE username = ?', [username], function (error, row) {
                 bot.moderateRemoveDJ(row.userid);
-                bot.chat(input[1] + ' Everyone is welcome to AFK and listen to the music but we ask that if you wish to DJ you must be able to at the very least respond to an @ mention in chat.')
+                bot.chat('@' + username + ' Everyone is welcome to AFK and listen to the music but we ask that if you wish to DJ you must be able to at the very least respond to an @ mention in chat.');
                 console.log('Removing ' + input[1] + ' from list: ' + row.userid);
             });
         }
