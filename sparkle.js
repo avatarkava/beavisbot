@@ -193,9 +193,9 @@ function runBot(error, auth, updateCode) {
         if (config.activeDJTimeoutMins > 0) {
             var maxIdleTime = config.activeDJTimeoutMins * 60;
             var idleDJs = [];
-            var z = 0;
+            var z = 1;
 
-            for (i = 0; i < room.djs.length; i++) {
+            for (i = 1; i < room.djs.length; i++) {
                 var dj = room.djs[i].user;
                 db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', strftime('%s', lastActive) AS 'lastActive', username FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
                     z++;
