@@ -243,19 +243,6 @@ function runBot(error, auth, updateCode) {
                 bot.upvote();
             }
         }
-
-        // Check if we prohibit mehing for DJs in Line
-        if (config.prohibitMehInLine)
-        for (i = 1; i < room.djs.length; i++) {
-            dj = room.djs[i].user;
-            if (room.votes[dj.id] == '-1') {
-                bot.moderateRemoveDJ(dj.id);
-                getUserFromDb(dj, function (dbUser) {
-                    bot.chat('@' + dbUser.username + ', voting MEH while in line is prohibited.  Please check .rules for more info.');
-                });
-
-            }
-        }
         
         lastRpcMessage = new Date();
     });
@@ -310,6 +297,20 @@ function runBot(error, auth, updateCode) {
                     notWootingList = notWooting.join(' @');
                     console.log('Not wooting: @' + notWootingList);
                     bot.chat('@' + notWootingList + ' ' + config.responses.wootReminder);
+                }
+            }
+
+            // Check if we prohibit mehing for DJs in Line
+            if (config.prohibitMehInLine) {
+                for (i = 1; i < room.djs.length; i++) {
+                    dj = room.djs[i].user;
+                    if (room.votes[dj.id] == '-1') {
+                        bot.moderateRemoveDJ(dj.id);
+                        getUserFromDb(dj, function (dbUser) {
+                            bot.chat('@' + dbUser.username + ', voting MEH while in line is prohibited.  Please check .rules for more info.');
+                        });
+
+                    }
                 }
             }
 

@@ -10,7 +10,7 @@ exports.handler = function(data) {
             db.get('SELECT * FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE username = ?', [username], function (error, row) {
                 bot.moderateRemoveDJ(row.userid);
                 if(input[0] == '.rmafk' || input[0] == '.rmidle') {
-                    bot.chat(input[1] + ' Everyone is welcome to listen to the music but we ask that if you wish to DJ you be able to at least respond to an @ mention in chat.');
+                    bot.chat(input[1] + ' ' + config.responses.activeDJRemoveMessage);
                 }
                 console.log('Removing ' + input[1] + ' from list: ' + row.userid);
             });
