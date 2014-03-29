@@ -51,6 +51,6 @@ exports.handler = function (data) {
         "Roads, {sender}? Where we're going, we don't need roads."
     ];
     var randomIndex = Math.floor(Math.random() * strings.length);
-    var message = string[randomIndex];
+    var message = strings[randomIndex];
     bot.chat(message.replace('{sender}', data.from));
 };
