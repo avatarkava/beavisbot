@@ -13,7 +13,7 @@ exports.handler = function (data) {
             theme = config.responses.theme;
         }
 
-        db.run('INSERT INTO THEMES (theme, userid, timestamp) VALUES (?, ?, CURRENT_TIMESTAMP)', [theme, data.fromID],
+        db.run('REPLACE INTO SETTINGS (name, value, userid, timestamp) VALUES (?, ?, ?, CURRENT_TIMESTAMP)', ['theme', theme, data.fromID],
             function(error) {
                 if (error) {
                     bot.chat('/me An error occurred.');
@@ -25,7 +25,7 @@ exports.handler = function (data) {
             });
     }
     else {
-        db.get("SELECT theme, username, strftime('%s', timestamp) AS 'lastUpdate' FROM THEMES t INNER JOIN USERS ON t.userid = USERS.userid ORDER BY id DESC LIMIT 1", [], function (error, row) {
+        db.get("SELECT name AS 'theme', username, strftime('%s', timestamp) AS 'lastUpdate' FROM SETTINGS s INNER JOIN USERS ON s.userid = USERS.userid WHERE name = ? ORDER BY id DESC LIMIT 1", [], function (error, row) {
             if (row != null) {
                 message = row.theme;
                 if(room.staff[data.fromID] > 1) {
