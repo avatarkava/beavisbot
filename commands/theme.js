@@ -25,7 +25,7 @@ exports.handler = function (data) {
             });
     }
     else {
-        db.get("SELECT name AS 'theme', username, strftime('%s', timestamp) AS 'lastUpdate' FROM SETTINGS s INNER JOIN USERS ON s.userid = USERS.userid WHERE name = ? LIMIT 1", ['theme'], function (error, row) {
+        db.get("SELECT value AS 'theme', username, strftime('%s', timestamp) AS 'lastUpdate' FROM SETTINGS s INNER JOIN USERS ON s.userid = USERS.userid WHERE name = ? LIMIT 1", ['theme'], function (error, row) {
             if (row != null) {
                 message = row.theme;
                 if(room.staff[data.fromID] > 1) {
