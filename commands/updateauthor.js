@@ -10,7 +10,7 @@ exports.handler = function(data) {
         db.run('UPDATE SONGS SET author = ? WHERE id = ?', [artist, input[1]],
             function(error) {
                 if (error) {
-                    bot.chat('An error occurred.');
+                    bot.chat('An error occurred.  Usage: .updateartist [artistname] [songid]');
                     console.log('Error while updating song ' + input[1], error);
                 } else {
                     bot.chat('Author updated.')

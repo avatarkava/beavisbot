@@ -307,7 +307,7 @@ function runBot(error, auth, updateCode) {
                     if (room.votes[dj.id] == '-1') {
                         bot.moderateRemoveDJ(dj.id);
                         getUserFromDb(dj, function (dbUser) {
-                            bot.chat('@' + dbUser.username + ', voting MEH while in line is prohibited.  Please check .rules for more info.');
+                            bot.chat('@' + dbUser.username + ', voting MEH/Chato/:down_arrow: while in line is prohibited.  Please wait until the song ends or change your vote before joining again.  Check .rules for more info.');
                         });
 
                     }
