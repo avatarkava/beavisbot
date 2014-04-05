@@ -2,7 +2,7 @@
 
 exports.names = ['hugs ' + config.botinfo.botname];
 exports.hidden = false;
-exports.enabled = false;
+exports.enabled = true;
 exports.matchStart = false;
 exports.handler = function (data) {
     if (Math.random() < 0.3) {
