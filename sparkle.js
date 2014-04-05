@@ -373,7 +373,7 @@ function runBot(error, auth, updateCode) {
 
         db.run('CREATE TABLE IF NOT EXISTS DISCIPLINE (userid VARCHAR(255) PRIMARY KEY, warns INTEGER, removes INTEGER, lastAction TIMESTAMP DEFAULT CURRENT_TIMESTAMP)');
 
-        db.run('CREATE TABLE IF NOT EXISTS CATFACTS (id integer PRIMARY KEY AUTOINCREMENT, fact varchar(255) NULL);');
+        db.run('CREATE TABLE IF NOT EXISTS FACTS (id integer PRIMARY KEY AUTOINCREMENT, category VARCHAR(255), fact varchar(255) NULL);');
 
         db.run('CREATE TABLE IF NOT EXISTS SCOTT_PILGRIM (id integer PRIMARY KEY AUTOINCREMENT, quote varchar(255) NULL);');
 
