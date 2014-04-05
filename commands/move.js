@@ -9,6 +9,7 @@ exports.handler = function(data) {
             username = input[1].substring(1);
             position = parseInt(input[2]);
             db.get('SELECT * FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE username = ?', [username], function (error, row) {
+                bot.addDJ(row.userid);
                 bot.moveDJ(row.userid, parseInt(input[2]));
                 console.log('Moving ' + input[1] + ' to position: ' + input[2]);
             });
