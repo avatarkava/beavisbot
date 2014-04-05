@@ -7,7 +7,8 @@ exports.handler = function (data) {
         'http://static.wixstatic.com/media/a07b92_537fd27edabf4722a7673f5c824c29f6.gif',
         'http://www.thecoast.ca/images/blogimages/2011/02/16/1297864255-taco.gif',
         'http://userserve-ak.last.fm/serve/_/79772399/Nyan%20Cat%20TacoCatnyancat26042543500484.gif',
-        'http://www.lolwithme.org/wp-content/uploads/tacocat.jpg'
+        'http://www.lolwithme.org/wp-content/uploads/tacocat.jpg',
+        'http://i.imgur.com/lSiZUtB.jpg'
     ];
     var randomIndex = Math.floor(Math.random() * strings.length);
     bot.chat(strings[randomIndex]);

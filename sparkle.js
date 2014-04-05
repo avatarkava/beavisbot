@@ -154,7 +154,7 @@ function runBot(error, auth, updateCode) {
                     
             db.run('INSERT INTO PLAYS (userid, songid, upvotes, downvotes, snags, started, listeners) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)',
                 [room.currentDJ, 
-                room.media.id, 
+                room.media.id,
                 _.values(room.votes).filter(function(vote) { return vote == 1; }).length, 
                 _.values(room.votes).filter(function(vote) { return vote == -1; }).length, 
                 _.values(room.curates).length, 
