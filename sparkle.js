@@ -83,9 +83,6 @@ function runBot(error, auth, updateCode) {
                 if (dbUser == undefined) {
                     message = config.responses.welcome.newUser.replace('{username}', data.username);
                     newUser = true;
-                    if (config.fanNewUsers && data.relationship < 2) {
-                        fanUser(data.id);
-                    }
                 }
                 else {
                     message = config.responses.welcome.oldUser.replace('{username}', data.username);
@@ -317,20 +314,6 @@ function runBot(error, auth, updateCode) {
 
         }
 
-    }
-
-    function fanUser(user) {
-        var request = require('request');
-        request({
-            uri: "http://plug.dj/_/gateway/user.follow",
-            method: 'POST',
-            form: {
-                service: "user.follow",
-                body: [user.id]
-            }
-        }, function (error, response, body) {
-            console.log('[FAN] Added ' + user.username);
-        });
     }
 
     function initializeModules(auth, updateCode) {

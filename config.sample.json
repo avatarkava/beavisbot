@@ -33,7 +33,6 @@
     "autoSuggestCorrections": false,
     "stopBotOnConnectionLoss": true,
     "welcomeUsers": "ALL",
-    "fanNewUsers": true,
     "wootSongs": "ALL",
     "requireWootInLine": false,
     "prohibitMehInLine": false,
