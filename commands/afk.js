@@ -16,7 +16,7 @@ exports.handler = function(data) {
                 if (row != null) {
                     if(row.secondsSinceLastActive >= maxIdleTime) {
                         console.log('[IDLE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
-                        idleDJs.push(row.username + '(' + timeSince(row.lastActive) = ')');
+                        idleDJs.push(row.username + ' (' + timeSince(row.lastActive) + ')');
                     }
                     else {
                         console.log('[ACTIVE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
@@ -24,8 +24,8 @@ exports.handler = function(data) {
 
                     if (z == room.djs.length) {
                         if(idleDJs.length > 0) {
-                            var idleDJsList = idleDJs.join(', @');
-                            bot.chat('@' + idleDJsList);
+                            var idleDJsList = idleDJs.join(', ');
+                            bot.chat('Currently idle: ' + idleDJsList);
                         }
                         else {
                             bot.chat('Everyone\'s currently active! :thumbsup:');
