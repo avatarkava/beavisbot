@@ -5,14 +5,14 @@ exports.matchStart = true;
 exports.handler = function(data) {
     if (room.staff[data.fromID] > 1) {
         var input = data.message.split(' ');
-        if (input.length == 3 && input[1].substring(0,1) == '@') {
-            username = input[1].substring(1);
-            position = parseInt(input[2]);
-            db.get('SELECT * FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE username = ?', [username], function (error, row) {
+        if (input.length >= 3) {
+            var username = _.rest(input, 1)..pop().join(' ');
+            position = parseInt(_.last(input, 1));
+            db.get('SELECT * FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE username = ?', [username.substring(1)], function (error, row) {
                 bot.moderateAddDJ(row.userid, function() {
-                    bot.moveDJ(row.userid, parseInt(input[2]));
+                    bot.moveDJ(row.userid, position);
                 });
-                console.log('Moving ' + input[1] + ' to position: ' + input[2]);
+                console.log('Moving ' + username + ' to position: ' + position);
             });
         }
     }
