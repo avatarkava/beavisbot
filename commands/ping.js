@@ -1,6 +1,6 @@
 exports.names = ['.ping'];
 exports.hidden = true;
-exports.enabled = true;
+exports.enabled = false;
 exports.matchStart = false;
 exports.handler = function (data) {
     var rand = Math.random();
