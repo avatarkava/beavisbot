@@ -16,18 +16,20 @@ exports.handler = function(data) {
                 if (row != null) {
                     if(row.secondsSinceLastActive >= maxIdleTime) {
                         console.log('[IDLE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
-                        idleDJs.push(row.username);
+                        idleDJs.push(row.username + '(' + timeSince(row.lastActive) = ')');
                     }
                     else {
                         console.log('[ACTIVE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
                     }
 
-                    if (z == room.djs.length && idleDJs.length > 0) {
-                        var idleDJsList = idleDJs.join(' @');
-                        bot.chat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
-                    }
-                    else {
-                        bot.chat('Everyone\'s currently active! :thumbsup:');
+                    if (z == room.djs.length) {
+                        if(idleDJs.length > 0) {
+                            var idleDJsList = idleDJs.join(', @');
+                            bot.chat('@' + idleDJsList);
+                        }
+                        else {
+                            bot.chat('Everyone\'s currently active! :thumbsup:');
+                        }
                     }
                 }
             });
