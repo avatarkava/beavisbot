@@ -87,8 +87,12 @@ function runBot(error, auth) {
         lastRpcMessage = new Date();
     })
     
-    bot.on('userLeave', function(data) {       
-        bot.log('[LEAVE]', 'User left: ' + data);
+    bot.on('userLeave', function(data) {
+        getUserFromDb(data, function (user) {
+            if(user) {
+                bot.log('[LEAVE]', 'User left: ' + data);
+            }
+        });
         db.run('UPDATE OR IGNORE USERS SET lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
         lastRpcMessage = new Date();
     });
@@ -99,13 +103,19 @@ function runBot(error, auth) {
     });
     
     bot.on('curateUpdate', function(data) {
-        bot.log('[GRAB]', data + ' grabbed this song');
+        var user = _.findWhere(bot.getUsers(), {id: data.id});
+        if (user) {
+            bot.log('[GRAB]', user.username + ' grabbed this song');
+        }
         db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
         lastRpcMessage = new Date();
     });
 
     bot.on('voteUpdate', function(data) {
-        bot.log('[VOTE]', data + ' voted ' + data.vote);
+        var user = _.findWhere(bot.getUsers(), {id: data.id});
+        if (user) {
+            bot.log('[VOTE]', user.username + ' voted ' + data.vote);
+        }
         lastRpcMessage = new Date();
     });
     
