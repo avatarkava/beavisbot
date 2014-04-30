@@ -2,7 +2,7 @@ module.exports = function(options) {
     var PlugAPI = require('plugapi');
     var sqlite3 = require('sqlite3').verbose();
     
-    bot = new PlugAPI(options.auth, options.updateCode); 
+    bot = new PlugAPI(options.auth);
     config = options.config;
     db = new sqlite3.Database(path.resolve(__dirname, 'sparkle.sqlite'));
     package = require(path.resolve(__dirname, 'package.json'));
@@ -86,8 +86,7 @@ module.exports = function(options) {
     };
 
     /**
-     * Annoying custom functionality
-     * @todo roll this into the core
+     * Custom functions accessible to commands
      */
     timeSince = function(unixTimestamp) {
 
@@ -115,15 +114,5 @@ module.exports = function(options) {
             return interval + " minutes";
         }
         return Math.floor(seconds) + " seconds";
-    }
-
-    smartSplit = function(str, separator, limit) {
-        str = str.split(separator);
-        if(str.length <= limit) return str;
-
-        var ret = str.splice(0, limit);
-        ret.push(str.join(separator));
-
-        return ret;
     }
 };

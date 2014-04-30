@@ -4,6 +4,7 @@ exports.enabled = true;
 exports.matchStart = false;
 exports.handler = function (data) {
     if (room.staff[data.fromID] > 1) {
-        bot.chat(data.from + ', you rolled a ' + Math.ceil(Math.random() * 6) + '!');
+        var roll = _.random(1, 6);
+        bot.sendChat(data.from + ', you rolled a ' + roll + '!');
     }
 };

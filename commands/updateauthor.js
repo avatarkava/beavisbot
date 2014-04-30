@@ -3,7 +3,7 @@ exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function(data) {
-    if (room.staff[data.fromID] > 1) {
+    if (_.findWhere(room.users, {id: data.fromID}).permission > 1) {
         var input = data.message.split(' ');
         var artist = _.rest(input, 2).join(' ');
 
@@ -12,18 +12,18 @@ exports.handler = function(data) {
                 db.run('UPDATE SONGS SET author = ? WHERE id = ?', [artist, input[1]],
                     function(error) {
                         if (error) {
-                            bot.chat('An error occurred.');
-                            console.log('Error while updating song ' + input[1], error);
+                            bot.sendChat('An error occurred.');
+                            bot.log('Error while updating song ' + input[1], error);
                         } else {
-                            bot.chat('Artist updated.')
+                            bot.sendChat('Artist updated.')
                         }
                     });
             }
             else {
-                bot.chat('Song not found for update.  Usage: .updateartist [songid] [artist]');
+                bot.sendChat('Song not found for update.  Usage: .updateartist [songid] [artist]');
             }
         });
     } else {
-        bot.chat('Only managers and hosts are allowed to update song metadata.');
+        bot.sendChat('Only managers and hosts are allowed to update song metadata.');
     }
 };

@@ -17,7 +17,6 @@
     },
     "dependencies": {
         "plugapi": "*",
-        "plug-dj-login": "*",
         "request": "*",
         "sqlite3": "*",
         "string": "*",

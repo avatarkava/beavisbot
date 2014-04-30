@@ -3,5 +3,5 @@ exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;
 exports.handler = function (data) {
-    bot.chat('http://i.imgur.com/GEt9OOv.gif');
+    bot.sendChat('http://i.imgur.com/GEt9OOv.gif');
 };

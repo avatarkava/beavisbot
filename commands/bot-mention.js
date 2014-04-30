@@ -52,5 +52,5 @@ exports.handler = function (data) {
     ];
     var randomIndex = Math.floor(Math.random() * strings.length);
     var message = strings[randomIndex];
-    bot.chat(message.replace('{sender}', data.from));
+    bot.sendChat(message.replace('{sender}', data.from));
 };

@@ -4,18 +4,19 @@ exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function (data) {
 
-    var input = smartSplit(data.message, ' ', 1);
-    if (input.length < 2) {
-        bot.chat('/me usage: .lastseen @username');
+    var params = _.rest(data.message.split(' '), 1);
+    if (params.length < 1) {
+        bot.sendChat('/me usage: .lastseen @username');
         return;
     }
-    username = input[1].substring(1);
+
+    username = params.join(' ').trim().substring(1);
 
     db.get("SELECT strftime('%s', lastSeen) AS 'lastSeen' FROM USERS WHERE username = ?", [username], function (error, row) {
         if (row != null) {
-            bot.chat(username + ' was last seen ' + timeSince(row.lastSeen) + ' ago.');
+            bot.sendChat(username + ' was last seen ' + timeSince(row.lastSeen) + ' ago.');
         } else {
-            bot.chat(username + ' was not found.');
+            bot.sendChat(username + ' was not found.');
         }
     });
 };

@@ -9,26 +9,28 @@ exports.handler = function(data) {
         var idleDJs = [];
         var z = 1;
 
+        waitlist = bot.getDJs().splice(1);
+
         for (i = 1; i < room.djs.length; i++) {
             var dj = room.djs[i].user;
             db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', strftime('%s', lastActive) AS 'lastActive', username FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
                 z++;
                 if (row != null) {
                     if(row.secondsSinceLastActive >= maxIdleTime) {
-                        console.log('[IDLE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
+                        bot.log('[IDLE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
                         idleDJs.push(row.username + ' (' + timeSince(row.lastActive) + ')');
                     }
                     else {
-                        console.log('[ACTIVE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
+                        bot.log('[ACTIVE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
                     }
 
                     if (z == room.djs.length) {
                         if(idleDJs.length > 0) {
                             var idleDJsList = idleDJs.join(', ');
-                            bot.chat('Currently idle: ' + idleDJsList);
+                            bot.sendChat('Currently idle: ' + idleDJsList);
                         }
                         else {
-                            bot.chat('Everyone\'s currently active! :thumbsup:');
+                            bot.sendChat('Everyone\'s currently active! :thumbsup:');
                         }
                     }
                 }

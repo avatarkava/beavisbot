@@ -7,7 +7,7 @@ exports.handler = function (data) {
     var input = data.message.split(' ');
     var theme = _.rest(input, 1).join(' ');
 
-    if (room.staff[data.fromID] > 2 && theme) {
+    if (_.findWhere(room.users, {id: data.fromID}).permission > 2 && theme) {
 
         if(theme == 'reset' || theme == 'clear') {
             theme = config.responses.theme;
@@ -16,11 +16,11 @@ exports.handler = function (data) {
         db.run('REPLACE INTO SETTINGS (name, value, userid, timestamp) VALUES (?, ?, ?, CURRENT_TIMESTAMP)', ['theme', theme, data.fromID],
             function(error) {
                 if (error) {
-                    bot.chat('/me An error occurred.');
-                    console.log('Error while updating theme. ', error);
+                    bot.sendChat('An error occurred.');
+                    bot.log('Error while updating theme. ', error);
                 } else {
-                    console.log("[THEME] " + theme);
-                    bot.chat('/me Theme updated.')
+                    bot.log("[THEME] " + theme);
+                    bot.sendChat('Theme updated, ' + data.from)
                 }
             });
     }
@@ -28,13 +28,13 @@ exports.handler = function (data) {
         db.get("SELECT value AS 'theme', username, strftime('%s', timestamp) AS 'lastUpdate' FROM SETTINGS s INNER JOIN USERS ON s.userid = USERS.userid WHERE name = ? LIMIT 1", ['theme'], function (error, row) {
             if (row != null) {
                 message = row.theme;
-                if(room.staff[data.fromID] > 1) {
+                if(_.findWhere(room.users, {id: data.fromID}).permission > 1) {
                     message += ' (set ' + timeSince(row.lastUpdate) + ' ago by ' + row.username + ')';
                 }
-                bot.chat('/me ' + message);
+                bot.sendChat('/me ' + message);
 
             } else {
-                bot.chat('/me ' + config.responses.theme);
+                bot.sendChat('/me ' + config.responses.theme);
             }
         });
     }

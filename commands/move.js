@@ -3,7 +3,7 @@ exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function(data) {
-    if (room.staff[data.fromID] > 1) {
+    if (_.findWhere(room.users, {id: data.fromID}).permission > 1) {
         var input = data.message.split(' ');
         if (input.length >= 3) {
             var username = _.rest(input, 1);
@@ -13,7 +13,7 @@ exports.handler = function(data) {
                 bot.moderateAddDJ(row.userid, function() {
                     bot.moveDJ(row.userid, position);
                 });
-                console.log('Moving ' + username + ' to position: ' + position);
+                bot.log('Moving ' + username + ' to position: ' + position);
             });
         }
     }

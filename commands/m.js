@@ -1,11 +1,10 @@
 // Instructs the bot to meh a song. Available to bouncers and higher.
-
-exports.names = ['.l', '.m'];
+exports.names = ['.m'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;
 exports.handler = function(data) {
-    if (room.staff[data.fromID] > 1) {
-        bot.downvote();
+    if (_.findWhere(room.users, {id: data.fromID}).permission > 1) {
+        bot.meh();
     }
 };

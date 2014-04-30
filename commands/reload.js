@@ -1,11 +1,11 @@
-exports.names = ['.reload'];
+exports.names = ['.reload','.reboot','.restart'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;
 exports.handler = function (data) {
-    if (room.staff[data.fromID] > 2) {
-        bot.chat("/me :wave: brb...");
-        console.log('[CHAT] Bot killed by ' + data.from);
+    if (_.findWhere(room.users, {id: data.fromID}).permission > 1) {
+        bot.sendChat("http://media.giphy.com/media/PllNNHVRrlVJe/giphy.gif");
+        bot.log('[KILL] Bot killed by ' + data.from);
         setTimeout(function () {
             process.exit(1);
         }, 3000);

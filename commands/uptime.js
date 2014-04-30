@@ -10,11 +10,13 @@ exports.handler = function (data) {
     cur = cur % 3600000;
     var minutes = Math.floor(cur / 60000);
     cur = cur % 60000;
-    var response = 'Uptime: ';
+    var response = '';
     if (days > 0) {
         response += days + ' days, ';
     }
-    response += (hours + ' hours, ' + minutes + ' minutes, '
-        + Math.floor(cur / 1000) + ' seconds.');
-    bot.chat(response);
+    if (hours > 0) {
+        response += hours + ' hours, ';
+    }
+    response += minutes + ' minutes, ' + Math.floor(cur / 1000) + ' seconds';
+    bot.sendChat(response);
 };

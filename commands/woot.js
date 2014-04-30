@@ -3,15 +3,15 @@ exports.hidden = false;
 exports.enabled = false;
 exports.matchStart = true;
 exports.handler = function (data) {
-    if (room.staff[data.fromID] > 1) {
+    if (_.findWhere(room.users, {id: data.fromID}).permission > 1) {
 
         var message = "";
-        var input = smartSplit(data.message, ' ', 1);
+        var input = _.rest(data.message.split(' '), 1).join(' ').trim();
         if (input.length > 1) {
-            message = input[1] + ' ';
+            message = input + ' ';
         }
 
         message += config.responses.wootReminder;
-        bot.chat(message);
+        bot.sendChat(message);
     }
 };
