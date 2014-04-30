@@ -7,12 +7,10 @@ exports.handler = function(data) {
 
         var maxIdleTime = config.activeDJTimeoutMins * 60;
         var idleDJs = [];
-        var z = 1;
+        var z = 0;
 
         waitlist = bot.getDJs().splice(1);
-
-        for (i = 1; i < room.djs.length; i++) {
-            var dj = room.djs[i].user;
+        waitlist.forEach(function(dj) {
             db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', strftime('%s', lastActive) AS 'lastActive', username FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
                 z++;
                 if (row != null) {
@@ -24,7 +22,7 @@ exports.handler = function(data) {
                         bot.log('[ACTIVE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
                     }
 
-                    if (z == room.djs.length) {
+                    if (z == waitlist.length) {
                         if(idleDJs.length > 0) {
                             var idleDJsList = idleDJs.join(', ');
                             bot.sendChat('Currently idle: ' + idleDJsList);
