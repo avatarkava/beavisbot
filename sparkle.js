@@ -93,7 +93,7 @@ function runBot(error, auth) {
         lastRpcMessage = new Date();
     })
     
-    bot.on('userLeave', function(data) {
+    bot.on('userLeave', function(data) {       
         bot.log('User left: ', data);
         db.run('UPDATE OR IGNORE USERS SET lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
         lastRpcMessage = new Date();
@@ -179,7 +179,7 @@ function runBot(error, auth) {
     });
     
     bot.on('djUpdate', function(data) {
-        bot.log('DJ update', JSON.stringify(data, null, 2));
+        //bot.log('DJ update', JSON.stringify(data, null, 2));
         lastRpcMessage = new Date();
     });
     

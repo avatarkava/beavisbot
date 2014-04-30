@@ -10,9 +10,14 @@ exports.handler = function(data) {
             username = _.initial(username, 1).join(' ').trim();
             var position = parseInt(_.last(input, 1));            
             db.get('SELECT * FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE username = ?', [username.substring(1)], function (error, row) {
-                bot.moderateAddDJ(row.userid, function() {
-                    bot.moveDJ(row.userid, position);
-                });
+                if (_.findWhere(room.djs, {id: row.userid})) {
+                    bot.moderateMoveDJ(row.userid, position);
+                } 
+                else {
+                    bot.moderateAddDJ(row.userid, function() {
+                        bot.moderateMoveDJ(row.userid, position);
+                    });
+                }
                 bot.log('Moving ' + username + ' to position: ' + position);
             });
         }
