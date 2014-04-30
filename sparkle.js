@@ -166,11 +166,11 @@ function runBot(error, auth) {
                         else {
                             bot.log('[ACTIVE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
                         }
+                    }
 
-                        if (z == waitlist.length && idleDJs.length > 0) {
-                            var idleDJsList = idleDJs.join(' @');
-                            bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
-                        }
+                    if (z == waitlist.length && idleDJs.length > 0) {
+                        var idleDJsList = idleDJs.join(' @');
+                        bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
                     }
                 });
             });
