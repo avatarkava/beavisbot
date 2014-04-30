@@ -106,6 +106,7 @@ function runBot(error, auth) {
     
     bot.on('curateUpdate', function(data) {
         bot.log('[GRAB]' + bot.getUsers().filter(function(user) { return user.id == data.id; })[0].username + ' grabbed this song');
+        db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
         lastRpcMessage = new Date();
     });
     
@@ -156,15 +157,15 @@ function runBot(error, auth) {
 
             waitlist = bot.getDJs().splice(1);
             waitlist.forEach(function(dj) {
-                z++;
                 db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', strftime('%s', lastActive) AS 'lastActive', username FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
+                    z++;
                     if (row != null) {
                         if(row.secondsSinceLastActive >= maxIdleTime) {
-                            bot.log('[IDLE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
+                            bot.log('[IDLE] ' + z + '. ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
                             idleDJs.push(row.username);
                         }
                         else {
-                            bot.log('[ACTIVE] ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
+                            bot.log('[ACTIVE] ' + z + '. ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
                         }
                     }
 
