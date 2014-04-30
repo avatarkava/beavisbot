@@ -43,12 +43,6 @@ function runBot(error, auth) {
         db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.fromID]);
     });
     
-    bot.on('emote', function(data) {
-        bot.log('[EMTE]', data.from + ': ' + data.from + ' ' + data.message);
-        handleCommand(data);
-        db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.fromID]);
-    });
-    
     bot.on('userJoin', function(data) {
         bot.log('[JOIN]', data.username);
 
@@ -105,8 +99,13 @@ function runBot(error, auth) {
     });
     
     bot.on('curateUpdate', function(data) {
-        bot.log('[GRAB]', bot.getUsers().filter(function(user) { return user.id == data.id; })[0].username + ' grabbed this song');
+        bot.log('[GRAB]', data + ' grabbed this song');
         db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
+        lastRpcMessage = new Date();
+    });
+
+    bot.on('voteUpdate', function(data) {
+        bot.log('[VOTE]', data + ' voted ' + data.vote);
         lastRpcMessage = new Date();
     });
     
@@ -178,14 +177,9 @@ function runBot(error, auth) {
         }
         lastRpcMessage = new Date();
     });
-    
+
     bot.on('djUpdate', function(data) {
         //bot.log('DJ update', JSON.stringify(data, null, 2));
-        lastRpcMessage = new Date();
-    });
-    
-    bot.on('voteUpdate', function(data) {
-        bot.log('[VOTE] ' + _.findWhere(bot.getUsers(), {id: data.id}).username + ' voted ' + data.vote);
         lastRpcMessage = new Date();
     });
 
