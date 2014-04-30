@@ -33,7 +33,7 @@ exports.handler = function(data) {
                     }
                 }
             });
-        }
+        });
 
     }
 };
