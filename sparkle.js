@@ -120,14 +120,21 @@ function runBot(error, auth) {
     });
     
     bot.on('djAdvance', function(data) {
-        //bot.log('djAdvance: ', JSON.stringify(data, null, 2));
+        if (config.verboseLogging) {
+            bot.log('djAdvance: ', JSON.stringify(data, null, 2));
+        }
         bot.log('[SONG]', data.media.author + ' - ' + data.media.title);
 
         // Write previous song data to DB
         // But only if the last song actually existed
         if (data.lastPlay != null) {
-            db.run('INSERT OR IGNORE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)', [data.lastPlay.media.id, data.lastPlay.media.title, data.lastPlay.media.format, data.lastPlay.media.author, data.lastPlay.media.cid, data.lastPlay.media.duration]);
-                    
+            db.run('INSERT OR IGNORE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)',
+                [data.lastPlay.media.id,
+                data.lastPlay.media.title,
+                data.lastPlay.media.format,
+                data.lastPlay.media.author,
+                data.lastPlay.media.cid,
+                data.lastPlay.media.duration]);
             db.run('INSERT INTO PLAYS (userid, songid, upvotes, downvotes, snags, started, listeners) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)',
                 [data.lastPlay.dj.id,
                 data.lastPlay.media.id,
@@ -189,7 +196,9 @@ function runBot(error, auth) {
     });
 
     bot.on('djUpdate', function(data) {
-        //bot.log('DJ update', JSON.stringify(data, null, 2));
+        if (config.verboseLogging) {
+            bot.log('DJ update', JSON.stringify(data, null, 2));
+        }
         lastRpcMessage = new Date();
     });
 
@@ -297,7 +306,9 @@ function runBot(error, auth) {
             room.users = bot.getUsers();
             room.media = bot.getMedia();
 
-            bot.log('[COMMAND]', JSON.stringify(data, null, 2));
+            if (config.verboseLogging) {
+                bot.log('[COMMAND]', JSON.stringify(data, null, 2));
+            }
 
             command.handler(data);
         }

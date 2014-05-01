@@ -35,5 +35,6 @@
     "wootSongs": "ALL",
     "requireWootInLine": false,
     "prohibitMehInLine": false,
-    "activeDJTimeoutMins": 60
+    "activeDJTimeoutMins": 60,
+    "verboseLogging": false
 }
