@@ -25,11 +25,11 @@ exports.handler = function (data) {
             });
     }
     else {
-        db.get("SELECT value AS 'theme', username, strftime('%s', timestamp) AS 'lastUpdate' FROM SETTINGS s INNER JOIN USERS ON s.userid = USERS.userid WHERE name = ? LIMIT 1", ['theme'], function (error, row) {
+        db.get("SELECT value AS 'theme', username, timestamp FROM SETTINGS s INNER JOIN USERS ON s.userid = USERS.userid WHERE name = ? LIMIT 1", ['theme'], function (error, row) {
             if (row != null) {
                 message = row.theme;
                 if(_.findWhere(room.users, {id: data.fromID}).permission > 1) {
-                    message += ' (set ' + timeSince(row.lastUpdate) + ' ago by ' + row.username + ')';
+                    message += ' (set ' + moment.utc(row.timestamp).fromNow() + ' by ' + row.username + ')';
                 }
                 bot.sendChat('/me ' + message);
 

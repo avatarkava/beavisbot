@@ -12,9 +12,9 @@ exports.handler = function (data) {
 
     username = params.join(' ').trim().substring(1);
 
-    db.get("SELECT strftime('%s', lastSeen) AS 'lastSeen' FROM USERS WHERE username = ?", [username], function (error, row) {
+    db.get("SELECT username, lastSeen FROM USERS WHERE username = ? COLLATE NOCASE", [username], function (error, row) {
         if (row != null) {
-            bot.sendChat(username + ' was last seen ' + timeSince(row.lastSeen) + ' ago.');
+            bot.sendChat(row.username + ' was seen ' + moment.utc(row.lastSeen).calendar() + '.');
         } else {
             bot.sendChat(username + ' was not found.');
         }

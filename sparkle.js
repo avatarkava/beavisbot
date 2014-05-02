@@ -123,11 +123,14 @@ function runBot(error, auth) {
         if (config.verboseLogging) {
             bot.log('djAdvance: ', JSON.stringify(data, null, 2));
         }
-        bot.log('[SONG]', data.media.author + ' - ' + data.media.title);
+
+        if(data.dj != null && data.media != null) {
+            bot.log('[SONG]', data.dj.user.username + ' played: ' + data.media.author + ' - ' + data.media.title);
+        }
 
         // Write previous song data to DB
         // But only if the last song actually existed
-        if (data.lastPlay != null) {
+        if (data.lastPlay != null && data.lastPlay.media != null) {
             db.run('INSERT OR IGNORE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)',
                 [data.lastPlay.media.id,
                 data.lastPlay.media.title,
@@ -144,53 +147,54 @@ function runBot(error, auth) {
                 data.lastPlay.score.listeners]);
         }
 
-        // @todo: Add support for other settings - for now, woot if it's set on ALL
-        if (data.media != null && config.wootSongs == 'ALL') {
-            bot.woot();
-        }
+        if (data.media != null) {
+            if (config.wootSongs == 'ALL') {
+                bot.woot();
+            }
 
-        // DOL Checks: Specific quirky bot messages (feel free to nuke)
-        if (data.media.author == 'U2') {
-            bot.sendChat(':boom:');
-        }
-        else if (data.media.author == 'Wing') {
-            bot.sendChat('OH MY GOD MY EARS! :hear_no_evil:')
-            bot.meh();
-        }
-        else if (data.media.author == 'Extreme' || data.media.title == 'Winds of Change' || data.media.title == 'Under the Bridge') {
-            bot.sendChat('What is this dreck?');
-        }
+            // DOL Checks: Specific quirky bot messages (feel free to nuke)
+            if (data.media.author == 'U2') {
+                bot.sendChat(':boom:');
+            }
+            else if (data.media.author == 'Wing') {
+                bot.sendChat('OH MY GOD MY EARS! :hear_no_evil:')
+                bot.meh();
+            }
+            else if (data.media.author == 'Extreme' || data.media.title == 'Winds of Change' || data.media.title == 'Under the Bridge') {
+                bot.sendChat('What is this dreck?');
+            }
 
-        // Perform automatic song metadata correction
-        if (data.media != null && config.autoSuggestCorrections) {
-            correctMetadata();
-        }
+            // Perform automatic song metadata correction
+            if (config.autoSuggestCorrections) {
+                correctMetadata();
+            }
 
-        if (config.activeDJTimeoutMins > 0) {
-            var maxIdleTime = config.activeDJTimeoutMins * 60;
-            var idleDJs = [];
-            var z = 0;
+            if (config.activeDJTimeoutMins > 0) {
+                var maxIdleTime = config.activeDJTimeoutMins * 60;
+                var idleDJs = [];
+                var z = 0;
 
-            waitlist = bot.getDJs().splice(1);
-            waitlist.forEach(function(dj) {
-                db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', strftime('%s', lastActive) AS 'lastActive', username FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
-                    z++;
-                    if (row != null) {
-                        if(row.secondsSinceLastActive >= maxIdleTime) {
-                            bot.log('[IDLE] ' + z + '. ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
-                            idleDJs.push(row.username);
+                waitlist = bot.getDJs().splice(1);
+                waitlist.forEach(function(dj) {
+                    db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', lastActive, username FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
+                        z++;
+                        if (row != null) {
+                            if(row.secondsSinceLastActive >= maxIdleTime) {
+                                bot.log('[IDLE] ' + z + '. ' + row.username + ' last active '+ moment.utc(row.lastActive).fromNow());
+                                idleDJs.push(row.username);
+                            }
+                            else {
+                                bot.log('[ACTIVE] ' + z + '. ' + row.username + ' last active '+ moment.utc(row.lastActive).fromNow());
+                            }
                         }
-                        else {
-                            bot.log('[ACTIVE] ' + z + '. ' + row.username + ' last active '+ timeSince(row.lastActive) + ' ago');
-                        }
-                    }
 
-                    if (z == waitlist.length && idleDJs.length > 0) {
-                        var idleDJsList = idleDJs.join(' @');
-                        bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
-                    }
+                        if (z == waitlist.length && idleDJs.length > 0) {
+                            var idleDJsList = idleDJs.join(' @');
+                            bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
+                        }
+                    });
                 });
-            });
+            }
         }
         lastRpcMessage = new Date();
     });

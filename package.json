@@ -20,7 +20,8 @@
         "request": "*",
         "sqlite3": "*",
         "string": "*",
-        "underscore": "*"
+        "underscore": "*",
+        "moment": "*"
     },
     "devDependencies": {},
     "optionalDependencies": {}
