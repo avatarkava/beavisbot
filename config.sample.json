@@ -36,5 +36,6 @@
     "requireWootInLine": false,
     "prohibitMehInLine": false,
     "activeDJTimeoutMins": 60,
+    "maxSongLengthSecs": 420,
     "verboseLogging": false
 }
