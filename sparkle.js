@@ -60,6 +60,15 @@ function runBot(error, auth) {
                     message = config.responses.welcome.oldUser.replace('{username}', data.username);
                 }
 
+                // Greet with the theme if it's not the default
+                db.get("SELECT value AS 'theme', username, timestamp FROM SETTINGS s INNER JOIN USERS ON s.userid = USERS.userid WHERE name = ? LIMIT 1", ['theme'], function (error, row) {
+                    if (row != null && row.theme != config.responses.theme) {
+                        regExp = new RegExp(/^(.*?)[.?!-;]\s/);
+                        matches = regExp.exec(row.theme);
+                        message += ' Theme: ' + matches[0] + ' .theme for details!';
+                    }
+                });
+
                 if (newUser && message && (config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
                     setTimeout(function(){ bot.sendChat(message) }, 5000);
                 } else if (config.welcomeUsers == "ALL") {
@@ -67,7 +76,7 @@ function runBot(error, auth) {
                     db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', lastActive FROM USERS WHERE userid = ?", [data.id] , function (error, row) {
                         if (row != null) {
                             bot.log('[JOIN] ' + data.username + ' visited '+ row.secondsSinceLastActive + ' seconds ago (' + row.lastActive + ')');
-                            if(row.secondsSinceLastActive >= 300 && message) {
+                            if(row.secondsSinceLastActive >= 600 && message) {
                                 setTimeout(function(){ bot.sendChat(message) }, 5000);
                                 db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
                             }
