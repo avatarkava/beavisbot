@@ -193,7 +193,7 @@ function runBot(error, auth) {
                             bot.log('[IDLE] ' + z + '. ' + row.username + ' last active '+ moment.utc(row.lastActive).fromNow());
                             if (row.warns > 0) {
                                 bot.moderateRemoveDJ(dj.id);
-                                bot.sendChat(row.username + ' ' + config.responses.activeDJRemoveMessage);
+                                bot.sendChat('@' + row.username + ' ' + config.responses.activeDJRemoveMessage);
                                 db.run('UPDATE DISCIPLINE SET warns = 0, removes = removes + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
                             }
                             else {
