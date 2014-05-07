@@ -185,13 +185,20 @@ function runBot(error, auth) {
 
             waitlist = bot.getDJs().splice(1);
             waitlist.forEach(function(dj) {
-                db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', lastActive, username FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
+                db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', lastActive, username, warns, removes FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE userid = ?", [dj.id] , function (error, row) {
                     z++;
                     if (row != null) {
 
                         if(row.secondsSinceLastActive >= maxIdleTime) {
                             bot.log('[IDLE] ' + z + '. ' + row.username + ' last active '+ moment.utc(row.lastActive).fromNow());
-                            idleDJs.push(row.username);
+                            if (row.warns > 0) {
+                                bot.moderateRemoveDJ(dj.id);
+                                bot.sendChat(row.username + ' ' + config.responses.activeDJRemoveMessage);
+                                db.run('UPDATE DISCIPLINE SET warns = 0, removes = removes + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
+                            }
+                            else {
+                                idleDJs.push(row.username);
+                            }
                         }
                         else {
                             if(dj.permission > 1) {
@@ -241,7 +248,7 @@ function runBot(error, auth) {
         db.run('INSERT OR IGNORE INTO USERS VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
         [user.id, user.username, user.language, user.dateJoined.replace('T', ' '), user.avatarID]);
         db.run('UPDATE USERS SET username = ?, language = ?, lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [user.username, user.language, user.id]);
-        db.run('INSERT OR IGNORE INTO DISCIPLINE VALUES(?, 0, 0, CURRENT_TIMESTAMP)', [user.id]);
+        db.run('INSERT OR IGNORE INTO DISCIPLINE VALUES(?, 0, 0, 0, CURRENT_TIMESTAMP)', [user.id]);
 
     }
 
@@ -300,7 +307,7 @@ function runBot(error, auth) {
         db.run('CREATE TABLE IF NOT EXISTS SETTINGS (name VARCHAR(255) PRIMARY KEY, value TEXT, userid VARCHAR(255), timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP);');
         db.run('CREATE TABLE IF NOT EXISTS CHAT (id INTEGER PRIMARY KEY AUTOINCREMENT, message VARCHAR(255), userid VARCHAR(255), timestamp TIMESTAMP)');
         db.run('CREATE TABLE IF NOT EXISTS GIFTS (id INTEGER PRIMARY KEY AUTOINCREMENT, category VARCHAR(255), name VARCHAR(255), chat TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)');
-        db.run('CREATE TABLE IF NOT EXISTS DISCIPLINE (userid VARCHAR(255) PRIMARY KEY, warns INTEGER, removes INTEGER, lastAction TIMESTAMP DEFAULT CURRENT_TIMESTAMP)');
+        db.run('CREATE TABLE IF NOT EXISTS DISCIPLINE (userid VARCHAR(255) PRIMARY KEY, warns INTEGER, removes INTEGER, kicks INTEGER, lastAction TIMESTAMP DEFAULT CURRENT_TIMESTAMP)');
         db.run('CREATE TABLE IF NOT EXISTS FACTS (id integer PRIMARY KEY AUTOINCREMENT, category VARCHAR(255), fact varchar(255) NULL);');
         db.run('CREATE TABLE IF NOT EXISTS SCOTT_PILGRIM (id integer PRIMARY KEY AUTOINCREMENT, quote varchar(255) NULL);');
     }

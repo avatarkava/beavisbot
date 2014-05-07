@@ -12,6 +12,7 @@ exports.handler = function(data) {
                 bot.moderateDeleteChat(data.chatID);
                 if(input[0] == '.rmafk' || input[0] == '.rmidle') {
                     bot.sendChat(username + ' ' + config.responses.activeDJRemoveMessage);
+                    db.run('UPDATE DISCIPLINE SET warns = 0, removes = removes + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [row.userid]);
                 }
                 bot.log('[REMOVE] ' + data.from + ' removed ' + username + ' from wait list');
             });
