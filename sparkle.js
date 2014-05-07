@@ -197,6 +197,7 @@ function runBot(error, auth) {
                                 db.run('UPDATE DISCIPLINE SET warns = 0, removes = removes + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
                             }
                             else {
+                                db.run('UPDATE DISCIPLINE SET warns = warns + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
                                 idleDJs.push(row.username);
                             }
                         }
