@@ -9,7 +9,7 @@ exports.handler = function(data) {
         var idleDJs = [];
         var z = 0;
 
-        waitlist = bot.getDJs();//.splice(1);
+        waitlist = bot.getDJs();
         waitlist.forEach(function(dj) {
             db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', lastActive, username FROM USERS WHERE userid = ?", [dj.id] , function (error, row) {
                 z++;

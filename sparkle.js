@@ -177,7 +177,7 @@ function runBot(error, auth) {
             var idleDJs = [];
             var z = 0;
 
-            waitlist = bot.getDJs().splice(1);
+            waitlist = bot.getWaitList();
             waitlist.forEach(function(dj) {
                 db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', lastActive, username, warns, removes FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE userid = ?", [dj.id] , function (error, row) {
                     z++;
@@ -259,7 +259,7 @@ function runBot(error, auth) {
     function monitorDJList() {
 
         if (config.prohibitMehInLine) {
-            waitlist = bot.getDJs().splice(1);
+            waitlist = bot.getWaitList();
             waitlist.forEach(function(dj) {
                 if (dj.vote == '-1') {
                     bot.moderateRemoveDJ(dj.id);
