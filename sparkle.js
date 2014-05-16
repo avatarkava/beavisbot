@@ -3,6 +3,7 @@ var fs = require('fs');
 path = require('path')
 var config = require(path.resolve(__dirname, 'config.json'));
 var runCount = 0;
+var startupTimestamp = new Date();
 
 if (config.botinfo.auth != "") {
     console.log("[INIT] Using auth key: " + config.botinfo.auth);
@@ -34,15 +35,15 @@ function runBot(error, auth) {
         }
 
         bot.getUsers().forEach(function(user) { addUserToDb(user); });
-        lastRpcMessage = new Date();
     });
 
     bot.on('chat', function(data) {
         bot.log('[CHAT]', data.from + ': ' + data.message);
         handleCommand(data);
         db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.fromID]);
+        db.run('UPDATE DISCIPLINE SET warns = 0 WHERE userid = ?', [data.fromID]);
     });
-    
+
     bot.on('userJoin', function(data) {
         bot.log('[JOIN]', data.username);
 
@@ -63,7 +64,7 @@ function runBot(error, auth) {
                 // Greet with the theme if it's not the default
                 db.get("SELECT value AS 'theme', username, timestamp FROM SETTINGS s INNER JOIN USERS ON s.userid = USERS.userid WHERE name = ? LIMIT 1", ['theme'], function (error, row) {
                     if (row != null && row.theme != config.responses.theme) {
-                        regExp = new RegExp(/^(.*?)[.?!-;]\s/);
+                        regExp = new RegExp(/^(.*?)[.?!-]\s/);
                         matches = regExp.exec(row.theme);
                         message += ' Theme: ' + matches[0] + ' .theme for details!';
                     }
@@ -90,12 +91,9 @@ function runBot(error, auth) {
         else {
             addUserToDb(data);
         }
-        
         room.users.push(data);
-        
-        lastRpcMessage = new Date();
     })
-    
+
     bot.on('userLeave', function(data) {
         getUserFromDb(data, function (user) {
             if(user) {
@@ -103,21 +101,18 @@ function runBot(error, auth) {
             }
         });
         db.run('UPDATE OR IGNORE USERS SET lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
-        lastRpcMessage = new Date();
     });
-    
+
     bot.on('userUpdate', function(data) {
         bot.log('User update: ', data);
-        lastRpcMessage = new Date();
     });
-    
+
     bot.on('curateUpdate', function(data) {
         var user = _.findWhere(bot.getUsers(), {id: data.id});
         if (user) {
             bot.log('[GRAB]', user.username + ' grabbed this song');
         }
         db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
-        lastRpcMessage = new Date();
     });
 
     bot.on('voteUpdate', function(data) {
@@ -125,9 +120,8 @@ function runBot(error, auth) {
         if (user) {
             bot.log('[VOTE]', user.username + ' voted ' + data.vote);
         }
-        lastRpcMessage = new Date();
     });
-    
+
     bot.on('djAdvance', function(data) {
         if (config.verboseLogging) {
             bot.log('djAdvance: ', JSON.stringify(data, null, 2));
@@ -169,7 +163,7 @@ function runBot(error, auth) {
                 bot.sendChat('OH MY GOD MY EARS! :hear_no_evil:')
                 bot.meh();
             }
-            else if (data.media.author == 'Extreme' || data.media.title == 'Winds of Change' || data.media.title == 'Under the Bridge') {
+            else if (data.media.author == 'Extreme' || data.media.title == 'To Be With You' || data.media.title == 'Winds of Change' || data.media.title == 'Under the Bridge') {
                 bot.sendChat('What is this dreck?');
             }
 
@@ -189,7 +183,8 @@ function runBot(error, auth) {
                     z++;
                     if (row != null) {
 
-                        if(row.secondsSinceLastActive >= maxIdleTime) {
+                        // Only bug idle people if the bot has been running for as long as the minimum idle time
+                        if(row.secondsSinceLastActive >= maxIdleTime && moment().isAfter(moment(startupTimestamp).add('minutes', config.activeDJTimeoutMins))) {
                             bot.log('[IDLE] ' + z + '. ' + row.username + ' last active '+ moment.utc(row.lastActive).fromNow());
                             if (row.warns > 0) {
                                 bot.moderateRemoveDJ(dj.id);
@@ -226,14 +221,12 @@ function runBot(error, auth) {
                 });
             });
         }
-        lastRpcMessage = new Date();
     });
 
     bot.on('djUpdate', function(data) {
         if (config.verboseLogging) {
             bot.log('DJ update', JSON.stringify(data, null, 2));
         }
-        lastRpcMessage = new Date();
     });
 
     if (config.requireWootInLine || config.activeDJTimeoutMins > 0) {
@@ -264,6 +257,7 @@ function runBot(error, auth) {
     }
 
     function monitorDJList() {
+
         if (config.prohibitMehInLine) {
             waitlist = bot.getDJs().splice(1);
             waitlist.forEach(function(dj) {
