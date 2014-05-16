@@ -177,8 +177,8 @@ function runBot(error, auth) {
             var idleDJs = [];
             var z = 0;
 
-            waitlist = bot.getWaitList();
-            waitlist.forEach(function(dj) {
+            idleWaitList = bot.getWaitList();
+            idleWaitList.forEach(function(dj) {
                 db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', lastActive, username, warns, removes FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE userid = ?", [dj.id] , function (error, row) {
                     z++;
                     if (row != null) {
@@ -204,7 +204,7 @@ function runBot(error, auth) {
                         }
                     }
 
-                    if (z == waitlist.length) {
+                    if (z == idleWaitList.length) {
 
                         if(idleDJs.length > 0) {
                             var idleDJsList = idleDJs.join(' @');
@@ -259,8 +259,8 @@ function runBot(error, auth) {
     function monitorDJList() {
 
         if (config.prohibitMehInLine) {
-            waitlist = bot.getWaitList();
-            waitlist.forEach(function(dj) {
+            mehWaitlist = bot.getWaitList();
+            mehWaitlist.forEach(function(dj) {
                 if (dj.vote == '-1') {
                     bot.moderateRemoveDJ(dj.id);
                     bot.sendChat('@' + dj.username + ', voting MEH/Chato/:thumbsdown: while in line is prohibited. Check .rules.');
