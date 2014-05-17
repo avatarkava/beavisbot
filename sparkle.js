@@ -17,10 +17,10 @@ function runBot(error, auth) {
     if(error) {
         console.log("[INIT] An error occurred: " + err);
         return;
-    } 
-    
+    }
+
     initializeModules(auth);
-    
+
     bot.connect(config.roomName);
 
     bot.on('roomJoin', function(data) {
@@ -56,10 +56,14 @@ function runBot(error, auth) {
                 if (dbUser == undefined) {
                     message = config.responses.welcome.newUser.replace('{username}', data.username);
                     newUser = true;
+                    bot.log('[JOIN] ' + data.username + ' is a first-time visitor to the room!');
                 }
                 else {
                     message = config.responses.welcome.oldUser.replace('{username}', data.username);
+                    bot.log('[JOIN] ' + data.username + ' last seen '+ dbUser.secondsSinceLastSeen + ' seconds ago (' + dbUser.lastSeen + ')');
                 }
+
+                db.run('UPDATE USERS SET lastSeen = CURRENT_TIMESTAMP, lastActive = CURRENT_TIMESTAMP, lastWaitListPosition = -1 WHERE userid = ?', [data.id]);
 
                 // Greet with the theme if it's not the default
                 db.get("SELECT value AS 'theme', username, timestamp FROM SETTINGS s INNER JOIN USERS ON s.userid = USERS.userid WHERE name = ? LIMIT 1", ['theme'], function (error, row) {
@@ -70,28 +74,26 @@ function runBot(error, auth) {
                     }
                 });
 
-                if (newUser && message && (config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
-                    setTimeout(function(){ bot.sendChat(message) }, 5000);
-                } else if (config.welcomeUsers == "ALL") {
-                    // Don't welcome people repeatedly if they're throttling in and out of the room
-                    db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', lastActive FROM USERS WHERE userid = ?", [data.id] , function (error, row) {
-                        if (row != null) {
-                            bot.log('[JOIN] ' + data.username + ' visited '+ row.secondsSinceLastActive + ' seconds ago (' + row.lastActive + ')');
-                            if(row.secondsSinceLastActive >= 600 && message) {
-                                setTimeout(function(){ bot.sendChat(message) }, 5000);
-                                db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
-                            }
-                        }
+                if (message && (config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
+                    if (newUser) {
+                        setTimeout(function(){ bot.sendChat(message) }, 5000);
+                    }
+                    else if(config.welcomeUsers == "ALL" && dbUser.secondsSinceLastSeen >= 600) {
+                        setTimeout(function(){ bot.sendChat(message) }, 5000);
+                    }
+                }
+
+                // Restore spot in line if user has been gone < 10 mins
+                if(dbUser.secondsSinceLastSeen <= 600 && dbUser.lastWaitListPosition != -1) {
+                    bot.moderateAddDJ(data.id, function() {
+                        bot.moderateMoveDJ(data.id, dbUser.lastWaitListPosition);
+                        bot.sendChat('I put you back in line, @' + data.username + ' :thumbsup:');
                     });
                 }
 
-                addUserToDb(data);
             });
-        }
-        else {
             addUserToDb(data);
         }
-        room.users.push(data);
     })
 
     bot.on('userLeave', function(data) {
@@ -129,6 +131,7 @@ function runBot(error, auth) {
 
         if(data.dj != null && data.media != null) {
             bot.log('[SONG]', data.dj.user.username + ' played: ' + data.media.author + ' - ' + data.media.title);
+            db.run('UPDATE USERS SET lastWaitListPosition = -1 WHERE userid = ?', [data.dj.user.id]);
         }
 
         // Write previous song data to DB
@@ -136,18 +139,18 @@ function runBot(error, auth) {
         if (data.lastPlay != null && data.lastPlay.media != null) {
             db.run('INSERT OR IGNORE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)',
                 [data.lastPlay.media.id,
-                data.lastPlay.media.title,
-                data.lastPlay.media.format,
-                data.lastPlay.media.author,
-                data.lastPlay.media.cid,
-                data.lastPlay.media.duration]);
+                    data.lastPlay.media.title,
+                    data.lastPlay.media.format,
+                    data.lastPlay.media.author,
+                    data.lastPlay.media.cid,
+                    data.lastPlay.media.duration]);
             db.run('INSERT INTO PLAYS (userid, songid, upvotes, downvotes, snags, started, listeners) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)',
                 [data.lastPlay.dj.id,
-                data.lastPlay.media.id,
-                data.lastPlay.score.positive,
-                data.lastPlay.score.negative,
-                data.lastPlay.score.curates,
-                data.lastPlay.score.listeners]);
+                    data.lastPlay.media.id,
+                    data.lastPlay.score.positive,
+                    data.lastPlay.score.negative,
+                    data.lastPlay.score.curates,
+                    data.lastPlay.score.listeners]);
         }
 
         if (data.media != null) {
@@ -179,13 +182,17 @@ function runBot(error, auth) {
 
             idleWaitList = bot.getWaitList();
             idleWaitList.forEach(function(dj) {
+
                 db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', lastActive, username, warns, removes FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE userid = ?", [dj.id] , function (error, row) {
                     z++;
+                    var position = bot.getWaitListPosition(dj.id);
+                    db.run('UPDATE USERS SET lastWaitListPosition = ? WHERE userid = ?', [position, dj.id]);
+
                     if (row != null) {
 
                         // Only bug idle people if the bot has been running for as long as the minimum idle time
                         if(row.secondsSinceLastActive >= maxIdleTime && moment().isAfter(moment(startupTimestamp).add('minutes', config.activeDJTimeoutMins))) {
-                            bot.log('[IDLE] ' + z + '. ' + row.username + ' last active '+ moment.utc(row.lastActive).fromNow());
+                            bot.log('[IDLE] ' + position + '. ' + row.username + ' last active '+ moment.utc(row.lastActive).fromNow());
                             if (row.warns > 0) {
                                 bot.moderateRemoveDJ(dj.id);
                                 bot.sendChat('@' + row.username + ' ' + config.responses.activeDJRemoveMessage);
@@ -200,7 +207,7 @@ function runBot(error, auth) {
                             if(dj.permission > 1) {
                                 roomHasActiveMods = true;
                             }
-                            bot.log('[ACTIVE] ' + z + '. ' + row.username + ' last active '+ moment.utc(row.lastActive).fromNow());
+                            bot.log('[ACTIVE] ' + position + '. ' + row.username + ' last active '+ moment.utc(row.lastActive).fromNow());
                         }
                     }
 
@@ -214,7 +221,7 @@ function runBot(error, auth) {
                         // Only police this if there aren't any mods around
                         if(!roomHasActiveMods && config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
                             bot.log('[SKIP] Skipped ' + data.dj.user.username + ' spinning a song of ' + data.media.duration + ' seconds');
-                            bot.sendChat('Sorry @' + data.dj.user.username + ', this song is over our maximum room length of ' + config.maxSongLengthSecs + ' seconds.');
+                            bot.sendChat('Sorry @' + data.dj.user.username + ', this song is over our maximum room length of ' + (config.maxSongLengthSecs / 60) + ' minutes.');
                             bot.moderateForceSkip();
                         }
                     }
@@ -228,7 +235,11 @@ function runBot(error, auth) {
             bot.log('DJ update', JSON.stringify(data, null, 2));
         }
 
-        //db.run('UPDATE USERS SET lastWaitListPosition = ? WHERE userid = ?', [x, data.id]);
+        curUserList = bot.getUsers();
+        curUserList.forEach(function(dj) {
+            var position = bot.getWaitListPosition(dj.id);
+            db.run('UPDATE USERS SET lastWaitListPosition = ? WHERE userid = ?', [position, dj.id]);
+        });
     });
 
     if (config.requireWootInLine || config.activeDJTimeoutMins > 0) {
@@ -241,15 +252,15 @@ function runBot(error, auth) {
     bot.on('error', reconnect);
 
     function addUserToDb(user) {
-        db.run('INSERT OR IGNORE INTO USERS VALUES (?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
-        [user.id, user.username, user.language, user.dateJoined.replace('T', ' '), user.avatarID]);
+        db.run('INSERT OR IGNORE INTO USERS VALUES (?, ?, ?, ?, ?, -1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
+            [user.id, user.username, user.language, user.dateJoined.replace('T', ' '), user.avatarID]);
         db.run('UPDATE USERS SET username = ?, language = ?, lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [user.username, user.language, user.id]);
         db.run('INSERT OR REPLACE INTO DISCIPLINE VALUES(?, 0, 0, 0, CURRENT_TIMESTAMP)', [user.id]);
 
     }
 
     function getUserFromDb(user, callback) {
-        db.get('SELECT * FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE userid = ?', [user.id], function (error, row) {
+        db.get("SELECT *, strftime('%s', 'now')-strftime('%s', lastSeen) AS 'secondsSinceLastSeen', strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive' FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE userid = ?", [user.id], function (error, row) {
             callback(row);
         });
     }
@@ -274,11 +285,11 @@ function runBot(error, auth) {
     function initializeModules(auth) {
         // load context
         require(path.resolve(__dirname, 'context.js'))({auth: auth, config: config});
-        
+
         // Allow bot to perform multi-line chat
         bot.multiLine = true;
         bot.multiLineLimit = 5;
-        
+
         // Load commands
         try {
             fs.readdirSync(path.resolve(__dirname, 'commands')).forEach(function(file) {
@@ -293,10 +304,10 @@ function runBot(error, auth) {
         } catch (e) {
             console.error('Unable to load command: ', e);
         }
-        
+
         initializeDatabase();
     }
-    
+
     function initializeDatabase() {
         db.run('CREATE TABLE IF NOT EXISTS USERS (userid VARCHAR(255) PRIMARY KEY, username VARCHAR(255), language VARCHAR(10), dateJoined TIMESTAMP, avatarID VARCHAR(255), lastWaitListPosition INTEGER, lastSeen TIMESTAMP, lastActive TIMESTAMP)');
         db.run('CREATE TABLE IF NOT EXISTS SONGS (id VARCHAR(255) PRIMARY KEY, title VARCHAR(255), format VARCHAR(255), author VARCHAR(255), cid VARCHAR(255), duration DOUBLE)');
@@ -308,7 +319,7 @@ function runBot(error, auth) {
         db.run('CREATE TABLE IF NOT EXISTS FACTS (id integer PRIMARY KEY AUTOINCREMENT, category VARCHAR(255), fact varchar(255) NULL);');
         db.run('CREATE TABLE IF NOT EXISTS SCOTT_PILGRIM (id integer PRIMARY KEY AUTOINCREMENT, quote varchar(255) NULL);');
     }
-    
+
     function handleCommand(data) {
         // unescape message
         data.message = S(data.message).unescapeHTML().s;
@@ -318,8 +329,8 @@ function runBot(error, auth) {
         data.message = data.message.replace(/&amp;/g, '\&');
         data.message = data.message.replace(/&lt;/gi, '\<');
         data.message = data.message.replace(/&gt;/gi, '\>');
-        
-        var command = commands.filter(function(cmd) { 
+
+        var command = commands.filter(function(cmd) {
             var found = false;
             for (i = 0; i < cmd.names.length; i++) {
                 if (!found) {
@@ -328,7 +339,7 @@ function runBot(error, auth) {
             }
             return found;
         })[0];
-        
+
         if (command && command.enabled) {
 
             // @FIXME - not efficient, but convenient!
@@ -346,7 +357,7 @@ function runBot(error, auth) {
             botMentionResponse(data);
         }
     }
-    
+
     function correctMetadata() {
         media = bot.getMedia();
 
@@ -356,25 +367,25 @@ function runBot(error, auth) {
                 // if the song isn't in the db yet, check it for suspicious strings
                 artistTitlePair = S((media.author + ' ' + media.title).toLowerCase());
                 if (artistTitlePair.contains('official music video')
-                  || artistTitlePair.contains('lyrics')
-                  || artistTitlePair.contains('|')
-                  || artistTitlePair.contains('official video')
-                  || artistTitlePair.contains('[')
-                  || artistTitlePair.contains('"')
-                  || artistTitlePair.contains('*')
-                  || artistTitlePair.contains('(HD)')
-                  || artistTitlePair.contains('(HQ)')
-                  || artistTitlePair.contains('1080p')
-                  || artistTitlePair.contains('720p')
-                  || artistTitlePair.contains(' - ')
-                  || artistTitlePair.contains('full version')
-                  || artistTitlePair.contains('album version')) {
+                    || artistTitlePair.contains('lyrics')
+                    || artistTitlePair.contains('|')
+                    || artistTitlePair.contains('official video')
+                    || artistTitlePair.contains('[')
+                    || artistTitlePair.contains('"')
+                    || artistTitlePair.contains('*')
+                    || artistTitlePair.contains('(HD)')
+                    || artistTitlePair.contains('(HQ)')
+                    || artistTitlePair.contains('1080p')
+                    || artistTitlePair.contains('720p')
+                    || artistTitlePair.contains(' - ')
+                    || artistTitlePair.contains('full version')
+                    || artistTitlePair.contains('album version')) {
                     suggestNewSongMetadata(media.author + ' ' + media.title);
                 }
             }
         });
     }
-    
+
     function suggestNewSongMetadata(valueToCorrect) {
         media = bot.getMedia();
         request('http://developer.echonest.com/api/v4/song/search?api_key=' + config.apiKeys.echoNest + '&format=json&results=1&combined=' + S(valueToCorrect).escapeHTML().stripPunctuation().s, function(error, response, body) {
@@ -384,15 +395,15 @@ function runBot(error, auth) {
                 bot.log('EchoNest error', error);
             } else {
                 response = JSON.parse(body).response;
-                    
+
                 room.media.suggested = {
                     author: response.songs[0].artist_name,
                     title: response.songs[0].title
                 };
-                
+
                 // log
                 bot.log('[EchoNest] Original: "' + media.author + '" - "' + media.title + '". Suggestion: "' + room.media.suggested.author + '" - "' + room.media.suggested.title);
-                
+
                 if (media.author != room.media.suggested.author || media.title != room.media.suggested.title) {
                     bot.sendChat('Hey, the metadata for this song looks wrong! Suggested Artist: "' + room.media.suggested.author + '". Title: "' + room.media.suggested.title + '". Type ".fixsong yes" to use the suggested tags.');
                 }
