@@ -228,6 +228,10 @@ function runBot(error, auth) {
                 });
             });
         }
+
+        // Cleanup functions
+        db.run("UPDATE USERS SET lastWaitListPosition = -1 WHERE strftime('%s', 'now')-strftime('%s', lastSeen) > 600");
+
     });
 
     bot.on('djUpdate', function(data) {
