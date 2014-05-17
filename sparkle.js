@@ -84,9 +84,12 @@ function runBot(error, auth) {
                 }
 
                 // Restore spot in line if user has been gone < 10 mins
-                if(!newUser && dbUser.secondsSinceLastSeen <= 600 && dbUser.lastWaitListPosition != -1) {
+                var currentPosition = bot.getWaitListPosition(data.id);
+                if(!newUser && dbUser.secondsSinceLastSeen <= 600 && dbUser.lastWaitListPosition != -1 && currentPosition != dbUser.lastWaitListPosition) {
                     bot.moderateAddDJ(data.id, function() {
-                        bot.moderateMoveDJ(data.id, dbUser.lastWaitListPosition + 1);
+                        if(currentPosition != dbUser.lastWaitListPosition) {
+                            bot.moderateMoveDJ(data.id, dbUser.lastWaitListPosition + 1);
+                        }
                         bot.sendChat('I put you back in line, @' + data.username + ' :thumbsup:');
                     });
                 }
@@ -230,7 +233,8 @@ function runBot(error, auth) {
         }
 
         // Cleanup functions
-        db.run("UPDATE USERS SET lastWaitListPosition = -1 WHERE strftime('%s', 'now')-strftime('%s', lastSeen) > 600");
+        // @FIXME - Can't use this since it will remove people while they're in a long line
+        //db.run("UPDATE USERS SET lastWaitListPosition = -1 WHERE strftime('%s', 'now')-strftime('%s', lastSeen) > 600");
 
     });
 
