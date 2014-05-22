@@ -182,6 +182,7 @@ function runBot(error, auth) {
             var idleDJs = [];
             var z = 0;
 
+
             idleWaitList = bot.getWaitList();
             idleWaitList.forEach(function(dj) {
 
