@@ -27,7 +27,9 @@ $bot_id = '52cc583f3e083e226a242efd';
         ],
         "rule": {
             "#chat .welcome": {
-                "border": "3px dashed #ac76ff"
+                "background-color": "rgba(24, 0, 38, 0.75)",
+                "border": "3px dashed #ac76ff",
+                "padding": "5px 2px 5px 25px""
             },
             "#chat .message:nth-child(2n+1),#chat .mention:nth-child(2n+1),#chat .skip:nth-child(2n+1),#chat .moderation:nth-child(2n+1),#chat .emote:nth-child(2n+1),#chat .update:nth-child(2n+1),#chat .welcome:nth-child(2n+1)": {
                 "background-color": "rgba(17, 19, 23, 0.75)"
@@ -39,10 +41,9 @@ $bot_id = '52cc583f3e083e226a242efd';
             "#chat .from-<?=$bot_id?> .from.staff.clickable": {
             },
             ".from-<?=$bot_id?> .icon-chat-manager": {
-                "background": "url('http://beavisbot.phpmonkeys.com/icons/beavis_icon.png')"
+                "background": "url('http://beavisbot.phpmonkeys.com/images/icons/beavis_icon.png')"
             },
             "#chat .from-<?=$bot_id?> .from": {
-                "color": "#fff !important"
             },
             "#chat .emote.from-<?=$bot_id?> .text": {
                 "font-style": "normal",
@@ -56,11 +57,11 @@ $bot_id = '52cc583f3e083e226a242efd';
         "icons": {
             "admin": "",
             "ambassador": "",
-            "bouncer": "http://beavisbot.phpmonkeys.com/icons/shell_green.png",
-            "cohost": "http://beavisbot.phpmonkeys.com/icons/star.png",
-            "residentdj": "http://beavisbot.phpmonkeys.com/icons/mushroom.png",
-            "host": "http://beavisbot.phpmonkeys.com/icons/star.png",
-            "manager": "http://beavisbot.phpmonkeys.com/icons/flowerpower.png"
+            "bouncer": "http://beavisbot.phpmonkeys.com/images/icons/shellgreen.png",
+            "cohost": "http://beavisbot.phpmonkeys.com/images/icons/star.png",
+            "residentdj": "http://beavisbot.phpmonkeys.com/images/icons/mushroom.png",
+            "host": "http://beavisbot.phpmonkeys.com/images/icons/star.png",
+            "manager": "http://beavisbot.phpmonkeys.com/images/icons/flowerpower.png"
         },
         "playback": "http://i.imgur.com/8xFgQmU.png"
     },
