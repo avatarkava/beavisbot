@@ -39,7 +39,7 @@ $bot_id = '52cc583f3e083e226a242efd';
             "#chat .from-<?=$bot_id?> .from.staff.clickable": {
             },
             ".from-<?=$bot_id?> .icon-chat-manager": {
-                "background": "url('http://beavisbot.phpmonkeys.com/images/beavis_icon.png')"
+                "background": "url('http://beavisbot.phpmonkeys.com/icons/beavis_icon.png')"
             },
             "#chat .from-<?=$bot_id?> .from": {
                 "color": "#fff !important"
@@ -56,11 +56,11 @@ $bot_id = '52cc583f3e083e226a242efd';
         "icons": {
             "admin": "",
             "ambassador": "",
-            "bouncer": "",
-            "cohost": "",
-            "residentdj": "",
-            "host": "",
-            "manager": ""
+            "bouncer": "http://beavisbot.phpmonkeys.com/icons/shell_green.png",
+            "cohost": "http://beavisbot.phpmonkeys.com/icons/star.png",
+            "residentdj": "http://beavisbot.phpmonkeys.com/icons/mushroom.png",
+            "host": "http://beavisbot.phpmonkeys.com/icons/star.png",
+            "manager": "http://beavisbot.phpmonkeys.com/icons/flowerpower.png"
         },
         "playback": "http://i.imgur.com/8xFgQmU.png"
     },
