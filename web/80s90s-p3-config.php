@@ -26,26 +26,27 @@ $bot_id = '52cc583f3e083e226a242efd';
         "import": [
         ],
         "rule": {
+            "#chat .welcome": {
+                "border-width": "3px dashed #ac76ff"
+            },
             "#chat .message:nth-child(2n+1),#chat .mention:nth-child(2n+1),#chat .skip:nth-child(2n+1),#chat .moderation:nth-child(2n+1),#chat .emote:nth-child(2n+1),#chat .update:nth-child(2n+1),#chat .welcome:nth-child(2n+1)": {
                 "background-color": "rgba(17, 19, 23, 0.75)"
             },
-            "#chat .emote.from-<?=$bot_id?>": {
+            "#chat .from-<?=$bot_id?>": {
                 "border-left": "#ac76ff 3px solid",
-                "background-color": "rgba(24, 0, 38, 0.9) !important"
+                "background-color": "rgba(24, 0, 38, 0.75) !important"
             },
-            ".emote.from-<?=$bot_id?> .from.staff.clickable": {
-                "display": "none"
+            "#chat .from-<?=$bot_id?> .from.staff.clickable": {
             },
-            ".emote.from-<?=$bot_id?> .icon-chat-manager": {
-                "display": "none"
+            ".from-<?=$bot_id?> .icon-chat-manager": {
+                "background": "url('http://beavisbot.phpmonkeys.com/images/beavis_icon.png')"
             },
-            "#chat .emote.from-<?=$bot_id?> .from": {
-                "color": "#ac76ff !important"
+            "#chat .from-<?=$bot_id?> .from": {
+                "color": "#fff !important"
             },
             "#chat .emote.from-<?=$bot_id?> .text": {
                 "font-style": "normal",
-                "font-weight": "bold",
-                "color": "#ac76ff"
+                "font-weight": "normal"
             }
         }
     },
