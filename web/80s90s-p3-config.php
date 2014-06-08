@@ -27,7 +27,7 @@ $bot_id = '52cc583f3e083e226a242efd';
         ],
         "rule": {
             "#chat .welcome": {
-                "border-width": "3px dashed #ac76ff"
+                "border": "3px dashed #ac76ff"
             },
             "#chat .message:nth-child(2n+1),#chat .mention:nth-child(2n+1),#chat .skip:nth-child(2n+1),#chat .moderation:nth-child(2n+1),#chat .emote:nth-child(2n+1),#chat .update:nth-child(2n+1),#chat .welcome:nth-child(2n+1)": {
                 "background-color": "rgba(17, 19, 23, 0.75)"
