@@ -29,6 +29,7 @@ $bot_id = '52cc583f3e083e226a242efd';
             "#chat .welcome": {
                 "background-color": "rgba(24, 0, 38, 0.75)",
                 "border": "3px dashed #ac76ff",
+                "font-weight": "bold",
                 "padding": "5px 2px 5px 25px""
             },
             "#chat .message:nth-child(2n+1),#chat .mention:nth-child(2n+1),#chat .skip:nth-child(2n+1),#chat .moderation:nth-child(2n+1),#chat .emote:nth-child(2n+1),#chat .update:nth-child(2n+1),#chat .welcome:nth-child(2n+1)": {
