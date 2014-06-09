@@ -26,29 +26,38 @@ $bot_id = '52cc583f3e083e226a242efd';
         "import": [
         ],
         "rule": {
-            "#chat .welcome": {
-                "background-color": "rgba(24, 0, 38, 0.75)",
-                "border": "3px dashed #ac76ff",
-                "font-weight": "bold",
-                "padding": "5px 2px 5px 25px""
+            "#chat .mention": {
+                "background-color": "rgba(24, 0, 38, 0.5) !important",
+                "border": "2px solid #1e75fb",
+                "border-left": "0px !important",
+                "border-right": "0px !important"
             },
-            "#chat .message:nth-child(2n+1),#chat .mention:nth-child(2n+1),#chat .skip:nth-child(2n+1),#chat .moderation:nth-child(2n+1),#chat .emote:nth-child(2n+1),#chat .update:nth-child(2n+1),#chat .welcome:nth-child(2n+1)": {
-                "background-color": "rgba(17, 19, 23, 0.75)"
+            "#chat .mention.is-staff": {
+                "border-color": "#ac76ff"
+            },
+            "#chat .welcome": {
+                "border": "3px dashed #1e75fb",
+                "font-weight": "bold",
+                "padding": "5px 2px 5px 25px"
             },
             "#chat .from-<?=$bot_id?>": {
-                "border-left": "#ac76ff 3px solid",
-                "background-color": "rgba(24, 0, 38, 0.75) !important"
+                "border-left": "#ac76ff 0px solid",
+                "background-color": "rgba(24, 0, 38, 0.5) !important"
             },
             "#chat .from-<?=$bot_id?> .from.staff.clickable": {
             },
             ".from-<?=$bot_id?> .icon-chat-manager": {
-                "background": "url('http://beavisbot.phpmonkeys.com/images/icons/beavis_icon.png')"
+                "background": "url('http://beavisbot.phpmonkeys.com/images/icons/beavis_icon.png') !important"
             },
             "#chat .from-<?=$bot_id?> .from": {
             },
-            "#chat .emote.from-<?=$bot_id?> .text": {
+            "#chat .from-<?=$bot_id?> .text": {
+                "color": "rgb(238, 238, 238) !important",
                 "font-style": "normal",
                 "font-weight": "normal"
+            },
+            "#chat .nxnotif": {
+                "border": "0 !important"
             }
         }
     },
@@ -58,11 +67,11 @@ $bot_id = '52cc583f3e083e226a242efd';
         "icons": {
             "admin": "",
             "ambassador": "",
-            "bouncer": "http://beavisbot.phpmonkeys.com/images/icons/shellgreen.png",
-            "cohost": "http://beavisbot.phpmonkeys.com/images/icons/star.png",
-            "residentdj": "http://beavisbot.phpmonkeys.com/images/icons/mushroom.png",
-            "host": "http://beavisbot.phpmonkeys.com/images/icons/star.png",
-            "manager": "http://beavisbot.phpmonkeys.com/images/icons/flowerpower.png"
+            "bouncer": "",
+            "cohost": "",
+            "residentdj": "",
+            "host": "",
+            "manager": ""
         },
         "playback": "http://i.imgur.com/8xFgQmU.png"
     },
