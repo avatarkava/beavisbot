@@ -90,13 +90,14 @@ function runBot(error, auth) {
                 }
 
                 // Restore spot in line if user has been gone < 10 mins
-                if(!newUser && dbUser.secondsSinceLastSeen <= 600 && dbUser.lastWaitListPosition != -1 && bot.getWaitListPosition(data.id) != dbUser.lastWaitListPosition) {
+                if(!newUser && dbUser.secondsSinceLastSeen <= 600 && dbUser.secondsSinceLastAction > 60 && dbUser.lastWaitListPosition != -1 && bot.getWaitListPosition(data.id) != dbUser.lastWaitListPosition) {
                     bot.moderateAddDJ(data.id, function() {
                         if(position <= room.djs.length && bot.getWaitListPosition(data.id) != dbUser.lastWaitListPosition) {
                             bot.moderateMoveDJ(data.id, dbUser.lastWaitListPosition + 1);
                         }
                         setTimeout(function(){ bot.sendChat('I put you back in line, @' + data.username + ' :thumbsup:')}, 5000);
                     });
+                    db.run('UPDATE DISCIPLINE SET lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
                 }
 
             });
@@ -274,7 +275,7 @@ function runBot(error, auth) {
     }
 
     function getUserFromDb(user, callback) {
-        db.get("SELECT *, strftime('%s', 'now')-strftime('%s', lastSeen) AS 'secondsSinceLastSeen', strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive' FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE userid = ?", [user.id], function (error, row) {
+        db.get("SELECT *, strftime('%s', 'now')-strftime('%s', lastSeen) AS 'secondsSinceLastSeen', strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', strftime('%s', 'now')-strftime('%s', lastAction) AS 'secondsSinceLastAction' FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE userid = ?", [user.id], function (error, row) {
             callback(row);
         });
     }
