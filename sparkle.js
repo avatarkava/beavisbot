@@ -92,7 +92,7 @@ function runBot(error, auth) {
                 // Restore spot in line if user has been gone < 10 mins
                 if(!newUser && dbUser.secondsSinceLastSeen <= 600 && dbUser.secondsSinceLastAction > 60 && dbUser.lastWaitListPosition != -1 && bot.getWaitListPosition(data.id) != dbUser.lastWaitListPosition) {
                     bot.moderateAddDJ(data.id, function() {
-                        if(position <= room.djs.length && bot.getWaitListPosition(data.id) != dbUser.lastWaitListPosition) {
+                        if(dbUser.lastWaitListPosition <= room.djs.length && bot.getWaitListPosition(data.id) != dbUser.lastWaitListPosition) {
                             bot.moderateMoveDJ(data.id, dbUser.lastWaitListPosition + 1);
                         }
                         setTimeout(function(){ bot.sendChat('I put you back in line, @' + data.username + ' :thumbsup:')}, 5000);
