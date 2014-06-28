@@ -30,7 +30,8 @@ $bot_id = '52cc583f3e083e226a242efd';
                 "background-color": "rgba(24, 0, 38, 0.5) !important",
                 "border": "2px solid #1e75fb",
                 "border-left": "0px !important",
-                "border-right": "0px !important"
+                "border-right": "0px !important",
+                "border-collapse": "collapse !important"
             },
             "#chat .mention.is-staff": {
                 "border-color": "#ac76ff"
