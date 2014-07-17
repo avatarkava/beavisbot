@@ -106,11 +106,7 @@ function runBot(error, auth) {
     })
 
     bot.on('userLeave', function(data) {
-        getUserFromDb(data, function (user) {
-            if(user) {
-                bot.log('[LEAVE]', 'User left: ' + user.username);
-            }
-        });
+        bot.log('[LEAVE]', 'User left: ' + data.username);
         db.run('UPDATE OR IGNORE USERS SET lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
     });
 
