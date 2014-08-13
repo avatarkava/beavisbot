@@ -38,7 +38,12 @@ function runBot(error, auth) {
     });
 
     bot.on('chat', function(data) {
-        bot.log('[CHAT]', data.from + ': ' + data.message);
+        if (config.verboseLogging) {
+            bot.log('[CHAT]', JSON.stringify(data, null, 2));
+        }
+        else {
+            bot.log('[CHAT]', data.from + ': ' + data.message);
+        }
         // Let people stay active with single-char, but don't let it spam up chat.
         if(data.message == '.') {
             bot.moderateDeleteChat(data.chatID);
@@ -111,7 +116,9 @@ function runBot(error, auth) {
     });
 
     bot.on('userUpdate', function(data) {
-        bot.log('User update: ', data);
+        if(config.verboseLogging) {
+            bot.log('User update: ', data);
+        }
     });
 
     bot.on('curateUpdate', function(data) {
