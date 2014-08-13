@@ -197,7 +197,7 @@ function runBot(error, auth) {
                     if (row != null) {
 
                         // Only bug idle people if the bot has been running for as long as the minimum idle time
-                        if(row.secondsSinceLastActive >= maxIdleTime && moment().isAfter(moment(startupTimestamp).add('minutes', config.activeDJTimeoutMins))) {
+                        if(row.secondsSinceLastActive >= maxIdleTime && moment().isAfter(moment(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
                             bot.log('[IDLE] ' + position + '. ' + row.username + ' last active '+ moment.utc(row.lastActive).fromNow());
                             if (row.warns > 0) {
                                 bot.moderateRemoveDJ(dj.id);
