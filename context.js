@@ -100,9 +100,14 @@ module.exports = function(options) {
      * Custom functions accessible to commands
      */
     timeSince = function(timestamp) {
-        return moment.utc(timestamp).fromNow();
-        // @todo: build in some more handling here for older dates
-        //moment.utc(row['started'], 'YYYY-MM-DD HH:mm:ss').calendar()
+        message = moment.utc(timestamp).fromNow();
+
+        if(moment().isAfter(moment(timestamp).add(24, 'hours'))) {
+            message += ' (' + moment.utc(timestamp, 'YYYY-MM-DD HH:mm:ss').calendar() + ')';
+        }
+
+        return message;
     };
+
 
 };
