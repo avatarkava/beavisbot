@@ -3,6 +3,7 @@ var fs = require('fs');
 path = require('path')
 var config = require(path.resolve(__dirname, 'config.json'));
 var runCount = 0;
+var roomHasActiveMods = false;
 var startupTimestamp = new Date();
 
 if (config.botinfo.auth != "") {
@@ -85,6 +86,10 @@ function runBot(error, auth) {
                     }
                 });
 
+                if (!roomHasActiveMods) {
+                    message += ' Type .help if you need it!';
+                }
+
                 if (message && (config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
                     if (newUser) {
                         setTimeout(function(){ bot.sendChat(message) }, 5000);
@@ -132,7 +137,13 @@ function runBot(error, auth) {
     bot.on('voteUpdate', function(data) {
         var user = _.findWhere(bot.getUsers(), {id: data.id});
         if (user) {
-            bot.log('[VOTE]', user.username + ' voted ' + data.vote);
+            if(data.vote == 1) {
+                bot.log('[VOTE]', user.username + ' - woot! (+1)');
+            }
+            else if (data.vote < 0) {
+                bot.log('[VOTE]', user.username + ' - meh (-1)');
+            }
+
         }
     });
 
@@ -142,6 +153,7 @@ function runBot(error, auth) {
         }
 
         if(data.dj != null && data.media != null) {
+            bot.log('********************************************************************');
             bot.log('[SONG]', data.dj.user.username + ' played: ' + data.media.author + ' - ' + data.media.title);
             db.run('UPDATE USERS SET lastWaitListPosition = -1 WHERE userid = ?', [data.dj.user.id]);
         }
@@ -188,9 +200,9 @@ function runBot(error, auth) {
             }
 
             var maxIdleTime = config.activeDJTimeoutMins * 60;
-            var roomHasActiveMods = false;
             var idleDJs = [];
             var z = 0;
+            roomHasActiveMods = false;
 
             idleWaitList = bot.getWaitList();
             idleWaitList.forEach(function(dj) {
