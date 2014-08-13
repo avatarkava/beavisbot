@@ -4,7 +4,7 @@ exports.enabled = false;
 exports.matchStart = true;
 exports.handler = function(data) {
 
-    var permission = _.findWhere(room.users, {id: data.fromID}).permission;
+    var permission = _.findWhere(room.users, {id: data.fid}).permission;
 
     // Only bouncers and above can call this
     if (permission > 1) {

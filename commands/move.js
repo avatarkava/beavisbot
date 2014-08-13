@@ -3,7 +3,7 @@ exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function(data) {
-    if (_.findWhere(room.users, {id: data.fromID}).permission > 1) {
+    if (_.findWhere(room.users, {id: data.fid}).permission > 1) {
         var input = data.message.split(' ');
         if (input.length >= 3) {
             var username = _.rest(input, 1);

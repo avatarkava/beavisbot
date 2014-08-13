@@ -46,13 +46,13 @@ function runBot(error, auth) {
         }
         // Let people stay active with single-char, but don't let it spam up chat.
         if(data.message == '.') {
-            bot.moderateDeleteChat(data.chatID);
+            bot.moderateDeleteChat(data.cid);
         }
         else {
             handleCommand(data);
         }
-        db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.fromID]);
-        db.run('UPDATE DISCIPLINE SET warns = 0 WHERE userid = ?', [data.fromID]);
+        db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.fid]);
+        db.run('UPDATE DISCIPLINE SET warns = 0 WHERE userid = ?', [data.fid]);
     });
 
     bot.on('userJoin', function(data) {

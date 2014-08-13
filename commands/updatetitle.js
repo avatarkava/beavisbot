@@ -3,7 +3,7 @@ exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function(data) {
-    if (_.findWhere(room.users, {id: data.fromID}).permission > 2) {
+    if (_.findWhere(room.users, {id: data.fid}).permission > 2) {
         var input = data.message.split(' ');
         var title = decodeURI(_.rest(input, 2).join(' '));
 
