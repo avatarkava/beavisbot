@@ -192,7 +192,6 @@ function runBot(error, auth) {
             var idleDJs = [];
             var z = 0;
 
-
             idleWaitList = bot.getWaitList();
             idleWaitList.forEach(function(dj) {
 
@@ -205,7 +204,7 @@ function runBot(error, auth) {
 
                         // Only bug idle people if the bot has been running for as long as the minimum idle time
                         if(row.secondsSinceLastActive >= maxIdleTime && moment().isAfter(moment(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
-                            bot.log('[IDLE] ' + position + '. ' + row.username + ' last active '+ moment.utc(row.lastActive).fromNow());
+                            bot.log('[IDLE] ' + position + '. ' + row.username + ' last active '+ timeSince(row.lastActive));
                             if (row.warns > 0) {
                                 bot.moderateRemoveDJ(dj.id);
                                 bot.sendChat('@' + row.username + ' ' + config.responses.activeDJRemoveMessage);
@@ -220,7 +219,7 @@ function runBot(error, auth) {
                             if(dj.permission > 1) {
                                 roomHasActiveMods = true;
                             }
-                            bot.log('[ACTIVE] ' + position + '. ' + row.username + ' last active '+ moment.utc(row.lastActive).fromNow());
+                            bot.log('[ACTIVE] ' + position + '. ' + row.username + ' last active '+ timeSince(row.lastActive));
                         }
                     }
 

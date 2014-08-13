@@ -14,7 +14,7 @@ exports.handler = function (data) {
 
     db.get("SELECT username, lastSeen FROM USERS WHERE username = ? COLLATE NOCASE", [username], function (error, row) {
         if (row != null) {
-            bot.sendChat(row.username + ' was seen ' + moment.utc(row.lastSeen).calendar() + '.');
+            bot.sendChat(row.username + ' was seen ' + timeSince(row.lastSeen) + '.');
         } else {
             bot.sendChat(username + ' was not found.');
         }

@@ -4,5 +4,5 @@ exports.enabled = true;
 exports.matchStart = false;
 exports.handler = function(data) {
     joined = _.findWhere(room.users, {id: data.fid}).dateJoined
-    bot.sendChat(data.from + ', you joined on ' + moment.utc(joined).format('dddd, MMMM Do YYYY') + '.');
+    bot.sendChat(data.from + ', you joined ' + timeSince(joined) + '.');
 };

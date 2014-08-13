@@ -20,8 +20,9 @@ exports.handler = function (data) {
                     bot.log('Error while updating theme. ', error);
                 } else {
                     bot.log("[THEME] " + theme);
-                    bot.sendChat('Theme updated, ' + data.from)
+                    bot.sendChat('Theme updated, ' + data.from);
                 }
+                bot.moderateDeleteChat(data.cid);
             });
     }
     else {
@@ -29,7 +30,7 @@ exports.handler = function (data) {
             if (row != null) {
                 message = row.theme;
                 if(_.findWhere(room.users, {id: data.fid}).permission > 2) {
-                    message += ' (set ' + moment.utc(row.timestamp).fromNow() + ' by ' + row.username + ')';
+                    message += ' (set ' + timeSince(row.timestamp) + ' by ' + row.username + ')';
                 }
                 bot.sendChat('/me ' + message);
 
