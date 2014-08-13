@@ -1,7 +1,7 @@
 exports.names = ['.roll'];
 exports.hidden = true;
 exports.enabled = true;
-exports.matchStart = false;
+exports.matchStart = true;
 exports.handler = function (data) {
 
     var maxValue = 6;
