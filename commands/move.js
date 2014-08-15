@@ -4,6 +4,7 @@ exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function(data) {
     if (_.findWhere(room.users, {id: data.fid}).permission > 1) {
+        bot.moderateDeleteChat(data.cid);
         var input = data.message.split(' ');
         if (input.length >= 3) {
             var username = _.rest(input, 1);
