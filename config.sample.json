@@ -1,9 +1,7 @@
 {
     "botinfo": {
-        "twitterUsername": "twitterusername",
-        "twitterPassword": "twitterpassword",
-        "gmailUsername": "username@gmail.com",
-        "gmailPassword": "12345",
+        "plugUsername": "username@gmail.com",
+        "plugPassword": "12345",
         "botname": "yourbotname",
         "auth": "somereallylongstringofabout128chars-getfromyourbrowserasthe'usr'cookie"
     },

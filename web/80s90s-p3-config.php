@@ -1,5 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: http://plug.dj");
+header("Access-Control-Allow-Origin: https://plug.dj");
 header('Content-Type: text/json');
 
 $bot_id = '52cc583f3e083e226a242efd';
