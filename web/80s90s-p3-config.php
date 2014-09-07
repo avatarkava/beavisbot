@@ -2,10 +2,11 @@
 header("Access-Control-Allow-Origin: https://plug.dj");
 header('Content-Type: text/json');
 
-$bot_id = '52cc583f3e083e226a242efd';
+$bot_id = '3819806';
 ?>
 {
     "instructions": "http://issue.plugcubed.net/wiki/Plug3%3ARSS",
+    "author": "AvatarKava",
     "colors": {
         "background": "",
         "chat": {
@@ -28,16 +29,18 @@ $bot_id = '52cc583f3e083e226a242efd';
         "rule": {
             "#chat .mention": {
                 "background-color": "rgba(24, 0, 38, 0.5) !important",
-                "border": "2px solid #1e75fb",
+                "border": "1px solid #009cdd",
                 "border-left": "0px !important",
                 "border-right": "0px !important",
                 "border-collapse": "collapse !important"
             },
             "#chat .mention.is-staff": {
-                "border-color": "#ac76ff"
             },
             "#chat .welcome": {
-                "border": "3px dashed #1e75fb",
+                "background-color": "rgba(24, 0, 38, 0.5) !important",
+                "border": "3px solid #009cdd",
+                "border-left": "0px !important",
+                "border-right": "0px !important",
                 "font-weight": "bold",
                 "padding": "5px 2px 5px 25px"
             },
@@ -48,7 +51,7 @@ $bot_id = '52cc583f3e083e226a242efd';
             "#chat .from-<?=$bot_id?> .from.staff.clickable": {
             },
             ".from-<?=$bot_id?> .icon-chat-manager": {
-                "background": "url('http://beavisbot.phpmonkeys.com/images/icons/beavis_icon.png') !important"
+                "background": "url('//beavisbot.phpmonkeys.com/images/icons/beavis_icon.png') !important"
             },
             "#chat .from-<?=$bot_id?> .from": {
             },
@@ -63,7 +66,7 @@ $bot_id = '52cc583f3e083e226a242efd';
         }
     },
     "images": {
-        "background": "https://dl.dropboxusercontent.com/u/3725813/i%20love80%27s.jpg",
+        "background": "//beavisbot.phpmonkeys.com/images/background/default.jpg",
         "booth": "",
         "icons": {
             "admin": "",
@@ -74,7 +77,7 @@ $bot_id = '52cc583f3e083e226a242efd';
             "host": "",
             "manager": ""
         },
-        "playback": "http://i.imgur.com/8xFgQmU.png"
+        "playback": "//beavisbot.phpmonkeys.com/images/tv-background.gif"
     },
     "rules": {
         "allowAutorespond": "false",
