@@ -1,7 +1,7 @@
 module.exports = function(options) {
     var PlugAPI = require('plugapi');
     var sqlite3 = require('sqlite3').verbose();
-    
+
     bot = new PlugAPI(options.auth);
     config = options.config;
     db = new sqlite3.Database(path.resolve(__dirname, 'sparkle.sqlite'));

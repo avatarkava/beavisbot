@@ -3,8 +3,8 @@
  * adapted from SimplePlugScript by Enyxx - arkaenyx(at)gmail(dot)com
  * This work is under CreativeCommons BY-NC-SA 3.0
  * http://creativecommons.org/licenses/by-nc-sa/3.0/legalcode*/
-nxVersion = "1.22";
-notice = "ButtheadScript v" + nxVersion + " by AvatarKava - menu located at the top left!";
+nxVersion = "1.25";
+notice = "ButtheadScript v" + nxVersion + " by AvatarKava!<br />- Options in the plug menu (top left)<br />- Type /cornholio for commands";
 forceReload = false;
 var nx = {
     initial: function () {
@@ -12,9 +12,12 @@ var nx = {
     }, OnFocus: function () {
         nx.DoMeh()
     }, OnCmd: function (a) {
-        0 === a.indexOf("/skip") ? API.moderateForceSkip() : 0 === a.indexOf("/warn") ? nx.warnBr() : 0 === a.indexOf("/kick") ? nx.ModKick(a) : 0 === a.indexOf("/ban") ? nx.ModBan(a) : 0 === a.indexOf("/add") ? nx.ModAdd(a) : 0 === a.indexOf("/remove") ? nx.ModRemove(a) : 0 === a.indexOf("/join") ?
+        0 === a.indexOf("/cornholio") ? nx.CommandList() : 0 === a.indexOf("/skip") ? API.moderateForceSkip() : 0 === a.indexOf("/kick") ? nx.ModKick(a) : 0 === a.indexOf("/ban") ? nx.ModBan(a) : 0 === a.indexOf("/add") ? nx.ModAdd(a) : 0 === a.indexOf("/remove") ? nx.ModRemove(a) : 0 === a.indexOf("/join") ?
             nx.ModJoin(a) : 0 === a.indexOf("/move") && nx.ModMove(a)
-    }, ModAdd: function (a) {
+    }, CommandList: function() {
+        $("#chat-messages").append('<div class="message welcome nxnotif"><span class="text"><b>ButtheadScript Command List</b><br /><b>/kick @username</b> - ban the user for one hour <br /><b>/add @username</b> - add the user to the wait list<br /><b>/ban @username</b> - ban the user permanently<br /><b>/move @username x</b> - move user to position x in the wait list<br /><b>/remove @username</b> - remove user from the wait list<br /><b>/skip</b> - skip the current DJ</span></div>');
+    },
+    ModAdd: function (a) {
         if (3 < a.length) {
             var b = a.substr(5), c, e;
             c = b.indexOf(" ");
@@ -260,7 +263,22 @@ var nx = {
         var c = 0;
         $previousUser = 0 !== a ? a : "";
         nxUserDiv1 = '<div class="listtxt">\n<span class="name">' + b.username.replace(/\'/g, "\\'").replace(/\"/g, '\\"').replace(/\\/g, "\\\\") + '</span>\n<span class="nxtimer"></span>\n';
-        nxUserPosition = '\n<span class="pos" style="position: absolute; left: auto; right: 30px;top: 0px;display: inline;">' + (b.wlIndex + 1) + "</span>";
+        idleSeconds = 0;
+
+        if(typeof AFKArray !== 'undefined') {
+            for (i = 0; i < AFKArray.length; i++) {
+                if (b.username == AFKArray[i].username) {
+                    idleSeconds = (new Date - AFKArray[i].Stime) / 1000;
+                }
+            }
+        }
+
+        if (idleSeconds > 3600) {
+            nxUserPosition = '\n<span class="pos" style="position: absolute; left: auto; right: 30px;top: 0px;display: inline;"><img src="//beavisbot.phpmonkeys.com/images/icons/time.png" /></span>';
+        }
+        else {
+            nxUserPosition = '\n<span class="pos" style="position: absolute; left: auto; right: 30px;top: 0px;display: inline;">' + (b.wlIndex + 1) + "</span>";
+        }
         API.getDJ().username == b.username && (c = 1, nxUserPosition = '\n<span class="pos" style="position: absolute; left: auto; right: 30px;top: 0px;display: inline;">DJ</span>');
         nxUserDiv2 = "</div>\n";
         nxUserContent = 1 == ListPos && (0 <= b.wlIndex || 1 == c) ? nxUserDiv1 + nxUserPosition + nxUserDiv2 : nxUserDiv1 + nxUserDiv2;
@@ -310,7 +328,7 @@ var nx = {
             return b.username == a.username ? null : b
         })
     }, resetAFK: function (a) {
-        if ("message" == a.type)for (i = 0; i < AFKArray.length; i++)a.un == AFKArray[i].username && (AFKArray[i].Stime = new Date)
+        if (0 === a.type.indexOf('message'))for (i = 0; i < AFKArray.length; i++)a.un == AFKArray[i].username && (AFKArray[i].Stime = new Date)
     }, convertMS: function (a) {
         var b, c, e;
         e = Math.floor(a / 1E3);
@@ -318,22 +336,6 @@ var nx = {
         b = Math.floor(c / 60);
         a = Math.floor(b / 24);
         return {d: a, h: b % 24, m: c % 60, s: e % 60}
-    }, warnBr: function () {
-        WarnUsers = API.getUsers();
-        var a = '<div class="message welcome nxnotif warn"><span class="text"> Warn:<br />',
-            b = 0;
-        for (x = 0; x < WarnUsers.length; x++)"pt" == WarnUsers[x].language && 300 > WarnUsers[x].djPoints + WarnUsers[x].listenerPoints + WarnUsers[x].curatorPoints && (a += '<span class="warnname">' + WarnUsers[x].username + "</span> lang:" + WarnUsers[x].language + " vote:" + WarnUsers[x].vote + "<br />", b++);
-        0 === b && (a += "None <br />");
-        a += "</span></div>";
-        $("#chat-messages").append(a);
-        $(".message.welcome.nxnotif.warn:last").on("click", ".warnname", function () {
-            var a = $("#chat-input-field");
-            a.val(a.val() + "@" + $(this).text() + " ").focus()
-        }).css({cursor: "pointer"})
-    },
-    showListSettings: function () {
-        $("#room").append('<div id="nxpopup" style="position: absolute;top: 80px;left: 16%;z-index: 51;background-color: #0a0a0a;width: 200px;">\n    \t<div id="nxpopupcontent" style="color: #808691;">\n        \t\t<div class="nxpoptitle" style="padding: 5px 0 8px 20px;background-color: #1c1f25;border-right: 1px solid #0a0a0a;">\n\t\t\t' +
-        '<span id="nxpoptitletext" style="font-size: 1.5em;">\n\t\t\t\tSettings\n\t\t\t</span>\n\t\t</div>\n\t\t<div id="nxpopcontainer" class="nxoption" style="padding: 5px 10px 5px 0px;">\n            \t\t\t<div class="nxpopcontainer" style="position: relative;">\n                \t\t\t\t<i class="icon icon-check-blue" style="left: 10px;"></i>\n                \t\t\t\t<span style="left: 30px;position: relative;">\n                    \t\t\t\t\tShow waitlist position\n                \t\t\t\t</span> \n            \t\t\t</div>\n        \t\t</div>\n    \t</div>\n    \t<div style="clear: both;"></div>\n</div>')
     },
     toogleListSelect: function (a) {
         0 === ToogleSelect ? (nx.showListSelect(a), ToogleSelect = 1) : ($("div#nxpopup").remove(), ToogleSelect = 0)

@@ -3,7 +3,7 @@ exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function(data) {
-    if (_.findWhere(room.users, {id: data.fid}).permission > 1) {
+    if (_.findWhere(room.users, {id: data.uid}).permission > 1) {
         bot.moderateDeleteChat(data.cid);
         var input = data.message.split(' ');
         var username = _.rest(input, 1).join(' ').trim();
@@ -14,7 +14,7 @@ exports.handler = function(data) {
                     bot.sendChat(username + ' ' + config.responses.activeDJRemoveMessage);
                     db.run('UPDATE DISCIPLINE SET warns = 0, removes = removes + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [row.userid]);
                 }
-                bot.log('[REMOVE] ' + data.from + ' removed ' + username + ' from wait list');
+                bot.log('[REMOVE] ' + data.un + ' removed ' + username + ' from wait list');
             });
         }
     }

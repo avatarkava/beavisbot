@@ -1,11 +1,18 @@
 {
-    "botinfo": {
-        "plugUsername": "username@gmail.com",
-        "plugPassword": "12345",
-        "botname": "yourbotname",
-        "auth": "somereallylongstringofabout128chars-getfromyourbrowserasthe'usr'cookie"
+    "botname": "SparkleBot",
+    "roomName": "room-name-slug-from-url",
+    "superAdmin": "YourUsername",
+    "auth": {
+        "type": "cookie",
+        "cookies": {
+            "session": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx_xxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "remember_token":  "0000000|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        },
+        "login": {
+            "email": "not-currently-implemented@tld.com",
+            "password": ""
+        }
     },
-    "roomName": "yourroom-name",
     "apiKeys": {
         "echoNest": "###",
         "lastFm": "lastFmApiKey",
