@@ -377,7 +377,7 @@ function runBot(error, auth) {
             command.handler(data);
         }
         else if (data.message.indexOf('@' + config.botname) > -1) {
-            verboseLogging(data);
+            botMentionResponse(data);
         }
     }
 
