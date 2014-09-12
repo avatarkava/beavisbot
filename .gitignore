@@ -16,7 +16,8 @@ node_modules
 
 config.json
 
-sparkle.sqlite
+*.sqlite
+!sparkle.sample.sqlite
 test.js
 
 .idea
