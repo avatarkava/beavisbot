@@ -276,7 +276,7 @@ function runBot(error, auth) {
 
     function addUserToDb(user) {
         db.run('INSERT OR IGNORE INTO USERS VALUES (?, ?, ?, ?, ?, -1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
-            [user.id, user.username, user.language, user.dateJoined.replace('T', ' '), user.avatarID]);
+            [user.id, user.username, user.language, user.joined.replace('T', ' '), user.avatarID]);
         db.run('UPDATE USERS SET username = ?, language = ?, lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [user.username, user.language, user.id]);
         db.run('INSERT OR REPLACE INTO DISCIPLINE VALUES(?, 0, 0, 0, CURRENT_TIMESTAMP)', [user.id]);
 
@@ -332,7 +332,7 @@ function runBot(error, auth) {
     }
 
     function initializeDatabase() {
-        db.run('CREATE TABLE IF NOT EXISTS USERS (userid VARCHAR(255) PRIMARY KEY, username VARCHAR(255), language VARCHAR(10), dateJoined TIMESTAMP, avatarID VARCHAR(255), lastWaitListPosition INTEGER, lastSeen TIMESTAMP, lastActive TIMESTAMP)');
+        db.run('CREATE TABLE IF NOT EXISTS USERS (userid VARCHAR(255) PRIMARY KEY, username VARCHAR(255), language VARCHAR(10), joined TIMESTAMP, avatarID VARCHAR(255), lastWaitListPosition INTEGER, lastSeen TIMESTAMP, lastActive TIMESTAMP)');
         db.run('CREATE TABLE IF NOT EXISTS SONGS (id VARCHAR(255) PRIMARY KEY, title VARCHAR(255), format VARCHAR(255), author VARCHAR(255), cid VARCHAR(255), duration DOUBLE)');
         db.run('CREATE TABLE IF NOT EXISTS PLAYS (id INTEGER PRIMARY KEY AUTOINCREMENT, userid VARCHAR(255), songid VARCHAR(255), upvotes INTEGER, downvotes INTEGER, snags INTEGER, started TIMESTAMP, listeners INTEGER)');
         db.run('CREATE TABLE IF NOT EXISTS SETTINGS (name VARCHAR(255) PRIMARY KEY, value TEXT, userid VARCHAR(255), timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP);');
