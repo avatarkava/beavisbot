@@ -4,7 +4,7 @@ exports.enabled = false;
 exports.matchStart = true;
 exports.handler = function(data) {
 
-    var permission = _.findWhere(room.users, {id: data.fid}).permission;
+    var permission = _.findWhere(room.users, {id: data.uid}).permission;
 
     // Only bouncers and above can call this
     if (permission > 1) {
@@ -47,18 +47,18 @@ exports.handler = function(data) {
 
         db.get('SELECT * FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE username = ?', [username.substring(1)], function (error, row) {
             if(row) {
-                bot.log('[DEBUG] ' + command + ': ' + username + ' (' + row.userid + ') ' + duration + ' by ' + data.from);
+                bot.log('[DEBUG] ' + command + ': ' + username + ' (' + row.userid + ') ' + duration + ' by ' + data.un);
                 switch(command) {
                     case '.ban':
                         bot.moderateBanUser(row.userid, 0, apiDuration, function() {
-                            bot.log('[BAN] ' + username + ' was banned for ' + duration + ' by ' + data.from);
+                            bot.log('[BAN] ' + username + ' was banned for ' + duration + ' by ' + data.un);
                             db.run('UPDATE DISCIPLINE SET kicks = kicks + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [row.userid]);
                         });
                         break;
                     case '.unban':
                         bot.moderateUnbanUser(row.userid, function() {
                             bot.sendChat('/me unbanning ' + username + '. This can take a few moments...');
-                            bot.log('[UNBAN] ' + username + ' was unbanned by ' + data.from);
+                            bot.log('[UNBAN] ' + username + ' was unbanned by ' + data.un);
                         });
                         break;
                     default:

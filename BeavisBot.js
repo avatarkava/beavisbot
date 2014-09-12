@@ -6,13 +6,7 @@ var runCount = 0;
 var roomHasActiveMods = false;
 var startupTimestamp = new Date();
 
-if (config.botinfo.auth != "") {
-    console.log("[INIT] Using auth key: " + config.botinfo.auth);
-    runBot(false, config.botinfo.auth);
-}
-else {
-    // @todo Set up plug-dj-login handling
-}
+runBot(false, config.auth);
 
 function runBot(error, auth) {
     if(error) {
@@ -43,7 +37,7 @@ function runBot(error, auth) {
             bot.log('[CHAT]', JSON.stringify(data, null, 2));
         }
         else {
-            bot.log('[CHAT]', data.from + ': ' + data.message);
+            bot.log('[CHAT]', data.un + ': ' + data.message);
         }
         // Let people stay active with single-char, but don't let it spam up chat.
         if(data.message == '.') {
@@ -52,8 +46,8 @@ function runBot(error, auth) {
         else {
             handleCommand(data);
         }
-        db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.fid]);
-        db.run('UPDATE DISCIPLINE SET warns = 0 WHERE userid = ?', [data.fid]);
+        db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.uid]);
+        db.run('UPDATE DISCIPLINE SET warns = 0 WHERE userid = ?', [data.uid]);
     });
 
     bot.on('userJoin', function(data) {
@@ -62,7 +56,7 @@ function runBot(error, auth) {
         var newUser = false;
         var message = "";
 
-        if (data.username != config.botinfo.botname) {
+        if (data.username != config.botname) {
             getUserFromDb(data, function (dbUser) {
 
                 if (dbUser == undefined) {
@@ -382,8 +376,8 @@ function runBot(error, auth) {
 
             command.handler(data);
         }
-        else if (data.message.indexOf('@' + config.botinfo.botname) > -1) {
-            botMentionResponse(data);
+        else if (data.message.indexOf('@' + config.botname) > -1) {
+            verboseLogging(data);
         }
     }
 
@@ -490,6 +484,6 @@ function runBot(error, auth) {
         ];
         var randomIndex = _.random(0, strings.length-1);
         var message = strings[randomIndex];
-        bot.sendChat(message.replace('{sender}', data.from));
+        bot.sendChat(message.replace('{sender}', data.un));
     }
 }

@@ -3,7 +3,7 @@ exports.hidden = false;
 exports.enabled = false;
 exports.matchStart = true;
 exports.handler = function (data) {
-    if (_.findWhere(room.users, {id: data.fid}).permission > 1) {
+    if (_.findWhere(room.users, {id: data.uid}).permission > 1) {
 
         var message = "";
         var input = _.rest(data.message.split(' '), 1).join(' ').trim();
