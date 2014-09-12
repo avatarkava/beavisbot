@@ -4,7 +4,7 @@ module.exports = function(options) {
 
     bot = new PlugAPI(options.auth);
     config = options.config;
-    db = new sqlite3.Database(path.resolve(__dirname, 'sparkle.sqlite'));
+    db = new sqlite3.Database(path.resolve(__dirname, config.db.sqlite3.filePath));
     package = require(path.resolve(__dirname, 'package.json'));
     request = require('request');
     _ = require('underscore');

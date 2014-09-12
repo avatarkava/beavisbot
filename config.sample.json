@@ -13,6 +13,12 @@
             "password": ""
         }
     },
+    "db": {
+        "type": "sqlite3",
+        "sqlite3": {
+            "filePath": "sparkle.sqlite"
+        }
+    },
     "apiKeys": {
         "echoNest": "###",
         "lastFm": "lastFmApiKey",
