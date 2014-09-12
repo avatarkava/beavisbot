@@ -7,7 +7,7 @@ exports.handler = function (data) {
     var input = data.message.split(' ');
     var event = _.rest(input, 1).join(' ');
 
-    if (_.findWhere(room.users, {id: data.uid}).permission > 2 && event) {
+    if (_.findWhere(room.users, {id: data.uid}).role > 2 && event) {
 
         if(event == 'reset' || event == 'clear') {
             event = 'No events currently scheduled.'
@@ -29,7 +29,7 @@ exports.handler = function (data) {
         db.get("SELECT value AS 'event', username, timestamp FROM SETTINGS s INNER JOIN USERS ON s.userid = USERS.userid WHERE name = ? LIMIT 1", ['event'], function (error, row) {
             if (row != null) {
                 message = row.event;
-                if(_.findWhere(room.users, {id: data.uid}).permission > 2) {
+                if(_.findWhere(room.users, {id: data.uid}).role > 2) {
                     message += ' (set ' + timeSince(row.timestamp) + ' by ' + row.username + ')';
                 }
                 bot.sendChat('/me ' + message);

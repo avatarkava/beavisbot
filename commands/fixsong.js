@@ -28,7 +28,7 @@ exports.handler = function(data) {
     
     var input = data.message.split(' ');
     
-    if (_.findWhere(room.users, {id: data.uid}).permission > 1 || (data.uid == room.currentDJ && input[1] != 'yes')) {
+    if (_.findWhere(room.users, {id: data.uid}).role > 1 || (data.uid == room.currentDJ && input[1] != 'yes')) {
         bot.sendChat('This command is only available to bouncers, managers, and hosts.');
         return;
     } 

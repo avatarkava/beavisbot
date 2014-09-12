@@ -222,7 +222,7 @@ function runBot(error, auth) {
                             }
                         }
                         else {
-                            if(dj.permission > 1) {
+                            if(dj.role > 1) {
                                 roomHasActiveMods = true;
                             }
                             bot.log('[ACTIVE] ' + position + '. ' + row.username + ' last active '+ timeSince(row.lastActive));

@@ -3,7 +3,7 @@ exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function(data) {
-    if (_.findWhere(room.users, {id: data.uid}).permission > 1) {
+    if (_.findWhere(room.users, {id: data.uid}).role > 1) {
         var input = data.message.split(' ');
         var artist = _.rest(input, 2).join(' ');
 
