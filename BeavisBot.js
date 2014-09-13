@@ -284,14 +284,15 @@ function runBot(error, auth) {
 
     }
 
-    function convertAPIUserID(user) {
+    function convertAPIUserID(user, callback) {
         db.get('SELECT userid FROM USERS WHERE username = ?', [user.username], function(error, row) {
             if (row != null && row.userid.length > 10) {
                 bot.log('Converting userid for ' + user.username + ': ' + row.userid + ' => ' + user.id);
-                db.run('UPDATE USERS SET userid = ? WHERE userid = ?', [user.id, row.userid]);
-                db.run('UPDATE PLAYS SET userid = ? WHERE userid = ?', [user.id, row.userid]);
                 db.run('DELETE FROM DISCIPLINE WHERE userid = ?', [row.userid]);
+                db.run('UPDATE PLAYS SET userid = ? WHERE userid = ?', [user.id, row.userid]);
+                db.run('UPDATE USERS SET userid = ? WHERE userid = ?', [user.id, row.userid], callback(true));
             }
+            callback(true);
         });
     }
 
@@ -311,6 +312,7 @@ function runBot(error, auth) {
             mehWaitlist = bot.getWaitList();
             mehWaitlist.forEach(function(dj) {
                 if (dj.vote == '-1') {
+                    bot.log('[REMOVE] Removed ' + dj.username + ' from wait list for mehing');
                     bot.moderateRemoveDJ(dj.id);
                     bot.sendChat('@' + dj.username + ', voting MEH/Chato/:thumbsdown: while in line is prohibited. Check .rules.');
                 }
