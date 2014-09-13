@@ -64,11 +64,11 @@ function runBot(error, auth) {
                 if (dbUser == undefined) {
                     message = config.responses.welcome.newUser.replace('{username}', data.username);
                     newUser = true;
-                    bot.log('[JOIN] ' + data.username + ' is a first-time visitor to the room!');
+                    bot.log('[JOIN]', data.username + ' is a first-time visitor to the room!');
                 }
                 else {
                     message = config.responses.welcome.oldUser.replace('{username}', data.username);
-                    bot.log('[JOIN] ' + data.username + ' last seen ' + dbUser.secondsSinceLastSeen + ' seconds ago (' + dbUser.lastSeen + ')');
+                    bot.log('[JOIN]', data.username + ' last seen ' + dbUser.secondsSinceLastSeen + ' seconds ago (' + dbUser.lastSeen + ')');
                 }
 
                 db.run('UPDATE USERS SET lastSeen = CURRENT_TIMESTAMP, lastActive = CURRENT_TIMESTAMP, lastWaitListPosition = -1 WHERE userid = ?', [data.id]);
@@ -124,7 +124,7 @@ function runBot(error, auth) {
 
     bot.on('userUpdate', function (data) {
         if (config.verboseLogging) {
-            bot.log('User update: ', data);
+            bot.log('[EVENT] userUpdate', data);
         }
     });
 
@@ -151,13 +151,13 @@ function runBot(error, auth) {
 
     bot.on('advance', function (data) {
         if (config.verboseLogging) {
-            bot.log('advance: ', JSON.stringify(data, null, 2));
+            bot.log('[EVENT] advance ', JSON.stringify(data, null, 2));
         }
 
         if (data.dj != null && data.media != null) {
             bot.log('********************************************************************');
-            bot.log('[SONG]', data.dj.user.username + ' played: ' + data.media.author + ' - ' + data.media.title);
-            db.run('UPDATE USERS SET lastWaitListPosition = -1 WHERE userid = ?', [data.dj.user.id]);
+            bot.log('[SONG]', data.dj.username + ' played: ' + data.media.author + ' - ' + data.media.title);
+            db.run('UPDATE USERS SET lastWaitListPosition = -1 WHERE userid = ?', [data.dj.id]);
         }
 
         // Write previous song data to DB
@@ -175,8 +175,8 @@ function runBot(error, auth) {
                     data.lastPlay.media.id,
                     data.lastPlay.score.positive,
                     data.lastPlay.score.negative,
-                    data.lastPlay.score.curates,
-                    data.lastPlay.score.listeners]);
+                    data.lastPlay.score.grabs,
+                    bot.getUsers().length]);
         }
 
         if (data.media != null) {
@@ -218,7 +218,7 @@ function runBot(error, auth) {
 
                         // Only bug idle people if the bot has been running for as long as the minimum idle time
                         if (row.secondsSinceLastActive >= maxIdleTime && moment().isAfter(moment(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
-                            bot.log('[IDLE] ' + position + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
+                            bot.log('[IDLE]', position + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
                             if (row.warns > 0) {
                                 bot.moderateRemoveDJ(dj.id);
                                 bot.sendChat('@' + row.username + ' ' + config.responses.activeDJRemoveMessage);
@@ -233,7 +233,7 @@ function runBot(error, auth) {
                             if (dj.role > 1) {
                                 roomHasActiveMods = true;
                             }
-                            bot.log('[ACTIVE] ' + position + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
+                            bot.log('[ACTIVE]', position + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
                         }
                     }
 
@@ -246,8 +246,8 @@ function runBot(error, auth) {
 
                         // Only police this if there aren't any mods around
                         if (!roomHasActiveMods && config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
-                            bot.log('[SKIP] Skipped ' + data.dj.user.username + ' spinning a song of ' + data.media.duration + ' seconds');
-                            bot.sendChat('Sorry @' + data.dj.user.username + ', this song is over our maximum room length of ' + (config.maxSongLengthSecs / 60) + ' minutes.');
+                            bot.log('[SKIP] Skipped ' + data.dj.username + ' spinning a song of ' + data.media.duration + ' seconds');
+                            bot.sendChat('Sorry @' + data.dj.username + ', this song is over our maximum room length of ' + (config.maxSongLengthSecs / 60) + ' minutes.');
                             bot.moderateForceSkip();
                         }
                     }
@@ -263,7 +263,7 @@ function runBot(error, auth) {
 
     bot.on('djListUpdate', function (data) {
         if (config.verboseLogging) {
-            bot.log('DJ update', JSON.stringify(data, null, 2));
+            bot.log('[EVENT] djListUpdate', JSON.stringify(data, null, 2));
         }
 
         curUserList = bot.getUsers();
