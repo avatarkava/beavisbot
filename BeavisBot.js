@@ -120,7 +120,7 @@ function runBot(error, auth) {
         }
     });
 
-    bot.on('curateUpdate', function(data) {
+    bot.on('grab', function(data) {
         var user = _.findWhere(bot.getUsers(), {id: data.id});
         if (user) {
             bot.log('[GRAB]', user.username + ' grabbed this song');
@@ -128,22 +128,22 @@ function runBot(error, auth) {
         db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
     });
 
-    bot.on('voteUpdate', function(data) {
-        var user = _.findWhere(bot.getUsers(), {id: data.id});
+    bot.on('vote', function(data) {
+        var user = _.findWhere(bot.getUsers(), {id: data.i});
         if (user) {
-            if(data.vote == 1) {
+            if(data.v == 1) {
                 bot.log('[VOTE]', user.username + ' - woot! (+1)');
             }
-            else if (data.vote < 0) {
+            else if (data.v < 0) {
                 bot.log('[VOTE]', user.username + ' - meh (-1)');
             }
 
         }
     });
 
-    bot.on('djAdvance', function(data) {
+    bot.on('advance', function(data) {
         if (config.verboseLogging) {
-            bot.log('djAdvance: ', JSON.stringify(data, null, 2));
+            bot.log('advance: ', JSON.stringify(data, null, 2));
         }
 
         if(data.dj != null && data.media != null) {
@@ -253,7 +253,7 @@ function runBot(error, auth) {
 
     });
 
-    bot.on('djUpdate', function(data) {
+    bot.on('djListUpdate', function(data) {
         if (config.verboseLogging) {
             bot.log('DJ update', JSON.stringify(data, null, 2));
         }
