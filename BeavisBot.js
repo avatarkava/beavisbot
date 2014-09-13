@@ -280,7 +280,7 @@ function runBot(error, auth) {
                 [user.id, user.username, user.language, user.joined.replace('T', ' '), user.avatarID]);
             db.run('UPDATE USERS SET username = ?, language = ?, lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [user.username, user.language, user.id]);
             db.run('INSERT OR REPLACE INTO DISCIPLINE VALUES(?, 0, 0, 0, CURRENT_TIMESTAMP)', [user.id]);
-        );
+        });
 
     }
 
