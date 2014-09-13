@@ -3,14 +3,13 @@
     "roomName": "room-name-slug-from-url",
     "superAdmin": "YourUsername",
     "auth": {
-        "type": "cookie",
+        "type": "email",
         "cookies": {
-            "session": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx_xxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxx",
-            "remember_token":  "0000000|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+            "session": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx_xxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxx"
         },
         "login": {
-            "email": "not-currently-implemented@tld.com",
-            "password": ""
+            "email": "account-email-address@tld.com",
+            "password": "account-password"
         }
     },
     "db": {
