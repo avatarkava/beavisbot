@@ -275,20 +275,22 @@ function runBot(error, auth) {
     bot.on('error', reconnect);
 
     function addUserToDb(user) {
-        convertAPIUserID(user);
-        db.run('INSERT OR IGNORE INTO USERS VALUES (?, ?, ?, ?, ?, -1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
-            [user.id, user.username, user.language, user.joined.replace('T', ' '), user.avatarID]);
-        db.run('UPDATE USERS SET username = ?, language = ?, lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [user.username, user.language, user.id]);
-        db.run('INSERT OR REPLACE INTO DISCIPLINE VALUES(?, 0, 0, 0, CURRENT_TIMESTAMP)', [user.id]);
+        convertAPIUserID(user, function() {
+            db.run('INSERT OR IGNORE INTO USERS VALUES (?, ?, ?, ?, ?, -1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
+                [user.id, user.username, user.language, user.joined.replace('T', ' '), user.avatarID]);
+            db.run('UPDATE USERS SET username = ?, language = ?, lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [user.username, user.language, user.id]);
+            db.run('INSERT OR REPLACE INTO DISCIPLINE VALUES(?, 0, 0, 0, CURRENT_TIMESTAMP)', [user.id]);
+        );
 
     }
 
     function convertAPIUserID(user) {
         db.get('SELECT userid FROM USERS WHERE username = ?', [user.username], function(error, row) {
-            if (row == null) {
+            if (row != null && row.userid.length > 10) {
+                bot.log('Converting userid for ' + user.username + ': ' + row.userid + ' => ' + user.id);
                 db.run('UPDATE USERS SET userid = ? WHERE userid = ?', [user.id, row.userid]);
                 db.run('UPDATE PLAYS SET userid = ? WHERE userid = ?', [user.id, row.userid]);
-                db.run('UPDATE DISCIPLINE SET userid = ? WHERE userid = ?', [user.id, row.userid]);
+                db.run('DELETE FROM DISCIPLINE WHERE userid = ?', [row.userid]);
             }
         });
     }
