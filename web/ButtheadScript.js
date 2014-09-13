@@ -123,8 +123,8 @@ var nx = {
     }, ShowMeh: function () {
         $.each(API.getUsers(), function (a, b) {
             $(document).find(".nxuser:contains('" + b.username.replace(/\'/g, "\\'").replace(/\"/g, '\\"').replace(/\\/g, "\\\\") + "') i.nxmehi").remove();
-            1 == b.grab ? $(document).find(".nxlist .nxuser:contains('" + b.username.replace(/\'/g, "\\'").replace(/\"/g, '\\"').replace(/\\/g, "\\\\") + "')").remove("i.icon-woot,i.icon-meh,i.icon-curate").append('<i class="nxmehi icon icon-curate"></i>') : "-1" == b.vote ? $(document).find(".nxuser:contains('" +
-            b.username.replace(/\'/g, "\\'").replace(/\"/g, '\\"').replace(/\\/g, "\\\\") + "')").remove("i.icon-woot,i.icon-meh,i.icon-curate").append('<i class="nxmehi icon icon-meh"></i>') : "1" == AutoList && "1" == b.vote && $(document).find(".nxlist .nxuser:contains('" + b.username.replace(/\'/g, "\\'").replace(/\"/g, '\\"').replace(/\\/g, "\\\\") + "')").remove("i.icon-woot,i.icon-meh,i.icon-curate").append('<i class="nxmehi icon icon-woot"></i>')
+            1 == b.grab ? $(document).find(".nxlist .nxuser:contains('" + b.username.replace(/\'/g, "\\'").replace(/\"/g, '\\"').replace(/\\/g, "\\\\") + "')").remove("i.icon-woot,i.icon-meh,i.icon-grab").append('<i class="nxmehi icon icon-grab"></i>') : "-1" == b.vote ? $(document).find(".nxuser:contains('" +
+            b.username.replace(/\'/g, "\\'").replace(/\"/g, '\\"').replace(/\\/g, "\\\\") + "')").remove("i.icon-woot,i.icon-meh,i.icon-grab").append('<i class="nxmehi icon icon-meh"></i>') : "1" == AutoList && "1" == b.vote && $(document).find(".nxlist .nxuser:contains('" + b.username.replace(/\'/g, "\\'").replace(/\"/g, '\\"').replace(/\\/g, "\\\\") + "')").remove("i.icon-woot,i.icon-meh,i.icon-grab").append('<i class="nxmehi icon icon-woot"></i>')
         });
         $("#user-lists .list.room .nxuser .icon-woot,#user-lists .list.room .nxuser .icon-meh").css({
             left: "auto",
@@ -132,7 +132,7 @@ var nx = {
         });
         $(".nxlist .nxuser .icon-woot").css({left: "auto", right: "0px", top: "-5px"});
         $(".nxlist .nxuser .icon-meh").css({left: "auto", right: "-1px", top: "-5px"});
-        $(".nxlist .nxuser .icon-curate").css({left: "auto", right: "-1px", top: "-5px"})
+        $(".nxlist .nxuser .icon-grab").css({left: "auto", right: "-1px", top: "-5px"})
     }, DoMeh: function () {
         0 < $(".list.room").length && nx.ShowMeh()
     }, GetSettings: function () {
