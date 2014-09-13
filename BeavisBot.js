@@ -106,7 +106,7 @@ function runBot(error, auth) {
                             bot.moderateMoveDJ(data.id, dbUser.lastWaitListPosition + 1);
                         }
                         setTimeout(function () {
-                            bot.sendChat('I put you back in line, @' + data.username + ' :thumbsup:')
+                            bot.sendChat('/me put @' + data.username + ' back in line :thumbsup:')
                         }, 5000);
                     });
                     db.run('UPDATE DISCIPLINE SET lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
@@ -158,25 +158,6 @@ function runBot(error, auth) {
             bot.log('********************************************************************');
             bot.log('[SONG]', data.dj.username + ' played: ' + data.media.author + ' - ' + data.media.title);
             db.run('UPDATE USERS SET lastWaitListPosition = -1 WHERE userid = ?', [data.dj.id]);
-        }
-
-        // Write previous song data to DB
-        // But only if the last song actually existed
-        if (data.lastPlay != null && data.lastPlay.media != null) {
-            db.run('INSERT OR IGNORE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)',
-                [data.lastPlay.media.id,
-                    data.lastPlay.media.title,
-                    data.lastPlay.media.format,
-                    data.lastPlay.media.author,
-                    data.lastPlay.media.cid,
-                    data.lastPlay.media.duration]);
-            db.run('INSERT INTO PLAYS (userid, songid, upvotes, downvotes, snags, started, listeners) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)',
-                [data.lastPlay.dj.id,
-                    data.lastPlay.media.id,
-                    data.lastPlay.score.positive,
-                    data.lastPlay.score.negative,
-                    data.lastPlay.score.grabs,
-                    bot.getUsers().length]);
         }
 
         if (data.media != null) {
@@ -261,6 +242,34 @@ function runBot(error, auth) {
 
     });
 
+    bot.on('historyUpdate', function (data) {
+
+        if (config.verboseLogging) {
+            bot.log('[EVENT] historyUpdate ', JSON.stringify(data, null, 2));
+        }
+        // Write previous song data to DB
+        // But only if the last song actually existed
+        if (_.first(data) != null) {
+            song = _.first(data);
+
+            db.run('INSERT OR IGNORE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)',
+                [song.media.id,
+                    song.media.title,
+                    song.media.format,
+                    song.media.author,
+                    song.media.cid,
+                    song.media.duration]);
+            db.run('INSERT INTO PLAYS (userid, songid, upvotes, downvotes, snags, started, listeners) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)',
+                [song.user.id,
+                    song.media.id,
+                    song.score.positive,
+                    song.score.negative,
+                    song.score.grabs,
+                    song.score.listeners]);
+        }
+
+    });
+
     bot.on('djListUpdate', function (data) {
         if (config.verboseLogging) {
             bot.log('[EVENT] djListUpdate', JSON.stringify(data, null, 2));
@@ -298,7 +307,7 @@ function runBot(error, auth) {
                 bot.log('Converting userid for ' + user.username + ': ' + row.userid + ' => ' + user.id);
                 db.run('DELETE FROM DISCIPLINE WHERE userid = ?', [row.userid]);
                 db.run('UPDATE PLAYS SET userid = ? WHERE userid = ?', [user.id, row.userid]);
-                db.run('UPDATE USERS SET userid = ? WHERE userid = ?', [user.id, row.userid], function() {
+                db.run('UPDATE USERS SET userid = ? WHERE userid = ?', [user.id, row.userid], function () {
                     callback(true);
                 });
             }
