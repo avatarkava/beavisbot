@@ -101,9 +101,9 @@ function runBot(error, auth) {
 
                 // Restore spot in line if user has been gone < 10 mins
                 if (!newUser && dbUser.secondsSinceLastSeen <= 600 && dbUser.secondsSinceLastAction > 60 && dbUser.lastWaitListPosition != -1 && bot.getWaitListPosition(data.id) != dbUser.lastWaitListPosition) {
-                    bot.moderateAddDJ(data.id, function () {
-                        if (dbUser.lastWaitListPosition <= room.djs.length && bot.getWaitListPosition(data.id) != dbUser.lastWaitListPosition) {
-                            bot.moderateMoveDJ(data.id, dbUser.lastWaitListPosition + 1);
+                    bot.moderateAddDJ(parseInt(data.id), function () {
+                        if (dbUser.lastWaitListPosition <= room.djs.length && bot.getWaitListPosition(parseInt(data.id)) != dbUser.lastWaitListPosition) {
+                            bot.moderateMoveDJ(parseInt(data.id), dbUser.lastWaitListPosition + 1);
                         }
                         setTimeout(function () {
                             bot.sendChat('/me put @' + data.username + ' back in line :thumbsup:')
@@ -192,7 +192,7 @@ function runBot(error, auth) {
 
                 db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', lastActive, username, warns, removes FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE userid = ?", [dj.id], function (error, row) {
                     z++;
-                    var position = bot.getWaitListPosition(dj.id);
+                    var position = bot.getWaitListPosition(parseInt(dj.id));
                     db.run('UPDATE USERS SET lastWaitListPosition = ? WHERE userid = ?', [position, dj.id]);
 
                     if (row != null) {
@@ -201,7 +201,7 @@ function runBot(error, auth) {
                         if (row.secondsSinceLastActive >= maxIdleTime && moment().isAfter(moment(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
                             bot.log('[IDLE]', position + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
                             if (row.warns > 0) {
-                                bot.moderateRemoveDJ(dj.id);
+                                bot.moderateRemoveDJ(parseInt(dj.id));
                                 bot.sendChat('@' + row.username + ' ' + config.responses.activeDJRemoveMessage);
                                 db.run('UPDATE DISCIPLINE SET warns = 0, removes = removes + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
                             }
@@ -277,7 +277,7 @@ function runBot(error, auth) {
 
         curUserList = bot.getUsers();
         curUserList.forEach(function (dj) {
-            var position = bot.getWaitListPosition(dj.id);
+            var position = bot.getWaitListPosition(parseInt(dj.id));
             db.run('UPDATE USERS SET lastWaitListPosition = ? WHERE userid = ?', [position, dj.id]);
         });
     });
@@ -334,7 +334,7 @@ function runBot(error, auth) {
             mehWaitlist.forEach(function (dj) {
                 if (dj.vote == '-1') {
                     bot.log('[REMOVE] Removed ' + dj.username + ' from wait list for mehing');
-                    bot.moderateRemoveDJ(dj.id);
+                    bot.moderateRemoveDJ(parseInt(dj.id));
                     bot.sendChat('@' + dj.username + ', voting MEH/Chato/:thumbsdown: while in line is prohibited. Check .rules.');
                 }
             });

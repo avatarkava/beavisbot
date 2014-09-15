@@ -12,12 +12,12 @@ exports.handler = function(data) {
             var position = parseInt(_.last(input, 1));            
             db.get('SELECT * FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE username = ?', [username.substring(1)], function (error, row) {
                 if (position <= room.djs.length && _.findWhere(room.djs, {id: row.userid})) {
-                    bot.moderateMoveDJ(row.userid, position);
+                    bot.moderateMoveDJ(parseInt(row.userid), position);
                 }
                 else {
-                    bot.moderateAddDJ(row.userid, function () {
+                    bot.moderateAddDJ(parseInt(row.userid), function () {
                         if (position <= room.djs.length) {
-                            bot.moderateMoveDJ(row.userid, position);
+                            bot.moderateMoveDJ(parseInt(row.userid), position);
                         }
                     });
                 }

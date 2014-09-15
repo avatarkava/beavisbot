@@ -50,13 +50,13 @@ exports.handler = function(data) {
                 bot.log('[DEBUG] ' + command + ': ' + username + ' (' + row.userid + ') ' + duration + ' by ' + data.un);
                 switch(command) {
                     case '.ban':
-                        bot.moderateBanUser(row.userid, 0, apiDuration, function() {
+                        bot.moderateBanUser(parseInt(row.userid), 0, apiDuration, function() {
                             bot.log('[BAN] ' + username + ' was banned for ' + duration + ' by ' + data.un);
                             db.run('UPDATE DISCIPLINE SET kicks = kicks + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [row.userid]);
                         });
                         break;
                     case '.unban':
-                        bot.moderateUnbanUser(row.userid, function() {
+                        bot.moderateUnbanUser(parseInt(row.userid), function() {
                             bot.sendChat('/me unbanning ' + username + '. This can take a few moments...');
                             bot.log('[UNBAN] ' + username + ' was unbanned by ' + data.un);
                         });
