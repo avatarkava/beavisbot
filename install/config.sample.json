@@ -1,5 +1,5 @@
 {
-    "botname": "SparkleBot",
+    "botname": "BeavisBot",
     "roomName": "room-name-slug-from-url",
     "superAdmin": "YourUsername",
     "auth": {
@@ -9,13 +9,13 @@
     "db": {
         "engine": "sqlite3",
         "sqlite3": {
-            "filePath": "sparkle.sqlite"
+            "filePath": "beavisbot.sqlite"
         },
         "mysql": {
             "host": "localhost",
             "username": "root",
             "password": "password",
-            "database": "sparklebot"
+            "database": "beavisbot"
         }
     },
     "apiKeys": {
@@ -23,7 +23,6 @@
         "lastFm": "lastFmApiKey",
         "lastFm_secret": "lastfmSecretKey"
     },
-    "admin": "usernameOfAdmin",
     "responses": {
         "botConnect": "",
         "freeSpin": "At DJ point milestones (500, 1000, 2000 and every 1k after), you may spin from any genre/date (still under 7 mins).  It should be played within 150 points of reaching and we call it a \"free spin\".  Check .rules for details.",

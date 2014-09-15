@@ -1,10 +1,27 @@
-module.exports = function(options) {
+module.exports = function (options) {
     var PlugAPI = require('plugapi');
-    var sqlite3 = require('sqlite3').verbose();
-
     bot = new PlugAPI(options.auth);
     config = options.config;
-    db = new sqlite3.Database(path.resolve(__dirname, config.db.sqlite3.filePath));
+
+    if (config.db.engine === 'sqlite3') {
+        var sqlite3 = require('sqlite3').verbose();
+        db = new sqlite3.Database(path.resolve(__dirname, config.db.sqlite3.filePath));
+    }
+    else if (config.db.engine === 'mysql') {
+        var mysql = require('mysql');
+        db = mysql.createConnection({
+                host: config.db.mysql.host,
+                user: config.db.mysql.username,
+                password: config.db.mysql.password,
+                database: config.db.mysql.database
+            }
+        );
+        db.connect();
+    }
+    else {
+        // We should error out with an invalid engine type
+    }
+
     package = require(path.resolve(__dirname, 'package.json'));
     request = require('request');
     _ = require('underscore');
@@ -13,7 +30,7 @@ module.exports = function(options) {
     commands = [];
     uptime = new Date();
     lastRpcMessage = new Date();
-    
+
     room = {
         users: [],
         djs: [],
@@ -21,7 +38,7 @@ module.exports = function(options) {
         votes: {},
         curates: {}
     };
-    
+
     iso_languages = {
         'af': 'Afrikkans',
         'ar': 'Arabic',
@@ -99,10 +116,10 @@ module.exports = function(options) {
     /**
      * Custom functions accessible to commands
      */
-    timeSince = function(timestamp) {
+    timeSince = function (timestamp) {
         message = moment.utc(timestamp).fromNow();
 
-        if(moment().isAfter(moment(timestamp).add(24, 'hours'))) {
+        if (moment().isAfter(moment(timestamp).add(24, 'hours'))) {
             message += ' (' + moment.utc(timestamp, 'YYYY-MM-DD HH:mm:ss').calendar() + ')';
         }
 

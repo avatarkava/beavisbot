@@ -1,14 +1,14 @@
 {
-    "name": "sparklebot",
-    "description": "A customizable plug.dj room bot.",
-    "version": "2.1.0",
+    "name": "BeavisBot",
+    "description": "A customizable plug.dj room bot based off of sparklebot by sharedferret",
+    "version": "1.0.0",
     "keywords": ["turntable.fm", "turntable", "plug.dj", "plug"],
     "repository": {
         "type": "git",
-        "url": "git://github.com/sharedferret/SparkleBot.git"
+        "url": "git://github.com/AvatarKava/BeavisBot.git"
     },
-    "author": "Kate Wellington <sharedferret@gmail.com>",
-    "main": "sparkle.js",
+    "author": "Mike Burke <mburke@phpmonkeys.com>",
+    "main": "bot.js",
     "directories": {
         "commands": "commands"
     },
@@ -19,6 +19,7 @@
         "plugapi": "*",
         "request": "*",
         "sqlite3": "*",
+        "node-mysql": "felixge/node-mysql",
         "string": "*",
         "underscore": "*",
         "moment": "*"
