@@ -18,7 +18,7 @@ function runBot(error, auth) {
 
     bot.connect(config.roomName);
 
-    bot.on('roomJoin', function (data) {
+    bot.on(PlugAPI.events.ROOM_JOIN, function (data) {
 
         bot.log('[INIT] Joined room:', data);
 
@@ -34,7 +34,8 @@ function runBot(error, auth) {
         });
     });
 
-    bot.on('chat', function (data) {
+    bot.on(PlugAPI.events.CHAT, function (data) {
+        data.message = data.message.trim();
         if (config.verboseLogging) {
             bot.log('[CHAT]', JSON.stringify(data, null, 2));
         }
@@ -52,7 +53,7 @@ function runBot(error, auth) {
         db.run('UPDATE DISCIPLINE SET warns = 0 WHERE userid = ?', [data.uid]);
     });
 
-    bot.on('userJoin', function (data) {
+    bot.on(PlugAPI.events.USER_JOIN, function (data) {
         bot.log('[JOIN]', data.username);
 
         var newUser = false;
@@ -101,9 +102,9 @@ function runBot(error, auth) {
 
                 // Restore spot in line if user has been gone < 10 mins
                 if (!newUser && dbUser.secondsSinceLastSeen <= 600 && dbUser.secondsSinceLastAction > 60 && dbUser.lastWaitListPosition != -1 && bot.getWaitListPosition(data.id) != dbUser.lastWaitListPosition) {
-                    bot.moderateAddDJ(parseInt(data.id), function () {
-                        if (dbUser.lastWaitListPosition <= room.djs.length && bot.getWaitListPosition(parseInt(data.id)) != dbUser.lastWaitListPosition) {
-                            bot.moderateMoveDJ(parseInt(data.id), dbUser.lastWaitListPosition + 1);
+                    bot.moderateAddDJ(data.id, function () {
+                        if (dbUser.lastWaitListPosition <= room.djs.length && bot.getWaitListPosition(data.id) != dbUser.lastWaitListPosition) {
+                            bot.moderateMoveDJ(data.id, dbUser.lastWaitListPosition + 1);
                         }
                         setTimeout(function () {
                             bot.sendChat('/me put @' + data.username + ' back in line :thumbsup:')
@@ -117,18 +118,18 @@ function runBot(error, auth) {
         }
     })
 
-    bot.on('userLeave', function (data) {
+    bot.on(PlugAPI.events.USER_LEAVE, function (data) {
         bot.log('[LEAVE]', 'User left: ' + data.username);
         db.run('UPDATE OR IGNORE USERS SET lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
     });
 
-    bot.on('userUpdate', function (data) {
+    bot.on(PlugAPI.events.USER_UPDATE, function (data) {
         if (config.verboseLogging) {
-            bot.log('[EVENT] userUpdate', data);
+            bot.log('[EVENT] USER_UPDATE', data);
         }
     });
 
-    bot.on('grab', function (data) {
+    bot.on(PlugAPI.events.GRAB, function (data) {
         var user = _.findWhere(bot.getUsers(), {id: data.id});
         if (user) {
             bot.log('[GRAB]', user.username + ' grabbed this song');
@@ -136,7 +137,7 @@ function runBot(error, auth) {
         db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
     });
 
-    bot.on('vote', function (data) {
+    bot.on(PlugAPI.events.VOTE, function (data) {
         var user = _.findWhere(bot.getUsers(), {id: data.i});
         if (user) {
             if (data.v == 1) {
@@ -149,9 +150,9 @@ function runBot(error, auth) {
         }
     });
 
-    bot.on('advance', function (data) {
+    bot.on(PlugAPI.events.ADVANCE, function (data) {
         if (config.verboseLogging) {
-            bot.log('[EVENT] advance ', JSON.stringify(data, null, 2));
+            bot.log('[EVENT] ADVANCE ', JSON.stringify(data, null, 2));
         }
 
         if (data.dj != null && data.media != null) {
@@ -192,7 +193,7 @@ function runBot(error, auth) {
 
                 db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', lastActive, username, warns, removes FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE userid = ?", [dj.id], function (error, row) {
                     z++;
-                    var position = bot.getWaitListPosition(parseInt(dj.id));
+                    var position = bot.getWaitListPosition(dj.id);
                     db.run('UPDATE USERS SET lastWaitListPosition = ? WHERE userid = ?', [position, dj.id]);
 
                     if (row != null) {
@@ -201,7 +202,7 @@ function runBot(error, auth) {
                         if (row.secondsSinceLastActive >= maxIdleTime && moment().isAfter(moment(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
                             bot.log('[IDLE]', position + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
                             if (row.warns > 0) {
-                                bot.moderateRemoveDJ(parseInt(dj.id));
+                                bot.moderateRemoveDJ(dj.id);
                                 bot.sendChat('@' + row.username + ' ' + config.responses.activeDJRemoveMessage);
                                 db.run('UPDATE DISCIPLINE SET warns = 0, removes = removes + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
                             }
@@ -236,29 +237,19 @@ function runBot(error, auth) {
             });
         }
 
-        // Cleanup functions
-        // @FIXME - Can't use this since it will remove people while they're in a long line
-        //db.run("UPDATE USERS SET lastWaitListPosition = -1 WHERE strftime('%s', 'now')-strftime('%s', lastSeen) > 600");
-
-    });
-
-    bot.on('historyUpdate', function (data) {
-
-        if (config.verboseLogging) {
-            bot.log('[EVENT] historyUpdate ', JSON.stringify(data, null, 2));
-        }
         // Write previous song data to DB
         // But only if the last song actually existed
-        if (_.first(data) != null) {
-            song = _.first(data);
-
+        if (data.lastPlay != null) {
+            song = data.lastPlay;
+/*
+@FIXME: This is broken right now.
             db.run('INSERT OR IGNORE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)',
-                [song.media.id,
-                    song.media.title,
-                    song.media.format,
-                    song.media.author,
-                    song.media.cid,
-                    song.media.duration]);
+                [song.id,
+                    song.title,
+                    song.format,
+                    song.author,
+                    song.cid,
+                    song.duration]);
             db.run('INSERT INTO PLAYS (userid, songid, upvotes, downvotes, snags, started, listeners) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)',
                 [song.user.id,
                     song.media.id,
@@ -266,18 +257,23 @@ function runBot(error, auth) {
                     song.score.negative,
                     song.score.grabs,
                     song.score.listeners]);
+                    */
         }
+
+        // Cleanup functions
+        // @FIXME - Can't use this since it will remove people while they're in a long line
+        //db.run("UPDATE USERS SET lastWaitListPosition = -1 WHERE strftime('%s', 'now')-strftime('%s', lastSeen) > 600");
 
     });
 
-    bot.on('djListUpdate', function (data) {
+    bot.on(PlugAPI.events.DJ_LIST_UPDATE, function (data) {
         if (config.verboseLogging) {
-            bot.log('[EVENT] djListUpdate', JSON.stringify(data, null, 2));
+            bot.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
         }
 
         curUserList = bot.getUsers();
         curUserList.forEach(function (dj) {
-            var position = bot.getWaitListPosition(parseInt(dj.id));
+            var position = bot.getWaitListPosition(dj.id);
             db.run('UPDATE USERS SET lastWaitListPosition = ? WHERE userid = ?', [position, dj.id]);
         });
     });
@@ -288,8 +284,9 @@ function runBot(error, auth) {
         }, 5000);
     }
 
-    bot.on('close', reconnect);
-    bot.on('error', reconnect);
+    bot.on(PlugAPI.events.CLOSE, reconnect);
+    bot.on(PlugAPI.events.ERROR, reconnect);
+
 
     function addUserToDb(user) {
         convertAPIUserID(user, function () {
@@ -334,7 +331,7 @@ function runBot(error, auth) {
             mehWaitlist.forEach(function (dj) {
                 if (dj.vote == '-1') {
                     bot.log('[REMOVE] Removed ' + dj.username + ' from wait list for mehing');
-                    bot.moderateRemoveDJ(parseInt(dj.id));
+                    bot.moderateRemoveDJ(dj.id);
                     bot.sendChat('@' + dj.username + ', voting MEH/Chato/:thumbsdown: while in line is prohibited. Check .rules.');
                 }
             });
@@ -364,20 +361,6 @@ function runBot(error, auth) {
         } catch (e) {
             console.error('Unable to load command: ', e);
         }
-
-        initializeDatabase();
-    }
-
-    function initializeDatabase() {
-        db.run('CREATE TABLE IF NOT EXISTS USERS (userid VARCHAR(255) PRIMARY KEY, username VARCHAR(255), language VARCHAR(10), joined TIMESTAMP, avatarID VARCHAR(255), lastWaitListPosition INTEGER, lastSeen TIMESTAMP, lastActive TIMESTAMP)');
-        db.run('CREATE TABLE IF NOT EXISTS SONGS (id VARCHAR(255) PRIMARY KEY, title VARCHAR(255), format VARCHAR(255), author VARCHAR(255), cid VARCHAR(255), duration DOUBLE)');
-        db.run('CREATE TABLE IF NOT EXISTS PLAYS (id INTEGER PRIMARY KEY AUTOINCREMENT, userid VARCHAR(255), songid VARCHAR(255), upvotes INTEGER, downvotes INTEGER, snags INTEGER, started TIMESTAMP, listeners INTEGER)');
-        db.run('CREATE TABLE IF NOT EXISTS SETTINGS (name VARCHAR(255) PRIMARY KEY, value TEXT, userid VARCHAR(255), timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP);');
-        db.run('CREATE TABLE IF NOT EXISTS CHAT (id INTEGER PRIMARY KEY AUTOINCREMENT, message VARCHAR(255), userid VARCHAR(255), timestamp TIMESTAMP)');
-        db.run('CREATE TABLE IF NOT EXISTS GIFTS (id INTEGER PRIMARY KEY AUTOINCREMENT, category VARCHAR(255), name VARCHAR(255), chat TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)');
-        db.run('CREATE TABLE IF NOT EXISTS DISCIPLINE (userid VARCHAR(255) PRIMARY KEY, warns INTEGER, removes INTEGER, kicks INTEGER, lastAction TIMESTAMP DEFAULT CURRENT_TIMESTAMP)');
-        db.run('CREATE TABLE IF NOT EXISTS FACTS (id integer PRIMARY KEY AUTOINCREMENT, category VARCHAR(255), fact varchar(255) NULL);');
-        db.run('CREATE TABLE IF NOT EXISTS SCOTT_PILGRIM (id integer PRIMARY KEY AUTOINCREMENT, quote varchar(255) NULL);');
     }
 
     function handleCommand(data) {

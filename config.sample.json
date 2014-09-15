@@ -3,19 +3,19 @@
     "roomName": "room-name-slug-from-url",
     "superAdmin": "YourUsername",
     "auth": {
-        "type": "email",
-        "cookies": {
-            "session": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx_xxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        },
-        "login": {
-            "email": "account-email-address@tld.com",
-            "password": "account-password"
-        }
+        "email": "account-email-address@tld.com",
+        "password": "account-password"
     },
     "db": {
-        "type": "sqlite3",
+        "engine": "sqlite3",
         "sqlite3": {
             "filePath": "sparkle.sqlite"
+        },
+        "mysql": {
+            "host": "localhost",
+            "username": "root",
+            "password": "password",
+            "database": "sparklebot"
         }
     },
     "apiKeys": {
