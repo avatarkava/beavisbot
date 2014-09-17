@@ -35,13 +35,14 @@ function runBot(error, auth) {
     });
 
     bot.on(PlugAPI.events.CHAT, function (data) {
-        data.message = data.message.trim();
         if (config.verboseLogging) {
             logger.info('[CHAT]', JSON.stringify(data, null, 2));
         }
         else {
             logger.info('[CHAT]', data.from.username + ': ' + data.message);
         }
+
+        data.message = data.message.trim();
         // Let people stay active with single-char, but don't let it spam up chat.
         if (data.message == '.') {
             bot.moderateDeleteChat(data.id);
@@ -241,28 +242,22 @@ function runBot(error, auth) {
         // But only if the last song actually existed
         if (data.lastPlay != null) {
             song = data.lastPlay;
-/*
-@FIXME: This is broken right now.
-            db.run('INSERT OR IGNORE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)',
-                [song.id,
-                    song.title,
-                    song.format,
-                    song.author,
-                    song.cid,
-                    song.duration]);
-            db.run('INSERT INTO PLAYS (userid, songid, upvotes, downvotes, snags, started, listeners) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)',
-                [song.user.id,
-                    song.media.id,
-                    song.score.positive,
-                    song.score.negative,
-                    song.score.grabs,
-                    song.score.listeners]);
-                    */
-        }
 
-        // Cleanup functions
-        // @FIXME - Can't use this since it will remove people while they're in a long line
-        //db.run("UPDATE USERS SET lastWaitListPosition = -1 WHERE strftime('%s', 'now')-strftime('%s', lastSeen) > 600");
+            db.run('INSERT OR IGNORE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)',
+                [song.media.id,
+                song.media.title,
+                song.media.format,
+                song.media.author,
+                song.media.cid,
+                song.media.duration]);
+            db.run('INSERT INTO PLAYS (userid, songid, upvotes, downvotes, snags, started, listeners) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)',
+                [song.dj.id,
+                song.media.id,
+                song.score.positive,
+                song.score.negative,
+                song.score.grabs,
+                song.score.listeners]);
+        }
 
     });
 
