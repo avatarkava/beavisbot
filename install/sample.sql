@@ -17,12 +17,12 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE IF NOT EXISTS `chat_log` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(10) unsigned NOT NULL,
   `user_id` int(10) unsigned NOT NULL,
-  `text` varchar(255) NOT NULL,
+  `message` varchar(255) NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
 
 -- --------------------------------------------------------
 
@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS `plays` (
   `mehs` int(10) unsigned NOT NULL DEFAULT '0',
   `grabs` int(10) unsigned NOT NULL DEFAULT '0',
   `listeners` int(10) unsigned NOT NULL DEFAULT '0',
+  `skipped` int(10) unsigned NOT NULL DEFAULT '0',
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -115,6 +116,7 @@ CREATE TABLE IF NOT EXISTS `songs` (
   `author` varchar(255) NOT NULL,
   `title` varchar(255) NOT NULL,
   `slug` varchar(255) NOT NULL,
+  `image` varchar(255) DEFAULT NULL,
   `release_date` date DEFAULT NULL,
   `format` tinyint(1) unsigned NOT NULL,
   `cid` varchar(255) NOT NULL,
@@ -131,15 +133,23 @@ CREATE TABLE IF NOT EXISTS `songs` (
 
 CREATE TABLE IF NOT EXISTS `users` (
   `id` int(10) unsigned NOT NULL,
-  `uername` varchar(255) NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL,
   `language` varchar(2) NOT NULL DEFAULT 'en',
-  `joined` datetime NOT NULL,
-  `avatar` varchar(255) NOT NULL,
+  `avatar_id` varchar(255) NOT NULL,
+  `badge` int(10) unsigned DEFAULT NULL,
+  `blurb` varchar(255) DEFAULT NULL,
+  `gRole` int(10) unsigned DEFAULT NULL,
+  `role` int(10) unsigned DEFAULT NULL,
+  `level` int(10) unsigned DEFAULT NULL,
+  `experience_points` int(10) unsigned DEFAULT NULL,
+  `plug_points` int(10) unsigned DEFAULT NULL,
   `last_waitlist_position` int(11) NOT NULL DEFAULT '-1',
+  `joined` datetime NOT NULL,
   `last_seen` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `last_active` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uername` (`uername`)
+  UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
