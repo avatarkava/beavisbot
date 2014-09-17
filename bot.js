@@ -2,7 +2,7 @@ var PlugAPI = require('plugapi');
 var fs = require('fs');
 path = require('path')
 var config = require(path.resolve(__dirname, 'config.json'));
-var runCount = 0;
+
 var roomHasActiveMods = false;
 var startupTimestamp = new Date();
 
@@ -10,7 +10,7 @@ runBot(false, config.auth);
 
 function runBot(error, auth) {
     if (error) {
-        console.log("[INIT] An error occurred: " + err);
+        logger.error("[INIT] An error occurred: " + err);
         return;
     }
 
@@ -20,7 +20,7 @@ function runBot(error, auth) {
 
     bot.on(PlugAPI.events.ROOM_JOIN, function (data) {
 
-        bot.log('[INIT] Joined room:', data);
+        logger.success('[INIT] Joined room:' + data);
 
         if (config.responses.botConnect !== "") {
             bot.sendChat(config.responses.botConnect);
@@ -37,10 +37,10 @@ function runBot(error, auth) {
     bot.on(PlugAPI.events.CHAT, function (data) {
         data.message = data.message.trim();
         if (config.verboseLogging) {
-            bot.log('[CHAT]', JSON.stringify(data, null, 2));
+            logger.info('[CHAT]', JSON.stringify(data, null, 2));
         }
         else {
-            bot.log('[CHAT]', data.un + ': ' + data.message);
+            logger.info('[CHAT]', data.un + ': ' + data.message);
         }
         // Let people stay active with single-char, but don't let it spam up chat.
         if (data.message == '.') {
@@ -54,7 +54,7 @@ function runBot(error, auth) {
     });
 
     bot.on(PlugAPI.events.USER_JOIN, function (data) {
-        bot.log('[JOIN]', data.username);
+        logger.info('[JOIN]', data.username);
 
         var newUser = false;
         var message = "";
@@ -65,11 +65,11 @@ function runBot(error, auth) {
                 if (dbUser == undefined) {
                     message = config.responses.welcome.newUser.replace('{username}', data.username);
                     newUser = true;
-                    bot.log('[JOIN]', data.username + ' is a first-time visitor to the room!');
+                    logger.info('[JOIN]', data.username + ' is a first-time visitor to the room!');
                 }
                 else {
                     message = config.responses.welcome.oldUser.replace('{username}', data.username);
-                    bot.log('[JOIN]', data.username + ' last seen ' + dbUser.secondsSinceLastSeen + ' seconds ago (' + dbUser.lastSeen + ')');
+                    logger.info('[JOIN]', data.username + ' last seen ' + dbUser.secondsSinceLastSeen + ' seconds ago (' + dbUser.lastSeen + ')');
                 }
 
                 db.run('UPDATE USERS SET lastSeen = CURRENT_TIMESTAMP, lastActive = CURRENT_TIMESTAMP, lastWaitListPosition = -1 WHERE userid = ?', [data.id]);
@@ -152,12 +152,12 @@ function runBot(error, auth) {
 
     bot.on(PlugAPI.events.ADVANCE, function (data) {
         if (config.verboseLogging) {
-            bot.log('[EVENT] ADVANCE ', JSON.stringify(data, null, 2));
+            logger.success('[EVENT] ADVANCE ', JSON.stringify(data, null, 2));
         }
 
         if (data.dj != null && data.media != null) {
-            bot.log('********************************************************************');
-            bot.log('[SONG]', data.dj.username + ' played: ' + data.media.author + ' - ' + data.media.title);
+            logger.success('********************************************************************');
+            logger.success('[SONG]', data.dj.username + ' played: ' + data.media.author + ' - ' + data.media.title);
             db.run('UPDATE USERS SET lastWaitListPosition = -1 WHERE userid = ?', [data.dj.id]);
         }
 
@@ -200,7 +200,7 @@ function runBot(error, auth) {
 
                         // Only bug idle people if the bot has been running for as long as the minimum idle time
                         if (row.secondsSinceLastActive >= maxIdleTime && moment().isAfter(moment(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
-                            bot.log('[IDLE]', position + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
+                            logger.warning('[IDLE]', position + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
                             if (row.warns > 0) {
                                 bot.moderateRemoveDJ(dj.id);
                                 bot.sendChat('@' + row.username + ' ' + config.responses.activeDJRemoveMessage);
@@ -215,7 +215,7 @@ function runBot(error, auth) {
                             if (dj.role > 1) {
                                 roomHasActiveMods = true;
                             }
-                            bot.log('[ACTIVE]', position + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
+                            logger.info('[ACTIVE]', position + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
                         }
                     }
 
@@ -228,7 +228,7 @@ function runBot(error, auth) {
 
                         // Only police this if there aren't any mods around
                         if (!roomHasActiveMods && config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
-                            bot.log('[SKIP] Skipped ' + data.dj.username + ' spinning a song of ' + data.media.duration + ' seconds');
+                            logger.warning('[SKIP] Skipped ' + data.dj.username + ' spinning a song of ' + data.media.duration + ' seconds');
                             bot.sendChat('Sorry @' + data.dj.username + ', this song is over our maximum room length of ' + (config.maxSongLengthSecs / 60) + ' minutes.');
                             bot.moderateForceSkip();
                         }
@@ -268,7 +268,7 @@ function runBot(error, auth) {
 
     bot.on(PlugAPI.events.DJ_LIST_UPDATE, function (data) {
         if (config.verboseLogging) {
-            bot.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+            logger.success('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
         }
 
         curUserList = bot.getUsers();
@@ -301,7 +301,7 @@ function runBot(error, auth) {
     function convertAPIUserID(user, callback) {
         db.get('SELECT userid FROM USERS WHERE username = ?', [user.username], function (error, row) {
             if (row != null && row.userid.length > 10) {
-                bot.log('Converting userid for ' + user.username + ': ' + row.userid + ' => ' + user.id);
+                logger.warning('Converting userid for ' + user.username + ': ' + row.userid + ' => ' + user.id);
                 db.run('DELETE FROM DISCIPLINE WHERE userid = ?', [row.userid]);
                 db.run('UPDATE PLAYS SET userid = ? WHERE userid = ?', [user.id, row.userid]);
                 db.run('UPDATE USERS SET userid = ? WHERE userid = ?', [user.id, row.userid], function () {
@@ -330,7 +330,7 @@ function runBot(error, auth) {
             mehWaitlist = bot.getWaitList();
             mehWaitlist.forEach(function (dj) {
                 if (dj.vote == '-1') {
-                    bot.log('[REMOVE] Removed ' + dj.username + ' from wait list for mehing');
+                    logger.warning('[REMOVE] Removed ' + dj.username + ' from wait list for mehing');
                     bot.moderateRemoveDJ(dj.id);
                     bot.sendChat('@' + dj.username + ', voting MEH/Chato/:thumbsdown: while in line is prohibited. Check .rules.');
                 }
@@ -391,7 +391,7 @@ function runBot(error, auth) {
             room.media = bot.getMedia();
 
             if (config.verboseLogging) {
-                bot.log('[COMMAND]', JSON.stringify(data, null, 2));
+                logger.info('[COMMAND]', JSON.stringify(data, null, 2));
             }
 
             command.handler(data);
@@ -432,10 +432,10 @@ function runBot(error, auth) {
     function suggestNewSongMetadata(valueToCorrect) {
         media = bot.getMedia();
         request('http://developer.echonest.com/api/v4/song/search?api_key=' + config.apiKeys.echoNest + '&format=json&results=1&combined=' + S(valueToCorrect).escapeHTML().stripPunctuation().s, function (error, response, body) {
-            bot.log('echonest body', body);
+            logger.info('echonest body', body);
             if (error) {
                 bot.sendChat('An error occurred while connecting to EchoNest.');
-                bot.log('EchoNest error', error);
+                bot.error('EchoNest error', error);
             } else {
                 response = JSON.parse(body).response;
 
@@ -445,7 +445,7 @@ function runBot(error, auth) {
                 };
 
                 // log
-                bot.log('[EchoNest] Original: "' + media.author + '" - "' + media.title + '". Suggestion: "' + room.media.suggested.author + '" - "' + room.media.suggested.title);
+                logger.info('[EchoNest] Original: "' + media.author + '" - "' + media.title + '". Suggestion: "' + room.media.suggested.author + '" - "' + room.media.suggested.title);
 
                 if (media.author != room.media.suggested.author || media.title != room.media.suggested.title) {
                     bot.sendChat('Hey, the metadata for this song looks wrong! Suggested Artist: "' + room.media.suggested.author + '". Title: "' + room.media.suggested.title + '". Type ".fixsong yes" to use the suggested tags.');

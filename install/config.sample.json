@@ -1,5 +1,5 @@
 {
-    "botname": "BeavisBot",
+    "botName": "BeavisBot",
     "roomName": "room-name-slug-from-url",
     "superAdmin": "YourUsername",
     "auth": {

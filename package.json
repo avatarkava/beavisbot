@@ -16,7 +16,7 @@
         "node": ">= 0.6.0"
     },
     "dependencies": {
-        "plugapi": "plugCubed/plugapi#develop",
+        "plugapi": "git://github.com/plugCubed/plugAPI.git#develop",
         "request": "*",
         "sqlite3": "*",
         "node-mysql": "felixge/node-mysql",

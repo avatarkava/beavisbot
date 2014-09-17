@@ -3,6 +3,8 @@ module.exports = function (options) {
     bot = new PlugAPI(options.auth);
     config = options.config;
 
+    logger = PlugAPI.getLogger('Bot');
+
     if (config.db.engine === 'sqlite3') {
         var sqlite3 = require('sqlite3').verbose();
         db = new sqlite3.Database(path.resolve(__dirname, config.db.sqlite3.filePath));
