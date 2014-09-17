@@ -198,7 +198,7 @@ function runBot(error, auth) {
 
                     if (row != null) {
 
-                        // Only bug idle people if the bot has been running for as long as the minimum idle time
+                        // Only bug idle people if the bot has been running for as long as the minimum idle time and they're not a DJ or on deck
                         if (row.secondsSinceLastActive >= maxIdleTime && moment().isAfter(moment(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
                             logger.warning('[IDLE]', position + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
                             if (row.warns > 0) {
@@ -206,7 +206,7 @@ function runBot(error, auth) {
                                 bot.sendChat('@' + row.username + ' ' + config.responses.activeDJRemoveMessage);
                                 db.run('UPDATE DISCIPLINE SET warns = 0, removes = removes + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
                             }
-                            else {
+                            else if (position > 1) {
                                 db.run('UPDATE DISCIPLINE SET warns = warns + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
                                 idleDJs.push(row.username);
                             }

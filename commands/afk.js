@@ -16,7 +16,7 @@ exports.handler = function(data) {
                 if (row != null) {
                     if(row.secondsSinceLastActive >= maxIdleTime) {
                         logger.warning('[IDLE] ' + z + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
-                        idleDJs.push(row.username + ' (' + timeSince(row.lastActive) + ')');
+                        idleDJs.push(row.username + ' (' + timeSince(row.lastActive, true) + ')');
                     }
                     else {
                         logger.info('[ACTIVE] ' + z + '. ' + row.username + ' last active ' + timeSince(row.lastActive));

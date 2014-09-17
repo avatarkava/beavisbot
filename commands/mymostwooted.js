@@ -9,7 +9,7 @@ exports.handler = function (data) {
                 return row['author'] + ' - ' + row['title'] + ' (+' + row['sum_up'] + ')';
             }).join(' • '));
         } else {
-            bot.sendChat('You haven\'t played anything in this room!');
+            bot.sendChat("You haven't played anything in this room!");
         }
     });
 };

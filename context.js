@@ -33,14 +33,6 @@ module.exports = function (options) {
     uptime = new Date();
     lastRpcMessage = new Date();
 
-    room = {
-        users: [],
-        djs: [],
-        media: {},
-        votes: {},
-        curates: {}
-    };
-
     iso_languages = {
         'af': 'Afrikkans',
         'ar': 'Arabic',
@@ -118,8 +110,9 @@ module.exports = function (options) {
     /**
      * Custom functions accessible to commands
      */
-    timeSince = function (timestamp) {
-        message = moment.utc(timestamp).fromNow();
+    timeSince = function (timestamp, ago) {
+        ago = typeof ago !== 'undefined' ? ago : false;
+        message = moment.utc(timestamp).fromNow(ago);
 
         if (moment().isAfter(moment(timestamp).add(24, 'hours'))) {
             message += ' (' + moment.utc(timestamp, 'YYYY-MM-DD HH:mm:ss').calendar() + ')';
