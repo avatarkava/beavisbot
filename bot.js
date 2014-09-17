@@ -59,7 +59,7 @@ function runBot(error, auth) {
         var newUser = false;
         var message = "";
 
-        if (data.username != config.botname) {
+        if (data.username != bot.getUser().username) {
             getUserFromDb(data, function (dbUser) {
 
                 if (dbUser == undefined) {
@@ -396,7 +396,7 @@ function runBot(error, auth) {
 
             command.handler(data);
         }
-        else if (data.message.indexOf('@' + config.botname) > -1) {
+        else if (data.message.indexOf('@' + bot.getUser().username) > -1) {
             botMentionResponse(data);
         }
     }
