@@ -18,7 +18,7 @@ function runBot(error, auth) {
 
     bot.connect(config.roomName);
 
-    bot.on(PlugAPI.events.ROOM_JOIN, function (data) {
+    bot.on('join', function (data) {
 
         logger.success('[INIT] Joined room:' + data);
 
@@ -34,7 +34,7 @@ function runBot(error, auth) {
         });
     });
 
-    bot.on(PlugAPI.events.CHAT, function (data) {
+    bot.on('chat', function (data) {
         if (config.verboseLogging) {
             logger.info('[CHAT]', JSON.stringify(data, null, 2));
         }
@@ -54,7 +54,7 @@ function runBot(error, auth) {
         db.run('UPDATE DISCIPLINE SET warns = 0 WHERE userid = ?', [data.from.id]);
     });
 
-    bot.on(PlugAPI.events.USER_JOIN, function (data) {
+    bot.on('userJoin', function (data) {
         logger.info('[JOIN]', data.username);
 
         var newUser = false;
@@ -119,18 +119,18 @@ function runBot(error, auth) {
         }
     })
 
-    bot.on(PlugAPI.events.USER_LEAVE, function (data) {
+    bot.on('userLeave', function (data) {
         logger.info('[LEAVE]', 'User left: ' + data.username);
         db.run('UPDATE OR IGNORE USERS SET lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
     });
 
-    bot.on(PlugAPI.events.USER_UPDATE, function (data) {
+    bot.on('userUpdate', function (data) {
         if (config.verboseLogging) {
             logger.info('[EVENT] USER_UPDATE', data);
         }
     });
 
-    bot.on(PlugAPI.events.GRAB, function (data) {
+    bot.on('grab', function (data) {
         var user = _.findWhere(bot.getUsers(), {id: data.id});
         if (user) {
             logger.info('[GRAB]', user.username + ' grabbed this song');
@@ -138,7 +138,7 @@ function runBot(error, auth) {
         db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
     });
 
-    bot.on(PlugAPI.events.VOTE, function (data) {
+    bot.on('vote', function (data) {
         var user = _.findWhere(bot.getUsers(), {id: data.i});
         if (user) {
             if (data.v == 1) {
@@ -151,7 +151,7 @@ function runBot(error, auth) {
         }
     });
 
-    bot.on(PlugAPI.events.ADVANCE, function (data) {
+    bot.on('advance', function (data) {
         if (config.verboseLogging) {
             logger.success('[EVENT] ADVANCE ', JSON.stringify(data, null, 2));
         }
@@ -261,7 +261,7 @@ function runBot(error, auth) {
 
     });
 
-    bot.on(PlugAPI.events.DJ_LIST_UPDATE, function (data) {
+    bot.on('djListUpdate', function (data) {
         if (config.verboseLogging) {
             logger.success('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
         }
@@ -277,8 +277,8 @@ function runBot(error, auth) {
         setInterval(monitorDJList, 5000);
     }
 
-    bot.on(PlugAPI.events.CLOSE, reconnect);
-    bot.on(PlugAPI.events.ERROR, reconnect);
+    bot.on('close', reconnect);
+    bot.on('error', reconnect);
 
 
     function addUserToDb(user) {

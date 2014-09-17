@@ -18,8 +18,9 @@
     "dependencies": {
         "plugapi": "git://github.com/plugCubed/plugAPI.git#develop",
         "request": "*",
+        "sequelize": "*",
+        "mysql": "*",
         "sqlite3": "*",
-        "node-mysql": "felixge/node-mysql",
         "string": "*",
         "underscore": "*",
         "moment": "*"

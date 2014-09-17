@@ -6,12 +6,13 @@
         "password": "account-password"
     },
     "db": {
-        "engine": "sqlite3",
-        "sqlite3": {
-            "filePath": "beavisbot.sqlite"
+        "dialect": "mysql",
+        "sqlite": {
+            "database": "BeavisBot.sqlite"
         },
         "mysql": {
             "host": "localhost",
+            "port": "3306",
             "username": "root",
             "password": "password",
             "database": "beavisbot"

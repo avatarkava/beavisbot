@@ -1,28 +1,34 @@
 module.exports = function (options) {
     var PlugAPI = require('plugapi');
+    var Sequelize = require('sequelize');
+
     bot = new PlugAPI(options.auth);
     config = options.config;
-
     logger = PlugAPI.getLogger('Bot');
 
-    if (config.db.engine === 'sqlite3') {
-        var sqlite3 = require('sqlite3').verbose();
-        db = new sqlite3.Database(path.resolve(__dirname, config.db.sqlite3.filePath));
+    if (config.db.dialect === 'sqlite') {
+        sequelize = new Sequelize(config.db.sqlite.path, null, null, {
+            dialect: 'sqlite',
+            logging: config.verboseLogging
+        });
     }
-    else if (config.db.engine === 'mysql') {
-        var mysql = require('mysql');
-        db = mysql.createConnection({
-                host: config.db.mysql.host,
-                user: config.db.mysql.username,
-                password: config.db.mysql.password,
-                database: config.db.mysql.database
-            }
-        );
-        db.connect();
+    else if (config.db.dialect === 'mysql') {
+        sequelize = new Sequelize(config.db.mysql.database, config.db.mysql.username, config.db.mysql.password, {
+            dialect: 'mysql',
+            host: config.db.mysql.host,
+            port: config.db.mysql.port,
+            logging: config.verboseLogging
+        });
     }
-    else {
-        // We should error out with an invalid engine type
-    }
+
+    sequelize.authenticate().complete(function (err) {
+        if (err) {
+            logger.error('Unable to connect to the database:', err);
+        }
+        else {
+            logger.success('Connected to ' + config.db.dialect + ' database');
+        }
+    });
 
     package = require(path.resolve(__dirname, 'package.json'));
     request = require('request');
@@ -122,4 +128,5 @@ module.exports = function (options) {
     };
 
 
-};
+}
+;
