@@ -11,7 +11,7 @@ exports.handler = function(data) {
             user = _.findWhere(room.users, {username: username.substring(1)});
             if (user) {
                 bot.moderateAddDJ(parseInt(user.id), function() {
-                    bot.log('Adding ' + username + ' to list: ' + user.id);
+                    logger.info('Adding ' + username + ' to list: ' + user.id);
                 });
             }
         }

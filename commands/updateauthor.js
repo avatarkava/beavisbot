@@ -13,7 +13,7 @@ exports.handler = function(data) {
                     function(error) {
                         if (error) {
                             bot.sendChat('An error occurred.');
-                            bot.log('Error while updating song ' + input[1], error);
+                            logger.error('Error while updating song ' + input[1], error);
                         } else {
                             bot.sendChat('Artist updated.')
                         }

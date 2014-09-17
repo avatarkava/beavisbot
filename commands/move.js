@@ -21,7 +21,7 @@ exports.handler = function(data) {
                         }
                     });
                 }
-                bot.log('Moving ' + username + ' to position: ' + position);
+                logger.info('Moving ' + username + ' to position: ' + position);
             });
         }
     }

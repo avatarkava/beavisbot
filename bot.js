@@ -119,20 +119,20 @@ function runBot(error, auth) {
     })
 
     bot.on(PlugAPI.events.USER_LEAVE, function (data) {
-        bot.log('[LEAVE]', 'User left: ' + data.username);
+        logger.info('[LEAVE]', 'User left: ' + data.username);
         db.run('UPDATE OR IGNORE USERS SET lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
     });
 
     bot.on(PlugAPI.events.USER_UPDATE, function (data) {
         if (config.verboseLogging) {
-            bot.log('[EVENT] USER_UPDATE', data);
+            logger.info('[EVENT] USER_UPDATE', data);
         }
     });
 
     bot.on(PlugAPI.events.GRAB, function (data) {
         var user = _.findWhere(bot.getUsers(), {id: data.id});
         if (user) {
-            bot.log('[GRAB]', user.username + ' grabbed this song');
+            logger.info('[GRAB]', user.username + ' grabbed this song');
         }
         db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
     });
@@ -141,10 +141,10 @@ function runBot(error, auth) {
         var user = _.findWhere(bot.getUsers(), {id: data.i});
         if (user) {
             if (data.v == 1) {
-                bot.log('[VOTE]', user.username + ' - woot! (+1)');
+                logger.info('[VOTE]', user.username + ' - woot! (+1)');
             }
             else if (data.v < 0) {
-                bot.log('[VOTE]', user.username + ' - meh (-1)');
+                logger.info('[VOTE]', user.username + ' - meh (-1)');
             }
 
         }

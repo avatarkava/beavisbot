@@ -17,9 +17,9 @@ exports.handler = function (data) {
             function(error) {
                 if (error) {
                     bot.sendChat('An error occurred.');
-                    bot.log('Error while updating event. ', error);
+                    logger.error('Error while updating event. ', error);
                 } else {
-                    bot.log("[EVENT] " + event);
+                    logger.info("[EVENT] " + event);
                     bot.sendChat('Event updated, ' + data.un);
                 }
                 bot.moderateDeleteChat(data.cid);

@@ -17,9 +17,9 @@ exports.handler = function (data) {
             function(error) {
                 if (error) {
                     bot.sendChat('An error occurred.');
-                    bot.log('Error while updating theme. ', error);
+                    logger.error('Error while updating theme. ', error);
                 } else {
-                    bot.log("[THEME] " + theme);
+                    logger.info("[THEME] " + theme);
                     bot.sendChat('Theme updated, ' + data.un);
                 }
                 bot.moderateDeleteChat(data.cid);
