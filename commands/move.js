@@ -4,7 +4,7 @@ exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function(data) {
     if (data.from.role > 1) {
-        djs = room.getDJs();
+        djs = bot.getDJs();
         bot.moderateDeleteChat(data.id);
         var input = data.message.split(' ');
         if (input.length >= 3) {

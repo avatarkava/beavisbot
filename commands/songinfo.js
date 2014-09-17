@@ -4,7 +4,7 @@ exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function(data) {
     var songId;
-    media = room.getMedia();
+    media = bot.getMedia();
     if (data.message.length > 10) {
         songId = data.message.substring(10);
     } else if (media != null) {

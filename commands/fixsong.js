@@ -12,11 +12,11 @@ exports.handler = function(data) {
             } else {
                 response = JSON.parse(body).response;
                 
-                room.getMedia().suggested = {
+                bot.getMedia().suggested = {
                     author: response.songs[0].artist_name,
                     title: response.songs[0].title
                 };
-                bot.sendChat('Suggested Artist: "' + room.getMedia().suggested.author + '". Title: "' + room.getMedia().suggested.title + '". Type ".fixsong yes" to use the suggested tags.');
+                bot.sendChat('Suggested Artist: "' + bot.getMedia().suggested.author + '". Title: "' + bot.getMedia().suggested.title + '". Type ".fixsong yes" to use the suggested tags.');
             }
         });
     }
@@ -28,17 +28,17 @@ exports.handler = function(data) {
     
     var input = data.message.split(' ');
     
-    if (data.from.role > 1 || (data.from.id == room.getMedia().currentDJ && input[1] != 'yes')) {
+    if (data.from.role > 1 || (data.from.id == bot.getMedia().currentDJ && input[1] != 'yes')) {
         bot.sendChat('This command is only available to bouncers, managers, and hosts.');
         return;
     } 
     
     if (input[1] == 'yes') {
         // commit suggested song value to DB and room.media
-        if (room.getMedia().suggested) {
-            room.getMedia().author = room.getMedia().suggested.author;
-            room.getMedia().title = room.getMedia().suggested.title;
-            db.run('INSERT OR REPLACE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)', [room.getMedia().id, room.getMedia().title, room.getMedia().format, room.getMedia().author, room.getMedia().cid, room.getMedia().duration]);
+        if (bot.getMedia().suggested) {
+            bot.getMedia().author = bot.getMedia().suggested.author;
+            bot.getMedia().title = bot.getMedia().suggested.title;
+            db.run('INSERT OR REPLACE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)', [bot.getMedia().id, bot.getMedia().title, bot.getMedia().format, bot.getMedia().author, bot.getMedia().cid, bot.getMedia().duration]);
             bot.sendChat('Database updated with corrected values.');
         } else {
             bot.sendChat('No suggested values present.');
@@ -46,12 +46,12 @@ exports.handler = function(data) {
     } else if (input[1] == 'artist') {
         // commit corrected artist value to DB and room.media
         var artist = _.rest(input, 2).join(' ');
-        room.getMedia().author = artist;
-        db.run('INSERT OR REPLACE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)', [room.getMedia().id, room.getMedia().title, room.getMedia().format, room.getMedia().author, room.getMedia().cid, room.getMedia().duration],
+        bot.getMedia().author = artist;
+        db.run('INSERT OR REPLACE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)', [bot.getMedia().id, bot.getMedia().title, bot.getMedia().format, bot.getMedia().author, bot.getMedia().cid, bot.getMedia().duration],
             function(error) {
                 if (error) {
                     bot.sendChat('An error occurred.');
-                    logger.error('Error while updating song ' + room.getMedia().id, error);
+                    logger.error('Error while updating song ' + bot.getMedia().id, error);
                 } else {
                     bot.sendChat('Author updated.')
                 }
@@ -59,22 +59,22 @@ exports.handler = function(data) {
     } else if (input[1] == 'title') {
         // commit corrected title value to DB and room.media
         var title = _.rest(input, 2).join(' ');
-        room.getMedia().title = title;
-        db.run('INSERT OR REPLACE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)', [room.getMedia().id, room.getMedia().title, room.getMedia().format, room.getMedia().author, room.getMedia().cid, room.getMedia().duration],
+        bot.getMedia().title = title;
+        db.run('INSERT OR REPLACE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)', [bot.getMedia().id, bot.getMedia().title, bot.getMedia().format, bot.getMedia().author, bot.getMedia().cid, bot.getMedia().duration],
             function(error) {
             if (error) {
                 bot.sendChat('An error occurred.');
-                logger.error('Error while updating song ' + room.getMedia().id, error);
+                logger.error('Error while updating song ' + bot.getMedia().id, error);
             } else {
                 bot.sendChat('Title updated.')
             }
         });
     } else if (input[1] == 'check') {
         // search echonest
-        checkEchoNest(room.getMedia().author + ' ' + room.getMedia().title);
+        checkEchoNest(bot.getMedia().author + ' ' + bot.getMedia().title);
     } else {
         // first, search db
-        db.get('SELECT author, title FROM SONGS WHERE id = ?', [room.getMedia().id],
+        db.get('SELECT author, title FROM SONGS WHERE id = ?', [bot.getMedia().id],
             function(error, row) {
             logger.info('db response: ', row);
             if (row != null) {
@@ -82,7 +82,7 @@ exports.handler = function(data) {
             } else {
                 // check echonest
                 logger.info('checking echonest');
-                checkEchoNest(room.getMedia().author + ' ' + room.getMedia().title);
+                checkEchoNest(bot.getMedia().author + ' ' + bot.getMedia().title);
             }
         });
     }

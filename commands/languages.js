@@ -3,7 +3,7 @@ exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = false;
 exports.handler = function(data) {
-    language_array = _.pluck(room.getUsers(), 'language');
+    language_array = _.pluck(bot.getUsers(), 'language');
     languages = {}
     
     for (i = 0; i < language_array.length; i++) {
