@@ -3,7 +3,7 @@ exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;
 exports.handler = function(data) {
-    if (_.findWhere(room.users, {id: data.uid}).role > 1 && config.activeDJTimeoutMins > 0) {
+    if (data.from.role > 1 && config.activeDJTimeoutMins > 0) {
 
         var maxIdleTime = config.activeDJTimeoutMins * 60;
         var idleDJs = [];

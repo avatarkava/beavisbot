@@ -3,8 +3,8 @@ exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;
 exports.handler = function (data) {
-    if (_.findWhere(room.users, {id: data.uid}).role > 1) {
-        bot.moderateDeleteChat(data.cid);
+    if (data.from.role > 1) {
+        bot.moderateDeleteChat(data.id);
         var message = "";
         var input = _.rest(data.message.split(' '), 1).join(' ').trim();
         if (input.length > 1) {

@@ -3,15 +3,15 @@ exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function(data) {
-    if (_.findWhere(room.users, {id: data.uid}).role > 1) {
-        bot.moderateDeleteChat(data.cid);
+    if (data.from.role > 1) {
+        bot.moderateDeleteChat(data.id);
         var input = data.message.split(' ');
         var username = _.rest(input, 1).join(' ').trim();
         if (username) {
             user = _.findWhere(room.users, {username: username.substring(1)});
             if (user) {
-                bot.moderateAddDJ(parseInt(user.id), function() {
-                    logger.info('Adding ' + username + ' to list: ' + user.id);
+                bot.moderateAddDJ(user.id, function() {
+                    logger.info('[ADD] ' + data.from.username + ' added ' + username + ' to waitlist.');
                 });
             }
         }

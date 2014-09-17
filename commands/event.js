@@ -7,29 +7,29 @@ exports.handler = function (data) {
     var input = data.message.split(' ');
     var event = _.rest(input, 1).join(' ');
 
-    if (_.findWhere(room.users, {id: data.uid}).role > 2 && event) {
+    if (data.from.role > 2 && event) {
 
         if(event == 'reset' || event == 'clear') {
             event = 'No events currently scheduled.'
         }
 
-        db.run('REPLACE INTO SETTINGS (name, value, userid, timestamp) VALUES (?, ?, ?, CURRENT_TIMESTAMP)', ['event', event, data.uid],
+        db.run('REPLACE INTO SETTINGS (name, value, userid, timestamp) VALUES (?, ?, ?, CURRENT_TIMESTAMP)', ['event', event, data.from.id],
             function(error) {
                 if (error) {
                     bot.sendChat('An error occurred.');
                     logger.error('Error while updating event. ', error);
                 } else {
                     logger.info("[EVENT] " + event);
-                    bot.sendChat('Event updated, ' + data.un);
+                    bot.sendChat('Event updated, ' + data.from.username);
                 }
-                bot.moderateDeleteChat(data.cid);
+                bot.moderateDeleteChat(data.id);
             });
     }
     else {
         db.get("SELECT value AS 'event', username, timestamp FROM SETTINGS s INNER JOIN USERS ON s.userid = USERS.userid WHERE name = ? LIMIT 1", ['event'], function (error, row) {
             if (row != null) {
                 message = row.event;
-                if(_.findWhere(room.users, {id: data.uid}).role > 2) {
+                if(data.from.role > 2) {
                     message += ' (set ' + timeSince(row.timestamp) + ' by ' + row.username + ')';
                 }
                 bot.sendChat('/me ' + message);

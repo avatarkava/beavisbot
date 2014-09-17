@@ -4,10 +4,8 @@ exports.enabled = false;
 exports.matchStart = true;
 exports.handler = function(data) {
 
-    var permission = _.findWhere(room.users, {id: data.uid}).role;
-
     // Only bouncers and above can call this
-    if (permission > 1) {
+    if (data.from.role > 1) {
 
         var input = data.message.split(' ');
         var command = _.first(input);
@@ -28,7 +26,7 @@ exports.handler = function(data) {
         }
 
         // Don't let bouncers get too feisty (API should prohibit this, but just making sure!
-        if (permission == 2) {
+        if (data.from.role == 2) {
             duration = 'HOUR';
         }
 
@@ -50,14 +48,14 @@ exports.handler = function(data) {
                 switch(command) {
                     case '.ban':
                         bot.moderateBanUser(parseInt(row.userid), 0, apiDuration, function() {
-                            logger.warning('[BAN] ' + username + ' was banned for ' + duration + ' by ' + data.un);
+                            logger.warning('[BAN] ' + username + ' was banned for ' + duration + ' by ' + data.from.username);
                             db.run('UPDATE DISCIPLINE SET kicks = kicks + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [row.userid]);
                         });
                         break;
                     case '.unban':
                         bot.moderateUnbanUser(parseInt(row.userid), function() {
                             bot.sendChat('/me unbanning ' + username + '. This can take a few moments...');
-                            logger.info('[UNBAN] ' + username + ' was unbanned by ' + data.un);
+                            logger.info('[UNBAN] ' + username + ' was unbanned by ' + data.from.username);
                         });
                         break;
                     default:

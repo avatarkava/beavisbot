@@ -40,17 +40,17 @@ function runBot(error, auth) {
             logger.info('[CHAT]', JSON.stringify(data, null, 2));
         }
         else {
-            logger.info('[CHAT]', data.un + ': ' + data.message);
+            logger.info('[CHAT]', data.from.username + ': ' + data.message);
         }
         // Let people stay active with single-char, but don't let it spam up chat.
         if (data.message == '.') {
-            bot.moderateDeleteChat(data.cid);
+            bot.moderateDeleteChat(data.id);
         }
         else {
             handleCommand(data);
         }
-        db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.uid]);
-        db.run('UPDATE DISCIPLINE SET warns = 0 WHERE userid = ?', [data.uid]);
+        db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.from.id]);
+        db.run('UPDATE DISCIPLINE SET warns = 0 WHERE userid = ?', [data.from.id]);
     });
 
     bot.on(PlugAPI.events.USER_JOIN, function (data) {
