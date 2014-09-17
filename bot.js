@@ -504,6 +504,6 @@ function runBot(error, auth) {
         ];
         var randomIndex = _.random(0, strings.length - 1);
         var message = strings[randomIndex];
-        bot.sendChat(message.replace('{sender}', data.un));
+        bot.sendChat(message.replace('{sender}', data.from.username));
     }
 }
