@@ -385,11 +385,6 @@ function runBot(error, auth) {
 
         if (command && command.enabled) {
 
-            // @FIXME - not efficient, but convenient!
-            room.djs = bot.getDJs();
-            room.users = bot.getUsers();
-            room.media = bot.getMedia();
-
             if (config.verboseLogging) {
                 logger.info('[COMMAND]', JSON.stringify(data, null, 2));
             }

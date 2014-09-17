@@ -8,7 +8,7 @@ exports.handler = function(data) {
         var input = data.message.split(' ');
         var username = _.rest(input, 1).join(' ').trim();
         if (username) {
-            user = _.findWhere(room.users, {username: username.substring(1)});
+            user = _.findWhere(room.getUsers(), {username: username.substring(1)});
             if (user) {
                 bot.moderateAddDJ(user.id, function() {
                     logger.info('[ADD] ' + data.from.username + ' added ' + username + ' to waitlist.');
