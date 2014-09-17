@@ -2,7 +2,7 @@ exports.names = ['.ban', '.unban'];
 exports.hidden = true;
 exports.enabled = false;
 exports.matchStart = true;
-exports.handler = function(data) {
+exports.handler = function (data) {
 
     // Only bouncers and above can call this
     if (data.from.role > 1) {
@@ -30,7 +30,7 @@ exports.handler = function(data) {
             duration = 'HOUR';
         }
 
-        switch(duration) {
+        switch (duration) {
             case 'HOUR':
                 apiDuration = 60;
                 break;
@@ -44,16 +44,16 @@ exports.handler = function(data) {
         }
 
         db.get('SELECT * FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE username = ?', [username.substring(1)], function (error, row) {
-            if(row) {
-                switch(command) {
+            if (row) {
+                switch (command) {
                     case '.ban':
-                        bot.moderateBanUser(row.userid, 0, apiDuration, function() {
+                        bot.moderateBanUser(row.userid, 0, apiDuration, function () {
                             logger.warning('[BAN] ' + username + ' was banned for ' + duration + ' by ' + data.from.username);
                             db.run('UPDATE DISCIPLINE SET kicks = kicks + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [row.userid]);
                         });
                         break;
                     case '.unban':
-                        bot.moderateUnbanUser(row.userid, function() {
+                        bot.moderateUnbanUser(row.userid, function () {
                             bot.sendChat('/me unbanning ' + username + '. This can take a few moments...');
                             logger.info('[UNBAN] ' + username + ' was unbanned by ' + data.from.username);
                         });

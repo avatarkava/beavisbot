@@ -10,6 +10,6 @@ exports.handler = function (data) {
         'http://www.lolwithme.org/wp-content/uploads/tacocat.jpg',
         'http://i.imgur.com/lSiZUtB.jpg'
     ];
-    var randomIndex = _.random(0, strings.length-1);
+    var randomIndex = _.random(0, strings.length - 1);
     bot.sendChat(strings[randomIndex]);
 };

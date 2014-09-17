@@ -12,6 +12,6 @@ exports.handler = function (data) {
         'http://www.bubblews.com/assets/images/news/866355749_1370199483.png',
         'http://i.imgur.com/WN5UZ4g.gif'
     ];
-    var randomIndex = _.random(0, strings.length-1);
+    var randomIndex = _.random(0, strings.length - 1);
     bot.sendChat(strings[randomIndex]);
 };

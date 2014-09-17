@@ -9,12 +9,12 @@ exports.handler = function (data) {
 
     if (data.from.role > 2 && event) {
 
-        if(event == 'reset' || event == 'clear') {
+        if (event == 'reset' || event == 'clear') {
             event = 'No events currently scheduled.'
         }
 
         db.run('REPLACE INTO SETTINGS (name, value, userid, timestamp) VALUES (?, ?, ?, CURRENT_TIMESTAMP)', ['event', event, data.from.id],
-            function(error) {
+            function (error) {
                 if (error) {
                     bot.sendChat('An error occurred.');
                     logger.error('Error while updating event. ', error);
@@ -29,7 +29,7 @@ exports.handler = function (data) {
         db.get("SELECT value AS 'event', username, timestamp FROM SETTINGS s INNER JOIN USERS ON s.userid = USERS.userid WHERE name = ? LIMIT 1", ['event'], function (error, row) {
             if (row != null) {
                 message = row.event;
-                if(data.from.role > 2) {
+                if (data.from.role > 2) {
                     message += ' (set ' + timeSince(row.timestamp) + ' by ' + row.username + ')';
                 }
                 bot.sendChat('/me ' + message);

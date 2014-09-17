@@ -245,18 +245,18 @@ function runBot(error, auth) {
 
             db.run('INSERT OR IGNORE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)',
                 [song.media.id,
-                song.media.title,
-                song.media.format,
-                song.media.author,
-                song.media.cid,
-                song.media.duration]);
+                    song.media.title,
+                    song.media.format,
+                    song.media.author,
+                    song.media.cid,
+                    song.media.duration]);
             db.run('INSERT INTO PLAYS (userid, songid, upvotes, downvotes, snags, started, listeners) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)',
                 [song.dj.id,
-                song.media.id,
-                song.score.positive,
-                song.score.negative,
-                song.score.grabs,
-                song.score.listeners]);
+                    song.media.id,
+                    song.score.positive,
+                    song.score.negative,
+                    song.score.grabs,
+                    song.score.listeners]);
         }
 
     });
@@ -274,9 +274,7 @@ function runBot(error, auth) {
     });
 
     if (config.requireWootInLine || config.activeDJTimeoutMins > 0) {
-        setInterval(function () {
-            monitorDJList();
-        }, 5000);
+        setInterval(monitorDJList, 5000);
     }
 
     bot.on(PlugAPI.events.CLOSE, reconnect);
@@ -353,7 +351,8 @@ function runBot(error, auth) {
                     matchStart: command.matchStart
                 })
             });
-        } catch (e) {
+        }
+        catch (e) {
             console.error('Unable to load command: ', e);
         }
     }

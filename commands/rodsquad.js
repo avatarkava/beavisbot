@@ -7,6 +7,6 @@ exports.handler = function (data) {
         'http://media.giphy.com/media/NBvCrzQgLh9cc/giphy.gif',
         'http://glogreen.files.wordpress.com/2011/02/glowstickanime.gif'
     ];
-    var randomIndex = _.random(0, strings.length-1);
+    var randomIndex = _.random(0, strings.length - 1);
     bot.sendChat(strings[randomIndex]);
 };

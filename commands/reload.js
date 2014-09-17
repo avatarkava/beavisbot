@@ -1,4 +1,4 @@
-exports.names = ['.reload','.reboot','.restart'];
+exports.names = ['.reload', '.reboot', '.restart'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;
