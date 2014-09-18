@@ -18,7 +18,7 @@ config.json
 roomState.json
 
 *.sqlite
-!sparkle.sample.sqlite
+!sample.sqlite
 test.js
 
 .idea

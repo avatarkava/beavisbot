@@ -7,8 +7,9 @@ module.exports = function (options) {
     logger = PlugAPI.getLogger('Bot');
 
     if (config.db.dialect === 'sqlite') {
-        sequelize = new Sequelize(config.db.sqlite.path, null, null, {
+        sequelize = new Sequelize(null, null, null, {
             dialect: 'sqlite',
+            storage: config.db.sqlite.storage,
             logging: config.verboseLogging
         });
     }
@@ -29,6 +30,41 @@ module.exports = function (options) {
             logger.success('Connected to ' + config.db.dialect + ' database');
         }
     });
+
+    /**
+     * Build up the models and relations
+     */
+    var models = [
+        'EventResponse',
+        'Karma',
+        'Play',
+        'Quote',
+        'RoomEvent',
+        'Song',
+        'SongResponse',
+        'User'
+    ];
+
+    models.forEach(function (model) {
+        this[model] = sequelize.import('models/' + model);
+    });
+
+    Song
+        .hasMany(Play);
+    User
+        .hasMany(Karma)
+        .hasMany(Karma, {foreignKey: 'modUserId'})
+        .hasMany(Play)
+        .hasMany(RoomEvent, {foreignKey: 'modUserId'});
+
+    // @FIXME - Currently this rebuilds the db in full on every load - great for testing :P
+    sequelize.sync({force: true})
+        .success(function () {
+        })
+        .error(function (error) {
+
+        });
+
 
     package = require(path.resolve(__dirname, 'package.json'));
     request = require('request');
