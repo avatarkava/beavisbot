@@ -60,11 +60,25 @@ module.exports = function (options) {
     // @FIXME - Currently this rebuilds the db in full on every load - great for testing :P
     sequelize.sync({force: true})
         .success(function () {
+            // @FIXME - Surely there's a more elegant way to do this, right?
+            var sequelize_fixtures = require('sequelize-fixtures'),
+                fixtureModels = {
+                    EventResponse: EventResponse,
+                    Karma: Karma,
+                    Play: Play,
+                    Quote: Quote,
+                    RoomEvent: RoomEvent,
+                    Song: Song,
+                    SongResponse: SongResponse,
+                    User: User
+                };
+            sequelize_fixtures.loadFile('fixtures/*.json', fixtureModels, function () {
+                // doStuffAfterLoading();
+            });
         })
         .error(function (error) {
 
         });
-
 
     package = require(path.resolve(__dirname, 'package.json'));
     request = require('request');

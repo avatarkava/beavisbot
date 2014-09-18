@@ -1,0 +1,25 @@
+[
+    {
+        "model": "User",
+        "data": {
+            "id": 1,
+            "username": "AvatarKava",
+            "slug": "avatarkava",
+            "language": "en",
+            "avatarId": "robot01",
+            "badge": "badge04",
+            "blurb": "Just an :eggplant:...",
+            "globalRole": 0,
+            "role": 0,
+            "level": 6,
+            "experiencePoints": 8000,
+            "plugPoints": 25000,
+            "joined": "2013-08-01 00:00:00",
+            "lastWaitListPosition": -1,
+            "lastSeen": "2014-06-01 00:00:00",
+            "lastActive": "2014-06-01 00:00:00",
+            "createdAt": "2014-06-01 00:00:00",
+            "updatedAt": "2014-06-01 00:00:00"
+        }
+    }
+]

@@ -25,6 +25,8 @@
         "underscore": "*",
         "moment": "*"
     },
-    "devDependencies": {},
+    "devDependencies": {
+        "sequelize-fixtures": "*"
+    },
     "optionalDependencies": {}
 }
