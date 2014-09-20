@@ -19,15 +19,13 @@ exports.handler = function (data) {
         var formPayload = {
             text: messageText,
             username: bot.getUser().username,
+            channel: config.slack.default.channel,
             icon_url: config.slack.default.icon_url
         }
 
         formPayload = JSON.stringify(formPayload);
 
         request.post(config.slack.webhook_url, {form: {payload: formPayload}}, function (error, response, body) {
-            if (1 || config.verboseLogging) {
-                logger.info(JSON.stringify(response), null, 2);
-            }
 
             if (!error && response.statusCode == 200) {
                 if (body == 'ok') {

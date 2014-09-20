@@ -7,11 +7,18 @@ module.exports = function (options) {
     config = options.config;
     logger = PlugAPI.getLogger('Bot');
 
+    if (config.verboseLogging) {
+        logLevel = logger.info;
+    }
+    else {
+        logLevel = false;
+    }
+
     if (config.db.dialect === 'sqlite') {
         sequelize = new Sequelize(null, null, null, {
             dialect: 'sqlite',
             storage: config.db.sqlite.storage,
-            logging: logger.info
+            logging: logLevel
         });
     }
     else if (config.db.dialect === 'mysql') {
@@ -19,7 +26,7 @@ module.exports = function (options) {
             dialect: 'mysql',
             host: config.db.mysql.host,
             port: config.db.mysql.port,
-            logging: logger.info
+            logging: logLevel
         });
     }
 

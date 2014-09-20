@@ -48,9 +48,7 @@ function runBot(error, auth) {
             bot.moderateDeleteChat(data.id);
         }
         else {
-            if (data.from.username === config.superAdmin) {
-                handleCommand(data);
-            }
+            handleCommand(data);
         }
         User.update({last_active: new Date()}, {id: data.from.id});
     });
@@ -147,7 +145,7 @@ function runBot(error, auth) {
 
     bot.on('vote', function (data) {
         var user = _.findWhere(bot.getUsers(), {id: data.i});
-        if (user) {
+        if (config.verboseLogging && user) {
             logger.info('[VOTE]', user.username + ': ' + data.v);
         }
     });
@@ -157,10 +155,10 @@ function runBot(error, auth) {
             logger.success('[EVENT] ADVANCE ', JSON.stringify(data, null, 2));
         }
 
-        if (data.dj != null && data.media != null) {
+        if (data.currentDJ != null && data.media != null) {
             logger.success('********************************************************************');
-            logger.success('[SONG]', data.dj.username + ' played: ' + data.media.author + ' - ' + data.media.title);
-            User.update({last_wait_list_position: -1}, {id: data.dj.id});
+            logger.success('[SONG]', data.currentDJ.username + ' played: ' + data.media.author + ' - ' + data.media.title);
+            User.update({last_wait_list_position: 0}, {id: data.currentDJ.id});
         }
 
         if (data.media != null) {
@@ -241,24 +239,31 @@ function runBot(error, auth) {
         }
 
         // Write previous song data to DB
-        // But only if the last song actually existed
-        if (data.lastPlay != null) {
-            song = data.lastPlay;
+        if (data.lastPlay.media != null) {
 
-            //db.run('INSERT OR IGNORE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)',
-            //    [song.media.id,
-            //        song.media.title,
-            //        song.media.format,
-            //        song.media.author,
-            //        song.media.cid,
-            //        song.media.duration]);
-            //db.run('INSERT INTO PLAYS (userid, songid, upvotes, downvotes, snags, started, listeners) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)',
-            //    [song.dj.id,
-            //        song.media.id,
-            //        song.score.positive,
-            //        song.score.negative,
-            //        song.score.grabs,
-            //        song.score.listeners]);
+            var songData = {
+                id: data.lastPlay.media.id,
+                author: data.lastPlay.media.author,
+                title: data.lastPlay.media.title,
+                format: data.lastPlay.media.format,
+                cid: data.lastPlay.media.cid,
+                duration: data.lastPlay.media.duration,
+                image: data.lastPlay.media.image
+            };
+            Song.findOrCreate({id: data.lastPlay.media.id}, songData).on('success', function (song) {
+                song.updateAttributes(songData);
+
+                Play.create({
+                    user_id: data.lastPlay.dj.id,
+                    song_id: data.lastPlay.media.id,
+                    positive: data.lastPlay.score.positive,
+                    negative: data.lastPlay.score.negative,
+                    grabs: data.lastPlay.score.grabs,
+                    listeners: data.lastPlay.score.listeners,
+                    skipped: data.lastPlay.score.skipped
+                });
+
+            });
         }
 
     });
@@ -375,6 +380,7 @@ function runBot(error, auth) {
     }
 
     function handleCommand(data) {
+
         // unescape message
         data.message = S(data.message).unescapeHTML().s;
 
@@ -395,6 +401,14 @@ function runBot(error, auth) {
         })[0];
 
         if (command && command.enabled) {
+
+            // @FIXME - Remove this for production
+            if (data.from.username !== config.superAdmin) {
+                return false;
+            }
+            else {
+                bot.moderateDeleteChat(data.id);
+            }
 
             if (config.verboseLogging) {
                 logger.info('[COMMAND]', JSON.stringify(data, null, 2));
