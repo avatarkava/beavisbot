@@ -112,7 +112,7 @@ function runBot(error, auth) {
                 if (!newUser && secondsSince(dbUser.last_seen) <= 600 && secondsSince(dbUser.last_seen) > 60 && dbUser.last_wait_list_position != -1 && bot.getWaitListPosition(data.id) != dbUser.last_wait_list_position) {
                     bot.moderateAddDJ(data.id, function () {
                         if (dbUser.last_wait_list_position <= room.djs.length && bot.getWaitListPosition(data.id) != dbUser.last_wait_list_position) {
-                            bot.moderateMoveDJ(data.id, dbUser.last_wait_list_position + 1);
+                            bot.moderateMoveDJ(data.id, last_wait_list_position);
                         }
                         setTimeout(function () {
                             bot.sendChat('/me put @' + data.username + ' back in line :thumbsup:')

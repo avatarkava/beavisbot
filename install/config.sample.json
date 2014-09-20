@@ -24,10 +24,10 @@
         "lastFm_secret": "lastfmSecretKey"
     },
     "slack": {
-        "token": "xxxxxxxxxxxxxxx",
+        "webhookUrl": "https://xxxxxx.slack.com/services/hooks/incoming-webhook?token=xxxxxxxxxxx",
         "default": {
             "channel":"#general",
-            "icon_url": ""
+            "iconUrl": ""
         }
     },
     "responses": {
