@@ -1,6 +1,7 @@
 module.exports = function (options) {
     var PlugAPI = require('plugapi');
-    var Sequelize = require('sequelize');
+
+    Sequelize = require('sequelize');
 
     bot = new PlugAPI(options.auth);
     config = options.config;
@@ -57,24 +58,24 @@ module.exports = function (options) {
         .hasMany(Play)
         .hasMany(RoomEvent, {foreignKey: 'modUserId'});
 
-    sequelize.sync({force: true})
+    sequelize.sync()
         .success(function () {
             // @FIXME - Surely there's a more elegant way to do this, right?
             /*
-            var sequelize_fixtures = require('sequelize-fixtures'),
-                fixtureModels = {
-                    EventResponse: EventResponse,
-                    Karma: Karma,
-                    Play: Play,
-                    RoomEvent: RoomEvent,
-                    Song: Song,
-                    SongResponse: SongResponse,
-                    User: User
-                };
-            sequelize_fixtures.loadFile('fixtures/*.json', fixtureModels, function () {
-                // doStuffAfterLoading();
-            });
-            */
+             var sequelize_fixtures = require('sequelize-fixtures'),
+             fixtureModels = {
+             EventResponse: EventResponse,
+             Karma: Karma,
+             Play: Play,
+             RoomEvent: RoomEvent,
+             Song: Song,
+             SongResponse: SongResponse,
+             User: User
+             };
+             sequelize_fixtures.loadFile('fixtures/*.json', fixtureModels, function () {
+             // doStuffAfterLoading();
+             });
+             */
         })
         .error(function (error) {
 
@@ -168,7 +169,7 @@ module.exports = function (options) {
      */
     timeSince = function (timestamp, ago) {
         ago = typeof ago !== 'undefined' ? ago : false;
-        message = moment.utc(timestamp).fromNow(ago);
+        var message = moment.utc(timestamp).fromNow(ago);
 
         if (moment().isAfter(moment(timestamp).add(24, 'hours'))) {
             message += ' (' + moment.utc(timestamp, 'YYYY-MM-DD HH:mm:ss').calendar() + ')';
@@ -177,6 +178,11 @@ module.exports = function (options) {
         return message;
     };
 
+    secondsSince = function (timestamp) {
+        var now = moment();
+        timestamp = moment(timestamp, 'YYYY-MM-DD HH:mm:ss');
+        return now.diff(timestamp, 'seconds');
+    };
 
-}
-;
+
+};

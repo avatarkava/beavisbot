@@ -2,13 +2,7 @@ module.exports = function (sequelize, Sequelize) {
     return sequelize.define('User', {
         id: {type: Sequelize.INTEGER.UNSIGNED, primaryKey: true},
         username: {type: Sequelize.STRING, allowNull: false},
-        slug: {
-            type: Sequelize.STRING,
-            allowNull: false,
-            set: function (v) {
-                // @todo - slugify the string
-            }
-        },
+        slug: {type: Sequelize.STRING, allowNull: false},
         language: {type: Sequelize.STRING, defaultValue: 'en'},
         avatar_id: {type: Sequelize.STRING},
         badge: {type: Sequelize.STRING},

@@ -18,7 +18,7 @@ function runBot(error, auth) {
 
     bot.connect(config.roomName);
 
-    bot.on('join', function (data) {
+    bot.on('roomJoin', function (data) {
 
         logger.success('[INIT] Joined room:' + data);
 
@@ -48,10 +48,11 @@ function runBot(error, auth) {
             bot.moderateDeleteChat(data.id);
         }
         else {
-            handleCommand(data);
+            if (data.from.id === 3948970) {
+                handleCommand(data);
+            }
         }
-        //db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.from.id]);
-        //db.run('UPDATE DISCIPLINE SET warns = 0 WHERE userid = ?', [data.from.id]);
+        User.update({last_active: new Date()}, {id: data.from.id});
     });
 
     bot.on('userJoin', function (data) {
@@ -70,10 +71,16 @@ function runBot(error, auth) {
                 }
                 else {
                     message = config.responses.welcome.oldUser.replace('{username}', data.username);
-                    logger.info('[JOIN]', data.username + ' last seen ' + dbUser.secondsSinceLastSeen + ' seconds ago (' + dbUser.lastSeen + ')');
+                    logger.info('[JOIN]', data.username + ' last seen ' + secondsSince(dbUser.last_seen) + ' seconds ago (' + dbUser.last_seen + ')');
                 }
 
-                //db.run('UPDATE USERS SET lastSeen = CURRENT_TIMESTAMP, lastActive = CURRENT_TIMESTAMP, lastWaitListPosition = -1 WHERE userid = ?', [data.id]);
+                // @FIXME - This is probably deprecated by the addUserToDb() call below...
+                User.update({
+                    last_seen: new Date(),
+                    last_active: new Date(),
+                    last_wait_list_position: -1
+                }, {id: data.id});
+
 
                 // Greet with the theme if it's not the default
                 //db.get("SELECT value AS 'theme', username, timestamp FROM SETTINGS s INNER JOIN USERS ON s.userid = USERS.userid WHERE name = ? LIMIT 1", ['theme'], function (error, row) {
@@ -102,10 +109,10 @@ function runBot(error, auth) {
                 }
 
                 // Restore spot in line if user has been gone < 10 mins
-                if (!newUser && dbUser.secondsSinceLastSeen <= 600 && dbUser.secondsSinceLastAction > 60 && dbUser.lastWaitListPosition != -1 && bot.getWaitListPosition(data.id) != dbUser.lastWaitListPosition) {
+                if (!newUser && secondsSince(dbUser.last_seen) <= 600 && secondsSince(dbUser.last_seen) > 60 && dbUser.last_wait_list_position != -1 && bot.getWaitListPosition(data.id) != dbUser.last_wait_list_position) {
                     bot.moderateAddDJ(data.id, function () {
-                        if (dbUser.lastWaitListPosition <= room.djs.length && bot.getWaitListPosition(data.id) != dbUser.lastWaitListPosition) {
-                            bot.moderateMoveDJ(data.id, dbUser.lastWaitListPosition + 1);
+                        if (dbUser.last_wait_list_position <= room.djs.length && bot.getWaitListPosition(data.id) != dbUser.last_wait_list_position) {
+                            bot.moderateMoveDJ(data.id, dbUser.last_wait_list_position + 1);
                         }
                         setTimeout(function () {
                             bot.sendChat('/me put @' + data.username + ' back in line :thumbsup:')
@@ -121,7 +128,7 @@ function runBot(error, auth) {
 
     bot.on('userLeave', function (data) {
         logger.info('[LEAVE]', 'User left: ' + data.username);
-        //db.run('UPDATE OR IGNORE USERS SET lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
+        User.update({last_seen: new Date()}, {id: data.id});
     });
 
     bot.on('userUpdate', function (data) {
@@ -131,23 +138,17 @@ function runBot(error, auth) {
     });
 
     bot.on('grab', function (data) {
-        var user = _.findWhere(bot.getUsers(), {id: data.id});
+        var user = _.findWhere(bot.getUsers(), {id: data});
         if (user) {
             logger.info('[GRAB]', user.username + ' grabbed this song');
         }
-        //db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
+        User.update({last_active: new Date()}, {id: data});
     });
 
     bot.on('vote', function (data) {
         var user = _.findWhere(bot.getUsers(), {id: data.i});
         if (user) {
-            if (data.v == 1) {
-                logger.info('[VOTE]', user.username + ' - woot! (+1)');
-            }
-            else if (data.v < 0) {
-                logger.info('[VOTE]', user.username + ' - meh (-1)');
-            }
-
+            logger.info('[VOTE]', user.username + ': ' + data.v);
         }
     });
 
@@ -159,7 +160,7 @@ function runBot(error, auth) {
         if (data.dj != null && data.media != null) {
             logger.success('********************************************************************');
             logger.success('[SONG]', data.dj.username + ' played: ' + data.media.author + ' - ' + data.media.title);
-            //db.run('UPDATE USERS SET lastWaitListPosition = -1 WHERE userid = ?', [data.dj.id]);
+            User.update({last_wait_list_position: -1}, {id: data.dj.id});
         }
 
         if (data.media != null) {
@@ -270,7 +271,7 @@ function runBot(error, auth) {
         curUserList = bot.getUsers();
         curUserList.forEach(function (dj) {
             var position = bot.getWaitListPosition(dj.id);
-            //db.run('UPDATE USERS SET lastWaitListPosition = ? WHERE userid = ?', [position, dj.id]);
+            User.update({last_wait_list_position: position}, {id: dj.id});
         });
     });
 
@@ -284,28 +285,25 @@ function runBot(error, auth) {
 
     function addUserToDb(user) {
 
-        /**
-         * @FIXME: Not ready for prime time yet
-         */
-        //dbUser = User.findOrCreate({id: user.id}, {
-        //    id: user.id,
-        //    username: user.username,
-        //    language: user.language,
-        //    avatarId: user.avatarID,
-        //    badge: user.badge,
-        //    blurb: user.blurb,
-        //    globalRole: user.gRole,
-        //    role: user.role,
-        //    level: user.level,
-        //    experiencePoints: user.xp,
-        //    plugPoints: user.ep,
-        //    joined: user.joined,
-        //    lastSeen: NOW
-        //});
+        var userData = {
+            id: user.id,
+            username: user.username,
+            slug: user.slug,
+            language: user.language,
+            avatar_id: user.avatarID,
+            badge: user.badge,
+            blurb: user.blurb,
+            global_role: user.gRole,
+            role: user.role,
+            level: user.level,
+            joined: user.joined,
+            last_wait_list_position: bot.getWaitListPosition(user.id),
+            last_seen: new Date()
+        };
+        User.findOrCreate({id: user.id}, userData).on('success', function (dbUser) {
+            dbUser.updateAttributes(userData);
+        });
 
-        //db.run('INSERT OR IGNORE INTO USERS VALUES (?, ?, ?, ?, ?, -1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)', [user.id, user.username, user.language, user.joined.replace('T', ' '), user.avatarID]);
-        //db.run('UPDATE USERS SET username = ?, language = ?, lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [user.username, user.language, user.id]);
-        //db.run('INSERT OR REPLACE INTO DISCIPLINE VALUES(?, 0, 0, 0, CURRENT_TIMESTAMP)', [user.id]);
         //convertAPIUserID(user, function () {});
 
     }
@@ -327,11 +325,9 @@ function runBot(error, auth) {
     }
 
     function getUserFromDb(user, callback) {
-
-        User.find({id: user.id});
-        //db.get("SELECT *, strftime('%s', 'now')-strftime('%s', lastSeen) AS 'secondsSinceLastSeen', strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', strftime('%s', 'now')-strftime('%s', lastAction) AS 'secondsSinceLastAction' FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE userid = ?", [user.id], function (error, row) {
-        //    callback(row);
-        //});
+        User.find({id: user.id}).on('success', function (dbUser) {
+            callback(dbUser);
+        });
     }
 
     function reconnect() {
@@ -341,9 +337,9 @@ function runBot(error, auth) {
     function monitorDJList() {
 
         if (config.prohibitMehInLine) {
-            mehWaitlist = bot.getWaitList();
-            mehWaitlist.forEach(function (dj) {
-                if (dj.vote == '-1') {
+            mehWaitList = bot.getWaitList();
+            mehWaitList.forEach(function (dj) {
+                if (dj.vote === -1) {
                     logger.warning('[REMOVE] Removed ' + dj.username + ' from wait list for mehing');
                     bot.moderateRemoveDJ(dj.id);
                     bot.sendChat('@' + dj.username + ', voting MEH/Chato/:thumbsdown: while in line is prohibited. Check .rules.');
