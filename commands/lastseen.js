@@ -12,11 +12,11 @@ exports.handler = function (data) {
 
     username = params.join(' ').trim().substring(1);
 
-    db.get("SELECT username, lastSeen FROM USERS WHERE username = ? COLLATE NOCASE", [username], function (error, row) {
-        if (row != null) {
-            bot.sendChat(row.username + ' was seen ' + timeSince(row.lastSeen) + '.');
-        } else {
-            bot.sendChat(username + ' was not found.');
-        }
-    });
+    //db.get("SELECT username, lastSeen FROM USERS WHERE username = ? COLLATE NOCASE", [username], function (error, row) {
+    //    if (row != null) {
+    //        bot.sendChat(row.username + ' was seen ' + timeSince(row.lastSeen) + '.');
+    //    } else {
+    //        bot.sendChat(username + ' was not found.');
+    //    }
+    //});
 };

@@ -11,28 +11,28 @@ exports.handler = function (data) {
 
         waitlist = bot.getDJs();
         waitlist.forEach(function (dj) {
-            db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', lastActive, username FROM USERS WHERE userid = ?", [dj.id], function (error, row) {
-                z++;
-                if (row != null) {
-                    if (row.secondsSinceLastActive >= maxIdleTime) {
-                        logger.warning('[IDLE] ' + z + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
-                        idleDJs.push(row.username + ' (' + timeSince(row.lastActive, true) + ')');
-                    }
-                    else {
-                        logger.info('[ACTIVE] ' + z + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
-                    }
-
-                    if (z == waitlist.length) {
-                        if (idleDJs.length > 0) {
-                            var idleDJsList = idleDJs.join(' • ');
-                            bot.sendChat('Currently idle: ' + idleDJsList);
-                        }
-                        else {
-                            bot.sendChat('Everyone\'s currently active! :thumbsup:');
-                        }
-                    }
-                }
-            });
+            //db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', lastActive, username FROM USERS WHERE userid = ?", [dj.id], function (error, row) {
+            //    z++;
+            //    if (row != null) {
+            //        if (row.secondsSinceLastActive >= maxIdleTime) {
+            //            logger.warning('[IDLE] ' + z + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
+            //            idleDJs.push(row.username + ' (' + timeSince(row.lastActive, true) + ')');
+            //        }
+            //        else {
+            //            logger.info('[ACTIVE] ' + z + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
+            //        }
+            //
+            //        if (z == waitlist.length) {
+            //            if (idleDJs.length > 0) {
+            //                var idleDJsList = idleDJs.join(' • ');
+            //                bot.sendChat('Currently idle: ' + idleDJsList);
+            //            }
+            //            else {
+            //                bot.sendChat('Everyone\'s currently active! :thumbsup:');
+            //            }
+            //        }
+            //    }
+            //});
         });
 
     }

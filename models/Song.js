@@ -1,4 +1,4 @@
-module.exports = function(sequelize, Sequelize) {
+module.exports = function (sequelize, Sequelize) {
     return sequelize.define('Song', {
         id: {type: Sequelize.INTEGER.UNSIGNED, primaryKey: true},
         author: {type: Sequelize.STRING, allowNull: false},
@@ -10,12 +10,15 @@ module.exports = function(sequelize, Sequelize) {
                 // @todo - slugify the string
             }
         },
-        releaseDate: {type: Sequelize.DATE},
+        release_date: {type: Sequelize.DATE},
         tags: {type: Sequelize.STRING},
         format: {type: Sequelize.INTEGER.UNSIGNED, defaultValue: 1},
         cid: {type: Sequelize.STRING, allowNull: false, unique: true},
         duration: {type: Sequelize.INTEGER.UNSIGNED},
         image: {type: Sequelize.STRING},
-        isBanned: {type: Sequelize.BOOLEAN, defaultValue: 0}
+        is_banned: {type: Sequelize.BOOLEAN, defaultValue: 0}
+    }, {
+        underscored: true,
+        tableName: 'songs'
     });
 }

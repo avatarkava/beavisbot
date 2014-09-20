@@ -50,8 +50,8 @@ function runBot(error, auth) {
         else {
             handleCommand(data);
         }
-        db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.from.id]);
-        db.run('UPDATE DISCIPLINE SET warns = 0 WHERE userid = ?', [data.from.id]);
+        //db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.from.id]);
+        //db.run('UPDATE DISCIPLINE SET warns = 0 WHERE userid = ?', [data.from.id]);
     });
 
     bot.on('userJoin', function (data) {
@@ -73,16 +73,16 @@ function runBot(error, auth) {
                     logger.info('[JOIN]', data.username + ' last seen ' + dbUser.secondsSinceLastSeen + ' seconds ago (' + dbUser.lastSeen + ')');
                 }
 
-                db.run('UPDATE USERS SET lastSeen = CURRENT_TIMESTAMP, lastActive = CURRENT_TIMESTAMP, lastWaitListPosition = -1 WHERE userid = ?', [data.id]);
+                //db.run('UPDATE USERS SET lastSeen = CURRENT_TIMESTAMP, lastActive = CURRENT_TIMESTAMP, lastWaitListPosition = -1 WHERE userid = ?', [data.id]);
 
                 // Greet with the theme if it's not the default
-                db.get("SELECT value AS 'theme', username, timestamp FROM SETTINGS s INNER JOIN USERS ON s.userid = USERS.userid WHERE name = ? LIMIT 1", ['theme'], function (error, row) {
-                    if (row != null && row.theme != config.responses.theme) {
-                        regExp = new RegExp(/^(.*?)[.?!-]\s/);
-                        matches = regExp.exec(row.theme);
-                        message += ' Theme: ' + matches[0] + ' .theme for details!';
-                    }
-                });
+                //db.get("SELECT value AS 'theme', username, timestamp FROM SETTINGS s INNER JOIN USERS ON s.userid = USERS.userid WHERE name = ? LIMIT 1", ['theme'], function (error, row) {
+                //    if (row != null && row.theme != config.responses.theme) {
+                //        regExp = new RegExp(/^(.*?)[.?!-]\s/);
+                //        matches = regExp.exec(row.theme);
+                //        message += ' Theme: ' + matches[0] + ' .theme for details!';
+                //    }
+                //});
 
                 if (!roomHasActiveMods) {
                     message += ' Type .help if you need it!';
@@ -111,7 +111,7 @@ function runBot(error, auth) {
                             bot.sendChat('/me put @' + data.username + ' back in line :thumbsup:')
                         }, 5000);
                     });
-                    db.run('UPDATE DISCIPLINE SET lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
+                    //db.run('UPDATE DISCIPLINE SET lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
                 }
 
             });
@@ -121,7 +121,7 @@ function runBot(error, auth) {
 
     bot.on('userLeave', function (data) {
         logger.info('[LEAVE]', 'User left: ' + data.username);
-        db.run('UPDATE OR IGNORE USERS SET lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
+        //db.run('UPDATE OR IGNORE USERS SET lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
     });
 
     bot.on('userUpdate', function (data) {
@@ -135,7 +135,7 @@ function runBot(error, auth) {
         if (user) {
             logger.info('[GRAB]', user.username + ' grabbed this song');
         }
-        db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
+        //db.run('UPDATE USERS SET lastActive = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
     });
 
     bot.on('vote', function (data) {
@@ -159,7 +159,7 @@ function runBot(error, auth) {
         if (data.dj != null && data.media != null) {
             logger.success('********************************************************************');
             logger.success('[SONG]', data.dj.username + ' played: ' + data.media.author + ' - ' + data.media.title);
-            db.run('UPDATE USERS SET lastWaitListPosition = -1 WHERE userid = ?', [data.dj.id]);
+            //db.run('UPDATE USERS SET lastWaitListPosition = -1 WHERE userid = ?', [data.dj.id]);
         }
 
         if (data.media != null) {
@@ -192,49 +192,50 @@ function runBot(error, auth) {
             idleWaitList = bot.getWaitList();
             idleWaitList.forEach(function (dj) {
 
-                db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', lastActive, username, warns, removes FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE userid = ?", [dj.id], function (error, row) {
-                    z++;
-                    var position = bot.getWaitListPosition(dj.id);
-                    db.run('UPDATE USERS SET lastWaitListPosition = ? WHERE userid = ?', [position, dj.id]);
-
-                    if (row != null) {
-
-                        // Only bug idle people if the bot has been running for as long as the minimum idle time and they're not a DJ or on deck
-                        if (row.secondsSinceLastActive >= maxIdleTime && moment().isAfter(moment(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
-                            logger.warning('[IDLE]', position + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
-                            if (row.warns > 0) {
-                                bot.moderateRemoveDJ(dj.id);
-                                bot.sendChat('@' + row.username + ' ' + config.responses.activeDJRemoveMessage);
-                                db.run('UPDATE DISCIPLINE SET warns = 0, removes = removes + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
-                            }
-                            else if (position > 1) {
-                                db.run('UPDATE DISCIPLINE SET warns = warns + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
-                                idleDJs.push(row.username);
-                            }
-                        }
-                        else {
-                            if (dj.role > 1) {
-                                roomHasActiveMods = true;
-                            }
-                            logger.info('[ACTIVE]', position + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
-                        }
-                    }
-
-                    if (z == idleWaitList.length) {
-
-                        if (idleDJs.length > 0) {
-                            var idleDJsList = idleDJs.join(' @');
-                            bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
-                        }
-
-                        // Only police this if there aren't any mods around
-                        if (!roomHasActiveMods && config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
-                            logger.warning('[SKIP] Skipped ' + data.dj.username + ' spinning a song of ' + data.media.duration + ' seconds');
-                            bot.sendChat('Sorry @' + data.dj.username + ', this song is over our maximum room length of ' + (config.maxSongLengthSecs / 60) + ' minutes.');
-                            bot.moderateForceSkip();
-                        }
-                    }
-                });
+                //db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', lastActive, username, warns, removes FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE userid = ?", [dj.id], function (error, row) {
+                //    z++;
+                //    var position = bot.getWaitListPosition(dj.id);
+                //    db.run('UPDATE USERS SET lastWaitListPosition = ? WHERE userid = ?', [position, dj.id]);
+                //
+                //    if (row != null) {
+                //
+                //        // Only bug idle people if the bot has been running for as long as the minimum idle time and they're not a DJ or on deck
+                //        if (row.secondsSinceLastActive >= maxIdleTime && moment().isAfter(moment(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
+                //            logger.warning('[IDLE]', position + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
+                //            if (row.warns > 0) {
+                //                bot.moderateRemoveDJ(dj.id);
+                //                bot.sendChat('@' + row.username + ' ' + config.responses.activeDJRemoveMessage);
+                //                db.run('UPDATE DISCIPLINE SET warns = 0, removes = removes + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
+                //            }
+                //            else if (position > 1) {
+                //                db.run('UPDATE DISCIPLINE SET warns = warns + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
+                //                idleDJs.push(row.username);
+                //            }
+                //        }
+                //        else {
+                //            if (dj.role > 1) {
+                //                roomHasActiveMods = true;
+                //            }
+                //            logger.info('[ACTIVE]', position + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
+                //        }
+                //    }
+                //
+                //    if (z == idleWaitList.length) {
+                //
+                //        if (idleDJs.length > 0) {
+                //            var idleDJsList = idleDJs.join(' @');
+                //            bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
+                //        }
+                //
+                //        // Only police this if there aren't any mods around
+                //        if (!roomHasActiveMods && config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
+                //            logger.warning('[SKIP] Skipped ' + data.dj.username + ' spinning a song of ' + data.media.duration + ' seconds');
+                //            bot.sendChat('Sorry @' + data.dj.username + ', this song is over our maximum room length of ' + (config.maxSongLengthSecs / 60) + ' minutes.');
+                //            bot.moderateForceSkip();
+                //        }
+                //    }
+                //
+                //});
             });
         }
 
@@ -243,20 +244,20 @@ function runBot(error, auth) {
         if (data.lastPlay != null) {
             song = data.lastPlay;
 
-            db.run('INSERT OR IGNORE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)',
-                [song.media.id,
-                    song.media.title,
-                    song.media.format,
-                    song.media.author,
-                    song.media.cid,
-                    song.media.duration]);
-            db.run('INSERT INTO PLAYS (userid, songid, upvotes, downvotes, snags, started, listeners) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)',
-                [song.dj.id,
-                    song.media.id,
-                    song.score.positive,
-                    song.score.negative,
-                    song.score.grabs,
-                    song.score.listeners]);
+            //db.run('INSERT OR IGNORE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)',
+            //    [song.media.id,
+            //        song.media.title,
+            //        song.media.format,
+            //        song.media.author,
+            //        song.media.cid,
+            //        song.media.duration]);
+            //db.run('INSERT INTO PLAYS (userid, songid, upvotes, downvotes, snags, started, listeners) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)',
+            //    [song.dj.id,
+            //        song.media.id,
+            //        song.score.positive,
+            //        song.score.negative,
+            //        song.score.grabs,
+            //        song.score.listeners]);
         }
 
     });
@@ -269,7 +270,7 @@ function runBot(error, auth) {
         curUserList = bot.getUsers();
         curUserList.forEach(function (dj) {
             var position = bot.getWaitListPosition(dj.id);
-            db.run('UPDATE USERS SET lastWaitListPosition = ? WHERE userid = ?', [position, dj.id]);
+            //db.run('UPDATE USERS SET lastWaitListPosition = ? WHERE userid = ?', [position, dj.id]);
         });
     });
 
@@ -282,35 +283,55 @@ function runBot(error, auth) {
 
 
     function addUserToDb(user) {
-        convertAPIUserID(user, function () {
-            db.run('INSERT OR IGNORE INTO USERS VALUES (?, ?, ?, ?, ?, -1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
-                [user.id, user.username, user.language, user.joined.replace('T', ' '), user.avatarID]);
-            db.run('UPDATE USERS SET username = ?, language = ?, lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [user.username, user.language, user.id]);
-            db.run('INSERT OR REPLACE INTO DISCIPLINE VALUES(?, 0, 0, 0, CURRENT_TIMESTAMP)', [user.id]);
-        });
+
+        /**
+         * @FIXME: Not ready for prime time yet
+         */
+        //dbUser = User.findOrCreate({id: user.id}, {
+        //    id: user.id,
+        //    username: user.username,
+        //    language: user.language,
+        //    avatarId: user.avatarID,
+        //    badge: user.badge,
+        //    blurb: user.blurb,
+        //    globalRole: user.gRole,
+        //    role: user.role,
+        //    level: user.level,
+        //    experiencePoints: user.xp,
+        //    plugPoints: user.ep,
+        //    joined: user.joined,
+        //    lastSeen: NOW
+        //});
+
+        //db.run('INSERT OR IGNORE INTO USERS VALUES (?, ?, ?, ?, ?, -1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)', [user.id, user.username, user.language, user.joined.replace('T', ' '), user.avatarID]);
+        //db.run('UPDATE USERS SET username = ?, language = ?, lastSeen = CURRENT_TIMESTAMP WHERE userid = ?', [user.username, user.language, user.id]);
+        //db.run('INSERT OR REPLACE INTO DISCIPLINE VALUES(?, 0, 0, 0, CURRENT_TIMESTAMP)', [user.id]);
+        //convertAPIUserID(user, function () {});
 
     }
 
     function convertAPIUserID(user, callback) {
-        db.get('SELECT userid FROM USERS WHERE username = ?', [user.username], function (error, row) {
-            if (row != null && row.userid.length > 10) {
-                logger.warning('Converting userid for ' + user.username + ': ' + row.userid + ' => ' + user.id);
-                db.run('DELETE FROM DISCIPLINE WHERE userid = ?', [row.userid]);
-                db.run('UPDATE PLAYS SET userid = ? WHERE userid = ?', [user.id, row.userid]);
-                db.run('UPDATE USERS SET userid = ? WHERE userid = ?', [user.id, row.userid], function () {
-                    callback(true);
-                });
-            }
-            else {
-                callback(true);
-            }
-        });
+        //db.get('SELECT userid FROM USERS WHERE username = ?', [user.username], function (error, row) {
+        //    if (row != null && row.userid.length > 10) {
+        //        logger.warning('Converting userid for ' + user.username + ': ' + row.userid + ' => ' + user.id);
+        //        //db.run('DELETE FROM DISCIPLINE WHERE userid = ?', [row.userid]);
+        //        //db.run('UPDATE PLAYS SET userid = ? WHERE userid = ?', [user.id, row.userid]);
+        //        //db.run('UPDATE USERS SET userid = ? WHERE userid = ?', [user.id, row.userid], function () {
+        //        //    callback(true);
+        //        //});
+        //    }
+        //    else {
+        //        callback(true);
+        //    }
+        //});
     }
 
     function getUserFromDb(user, callback) {
-        db.get("SELECT *, strftime('%s', 'now')-strftime('%s', lastSeen) AS 'secondsSinceLastSeen', strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', strftime('%s', 'now')-strftime('%s', lastAction) AS 'secondsSinceLastAction' FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE userid = ?", [user.id], function (error, row) {
-            callback(row);
-        });
+
+        User.find({id: user.id});
+        //db.get("SELECT *, strftime('%s', 'now')-strftime('%s', lastSeen) AS 'secondsSinceLastSeen', strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', strftime('%s', 'now')-strftime('%s', lastAction) AS 'secondsSinceLastAction' FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE userid = ?", [user.id], function (error, row) {
+        //    callback(row);
+        //});
     }
 
     function reconnect() {
@@ -394,28 +415,28 @@ function runBot(error, auth) {
         media = bot.getMedia();
 
         // first, see if the song exists in the db
-        db.get('SELECT id FROM SONGS WHERE id = ?', [media.id], function (error, row) {
-            if (row == null) {
-                // if the song isn't in the db yet, check it for suspicious strings
-                artistTitlePair = S((media.author + ' ' + media.title).toLowerCase());
-                if (artistTitlePair.contains('official music video')
-                    || artistTitlePair.contains('lyrics')
-                    || artistTitlePair.contains('|')
-                    || artistTitlePair.contains('official video')
-                    || artistTitlePair.contains('[')
-                    || artistTitlePair.contains('"')
-                    || artistTitlePair.contains('*')
-                    || artistTitlePair.contains('(HD)')
-                    || artistTitlePair.contains('(HQ)')
-                    || artistTitlePair.contains('1080p')
-                    || artistTitlePair.contains('720p')
-                    || artistTitlePair.contains(' - ')
-                    || artistTitlePair.contains('full version')
-                    || artistTitlePair.contains('album version')) {
-                    suggestNewSongMetadata(media.author + ' ' + media.title);
-                }
-            }
-        });
+        //db.get('SELECT id FROM SONGS WHERE id = ?', [media.id], function (error, row) {
+        //    if (row == null) {
+        //        // if the song isn't in the db yet, check it for suspicious strings
+        //        artistTitlePair = S((media.author + ' ' + media.title).toLowerCase());
+        //        if (artistTitlePair.contains('official music video')
+        //            || artistTitlePair.contains('lyrics')
+        //            || artistTitlePair.contains('|')
+        //            || artistTitlePair.contains('official video')
+        //            || artistTitlePair.contains('[')
+        //            || artistTitlePair.contains('"')
+        //            || artistTitlePair.contains('*')
+        //            || artistTitlePair.contains('(HD)')
+        //            || artistTitlePair.contains('(HQ)')
+        //            || artistTitlePair.contains('1080p')
+        //            || artistTitlePair.contains('720p')
+        //            || artistTitlePair.contains(' - ')
+        //            || artistTitlePair.contains('full version')
+        //            || artistTitlePair.contains('album version')) {
+        //            suggestNewSongMetadata(media.author + ' ' + media.title);
+        //        }
+        //    }
+        //});
     }
 
     function suggestNewSongMetadata(valueToCorrect) {

@@ -43,27 +43,27 @@ exports.handler = function (data) {
                 break;
         }
 
-        db.get('SELECT * FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE username = ?', [username.substring(1)], function (error, row) {
-            if (row) {
-                switch (command) {
-                    case '.ban':
-                        bot.moderateBanUser(row.userid, 0, apiDuration, function () {
-                            logger.warning('[BAN] ' + username + ' was banned for ' + duration + ' by ' + data.from.username);
-                            db.run('UPDATE DISCIPLINE SET kicks = kicks + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [row.userid]);
-                        });
-                        break;
-                    case '.unban':
-                        bot.moderateUnbanUser(row.userid, function () {
-                            bot.sendChat('/me unbanning ' + username + '. This can take a few moments...');
-                            logger.info('[UNBAN] ' + username + ' was unbanned by ' + data.from.username);
-                        });
-                        break;
-                    default:
-                        logger.error('Invalid command called: ' + command);
-                        break;
-                }
-            }
-        });
+        //db.get('SELECT * FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE username = ?', [username.substring(1)], function (error, row) {
+        //    if (row) {
+        //        switch (command) {
+        //            case '.ban':
+        //                bot.moderateBanUser(row.userid, 0, apiDuration, function () {
+        //                    logger.warning('[BAN] ' + username + ' was banned for ' + duration + ' by ' + data.from.username);
+        //                    //db.run('UPDATE DISCIPLINE SET kicks = kicks + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [row.userid]);
+        //                });
+        //                break;
+        //            case '.unban':
+        //                bot.moderateUnbanUser(row.userid, function () {
+        //                    bot.sendChat('/me unbanning ' + username + '. This can take a few moments...');
+        //                    logger.info('[UNBAN] ' + username + ' was unbanned by ' + data.from.username);
+        //                });
+        //                break;
+        //            default:
+        //                logger.error('Invalid command called: ' + command);
+        //                break;
+        //        }
+        //    }
+        //});
 
     }
 };

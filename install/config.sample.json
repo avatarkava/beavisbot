@@ -39,12 +39,12 @@
         "wootReminder": "Help us maintain an active, positive environment! Wooting all songs while in line to DJ is required. For auto-woot info, click the music note at the top left of the page."
     },
     "autoSuggestCorrections": false,
-    "stopBotOnConnectionLoss": true,
     "welcomeUsers": "ALL",
-    "wootSongs": "ALL",
+    "wootSongs": "NONE",
     "requireWootInLine": false,
-    "prohibitMehInLine": false,
+    "prohibitMehInLine": true,
     "activeDJTimeoutMins": 60,
     "maxSongLengthSecs": 420,
-    "verboseLogging": false
+    "verboseLogging": false,
+    "migrateOldPlugDatabase": false
 }

@@ -10,7 +10,7 @@ module.exports = function (options) {
         sequelize = new Sequelize(null, null, null, {
             dialect: 'sqlite',
             storage: config.db.sqlite.storage,
-            logging: config.verboseLogging
+            logging: logger.info
         });
     }
     else if (config.db.dialect === 'mysql') {
@@ -18,7 +18,7 @@ module.exports = function (options) {
             dialect: 'mysql',
             host: config.db.mysql.host,
             port: config.db.mysql.port,
-            logging: config.verboseLogging
+            logging: logger.info
         });
     }
 
@@ -38,7 +38,6 @@ module.exports = function (options) {
         'EventResponse',
         'Karma',
         'Play',
-        'Quote',
         'RoomEvent',
         'Song',
         'SongResponse',
@@ -49,6 +48,7 @@ module.exports = function (options) {
         this[model] = sequelize.import('models/' + model);
     });
 
+    // @TODO - Is it better to declare these directly in the model?
     Song
         .hasMany(Play);
     User
@@ -57,16 +57,15 @@ module.exports = function (options) {
         .hasMany(Play)
         .hasMany(RoomEvent, {foreignKey: 'modUserId'});
 
-    // @FIXME - Currently this rebuilds the db in full on every load - great for testing :P
     sequelize.sync({force: true})
         .success(function () {
             // @FIXME - Surely there's a more elegant way to do this, right?
+            /*
             var sequelize_fixtures = require('sequelize-fixtures'),
                 fixtureModels = {
                     EventResponse: EventResponse,
                     Karma: Karma,
                     Play: Play,
-                    Quote: Quote,
                     RoomEvent: RoomEvent,
                     Song: Song,
                     SongResponse: SongResponse,
@@ -75,6 +74,7 @@ module.exports = function (options) {
             sequelize_fixtures.loadFile('fixtures/*.json', fixtureModels, function () {
                 // doStuffAfterLoading();
             });
+            */
         })
         .error(function (error) {
 
