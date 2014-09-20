@@ -48,7 +48,7 @@ function runBot(error, auth) {
             bot.moderateDeleteChat(data.id);
         }
         else {
-            if (data.from.id === 3948970) {
+            if (data.from.username === config.superAdmin) {
                 handleCommand(data);
             }
         }
