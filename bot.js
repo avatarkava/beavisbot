@@ -46,7 +46,7 @@ function runBot(error, auth) {
                 duration: playing.duration,
                 image: playing.image
             };
-            Song.findOrCreate({id: playing.id}, songData).success(function (song) {
+            Song.findOrCreate({id: playing.id, cid: playing.cid}, songData).success(function (song) {
                 song.updateAttributes(songData);
             });
         }
@@ -254,17 +254,18 @@ function runBot(error, auth) {
         // Write previous song data to DB
         if (data.lastPlay.media != null) {
 
+            logger.warning(JSON.stringify(data.lastPlay, null, 2));
+
             var songData = {
                 id: data.lastPlay.media.id,
                 author: data.lastPlay.media.author,
                 title: data.lastPlay.media.title,
-                slug: data.lastPlay.media.author + '-' + data.lastPlay.media.title,
                 format: data.lastPlay.media.format,
                 cid: data.lastPlay.media.cid,
                 duration: data.lastPlay.media.duration,
                 image: data.lastPlay.media.image
             };
-            Song.findOrCreate({id: data.lastPlay.media.id}, songData).success(function (song) {
+            Song.findOrCreate({id: data.lastPlay.media.id, cid: data.lastPlay.media.cid}, songData).success(function (song) {
                 song.updateAttributes(songData);
 
                 Play.create({

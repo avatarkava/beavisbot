@@ -16,7 +16,7 @@ module.exports = function (sequelize, Sequelize) {
         tableName: 'songs',
         setterMethods: {
             title: function (v) {
-                var formattedSlug = S(v + '-' + this.getDataValue('author')).slugify().s;
+                var formattedSlug = S(this.getDataValue('author') + '-' + v).slugify().s;
                 this.setDataValue('slug', formattedSlug);
                 return this.setDataValue('title', v);
             },
