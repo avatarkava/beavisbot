@@ -38,7 +38,7 @@ function runBot(error, auth) {
         if (config.verboseLogging) {
             logger.info('[CHAT]', JSON.stringify(data, null, 2));
         }
-        else {
+        else if (data.from !== undefined) {
             logger.info('[CHAT]', data.from.username + ': ' + data.message);
         }
 
@@ -54,15 +54,17 @@ function runBot(error, auth) {
     });
 
     bot.on('userJoin', function (data) {
-        logger.info('[JOIN]', data.username);
+        if (config.verboseLogging) {
+            logger.info('[JOIN]', JSON.stringify(data, null, 2));
+        }
 
         var newUser = false;
         var message = "";
 
-        if (data.username != bot.getUser().username) {
-            getUserFromDb(data, function (dbUser) {
+        if (data.username !== bot.getUser().username) {
+            User.find(data.id).success(function (dbUser) {
 
-                if (dbUser == undefined) {
+                if (dbUser == null) {
                     message = config.responses.welcome.newUser.replace('{username}', data.username);
                     newUser = true;
                     logger.info('[JOIN]', data.username + ' is a first-time visitor to the room!');
@@ -71,14 +73,6 @@ function runBot(error, auth) {
                     message = config.responses.welcome.oldUser.replace('{username}', data.username);
                     logger.info('[JOIN]', data.username + ' last seen ' + secondsSince(dbUser.last_seen) + ' seconds ago (' + dbUser.last_seen + ')');
                 }
-
-                // @FIXME - This is probably deprecated by the addUserToDb() call below...
-                User.update({
-                    last_seen: new Date(),
-                    last_active: new Date(),
-                    last_wait_list_position: -1
-                }, {id: data.id});
-
 
                 // Greet with the theme if it's not the default
                 //db.get("SELECT value AS 'theme', username, timestamp FROM SETTINGS s INNER JOIN USERS ON s.userid = USERS.userid WHERE name = ? LIMIT 1", ['theme'], function (error, row) {
@@ -99,7 +93,7 @@ function runBot(error, auth) {
                             bot.sendChat(message)
                         }, 5000);
                     }
-                    else if (config.welcomeUsers == "ALL" && dbUser.secondsSinceLastSeen >= 600) {
+                    else if (config.welcomeUsers == "ALL" && secondsSince(dbUser.last_seen) >= 600) {
                         setTimeout(function () {
                             bot.sendChat(message)
                         }, 5000);
@@ -110,13 +104,12 @@ function runBot(error, auth) {
                 if (!newUser && secondsSince(dbUser.last_seen) <= 600 && secondsSince(dbUser.last_seen) > 60 && dbUser.last_wait_list_position != -1 && bot.getWaitListPosition(data.id) != dbUser.last_wait_list_position) {
                     bot.moderateAddDJ(data.id, function () {
                         if (dbUser.last_wait_list_position <= room.djs.length && bot.getWaitListPosition(data.id) != dbUser.last_wait_list_position) {
-                            bot.moderateMoveDJ(data.id, last_wait_list_position);
+                            bot.moderateMoveDJ(data.id, dbUser.last_wait_list_position);
                         }
                         setTimeout(function () {
                             bot.sendChat('/me put @' + data.username + ' back in line :thumbsup:')
                         }, 5000);
                     });
-                    //db.run('UPDATE DISCIPLINE SET lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [data.id]);
                 }
 
             });
@@ -190,52 +183,54 @@ function runBot(error, auth) {
 
             idleWaitList = bot.getWaitList();
             idleWaitList.forEach(function (dj) {
+                User.find(dj.id).success(function (dbUser) {
 
-                //db.get("SELECT strftime('%s', 'now')-strftime('%s', lastActive) AS 'secondsSinceLastActive', lastActive, username, warns, removes FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE userid = ?", [dj.id], function (error, row) {
-                //    z++;
-                //    var position = bot.getWaitListPosition(dj.id);
-                //    db.run('UPDATE USERS SET lastWaitListPosition = ? WHERE userid = ?', [position, dj.id]);
-                //
-                //    if (row != null) {
-                //
-                //        // Only bug idle people if the bot has been running for as long as the minimum idle time and they're not a DJ or on deck
-                //        if (row.secondsSinceLastActive >= maxIdleTime && moment().isAfter(moment(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
-                //            logger.warning('[IDLE]', position + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
-                //            if (row.warns > 0) {
-                //                bot.moderateRemoveDJ(dj.id);
-                //                bot.sendChat('@' + row.username + ' ' + config.responses.activeDJRemoveMessage);
-                //                db.run('UPDATE DISCIPLINE SET warns = 0, removes = removes + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
-                //            }
-                //            else if (position > 1) {
-                //                db.run('UPDATE DISCIPLINE SET warns = warns + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
-                //                idleDJs.push(row.username);
-                //            }
-                //        }
-                //        else {
-                //            if (dj.role > 1) {
-                //                roomHasActiveMods = true;
-                //            }
-                //            logger.info('[ACTIVE]', position + '. ' + row.username + ' last active ' + timeSince(row.lastActive));
-                //        }
-                //    }
-                //
-                //    if (z == idleWaitList.length) {
-                //
-                //        if (idleDJs.length > 0) {
-                //            var idleDJsList = idleDJs.join(' @');
-                //            bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
-                //        }
-                //
-                //        // Only police this if there aren't any mods around
-                //        if (!roomHasActiveMods && config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
-                //            logger.warning('[SKIP] Skipped ' + data.dj.username + ' spinning a song of ' + data.media.duration + ' seconds');
-                //            bot.sendChat('Sorry @' + data.dj.username + ', this song is over our maximum room length of ' + (config.maxSongLengthSecs / 60) + ' minutes.');
-                //            bot.moderateForceSkip();
-                //        }
-                //    }
-                //
-                //});
+                    z++;
+
+                    var position = bot.getWaitListPosition(dj.id);
+
+                    //db.run('UPDATE USERS SET lastWaitListPosition = ? WHERE userid = ?', [position, dj.id]);
+
+                    // Only bug idle people if the bot has been running for as long as the minimum idle time
+
+                    if (secondsSince(dbUser.last_active) >= maxIdleTime && moment().isAfter(moment(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
+                        logger.warning('[IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
+                        if (dbUser.warns > 0) {
+                            bot.moderateRemoveDJ(dj.id);
+                            bot.sendChat('@' + dbUser.username + ' ' + config.responses.activeDJRemoveMessage);
+                            //db.run('UPDATE DISCIPLINE SET warns = 0, removes = removes + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
+                        }
+                        else if (position > 1) {
+                            //db.run('UPDATE DISCIPLINE SET warns = warns + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
+                            idleDJs.push(dbUser.username);
+                        }
+                    }
+                    else {
+                        if (dj.role > 1) {
+                            roomHasActiveMods = true;
+                        }
+                        logger.info('[ACTIVE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
+                    }
+
+                    if (z === idleWaitList.length) {
+
+                        if (idleDJs.length > 0) {
+                            var idleDJsList = idleDJs.join(' @');
+                            bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
+                        }
+
+                        // Only police this if there aren't any mods around
+                        if (!roomHasActiveMods && config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
+                            logger.warning('[SKIP] Skipped ' + data.dj.username + ' spinning a song of ' + data.media.duration + ' seconds');
+                            bot.sendChat('Sorry @' + data.dj.username + ', this song is over our maximum room length of ' + (config.maxSongLengthSecs / 60) + ' minutes.');
+                            bot.moderateForceSkip();
+
+                        }
+                    }
+
+                });
             });
+
         }
 
         // Write previous song data to DB
@@ -250,7 +245,7 @@ function runBot(error, auth) {
                 duration: data.lastPlay.media.duration,
                 image: data.lastPlay.media.image
             };
-            Song.findOrCreate({id: data.lastPlay.media.id}, songData).on('success', function (song) {
+            Song.findOrCreate({id: data.lastPlay.media.id}, songData).success(function (song) {
                 song.updateAttributes(songData);
 
                 Play.create({
@@ -305,7 +300,7 @@ function runBot(error, auth) {
             last_wait_list_position: bot.getWaitListPosition(user.id),
             last_seen: new Date()
         };
-        User.findOrCreate({id: user.id}, userData).on('success', function (dbUser) {
+        User.findOrCreate({id: user.id}, userData).success(function (dbUser) {
             dbUser.updateAttributes(userData);
         });
 
@@ -327,12 +322,6 @@ function runBot(error, auth) {
         //        callback(true);
         //    }
         //});
-    }
-
-    function getUserFromDb(user, callback) {
-        User.find({id: user.id}).on('success', function (dbUser) {
-            callback(dbUser);
-        });
     }
 
     function reconnect() {
@@ -401,14 +390,6 @@ function runBot(error, auth) {
         })[0];
 
         if (command && command.enabled) {
-
-            // @FIXME - Remove this for production
-            if (data.from.username !== config.superAdmin) {
-                return false;
-            }
-            else {
-                bot.moderateDeleteChat(data.id);
-            }
 
             if (config.verboseLogging) {
                 logger.info('[COMMAND]', JSON.stringify(data, null, 2));

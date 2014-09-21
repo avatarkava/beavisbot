@@ -1,6 +1,6 @@
 exports.names = ['.fixsong'];
 exports.hidden = true;
-exports.enabled = true;
+exports.enabled = false;
 exports.matchStart = true;
 exports.handler = function (data) {
     function checkEchoNest(valueToCorrect) {

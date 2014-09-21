@@ -1,6 +1,6 @@
 exports.names = ['.songinfo'];
 exports.hidden = false;
-exports.enabled = true;
+exports.enabled = false;
 exports.matchStart = true;
 exports.handler = function (data) {
     var songId;

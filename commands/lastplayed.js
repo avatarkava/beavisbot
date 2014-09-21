@@ -1,6 +1,6 @@
 exports.names = ['.lastplayed'];
 exports.hidden = false;
-exports.enabled = true;
+exports.enabled = false;
 exports.matchStart = false;
 exports.handler = function (data) {
     //db.get('SELECT username, started, upvotes, downvotes, snags FROM (SELECT userid, started, upvotes, downvotes, snags FROM PLAYS WHERE songid = ? AND strftime("%s", datetime("now")) - strftime("%s", started) > 600 ORDER BY started DESC LIMIT 1) a INNER JOIN USERS ON a.userid = USERS.userid', [bot.getMedia().id], function (error, row) {

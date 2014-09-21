@@ -1,6 +1,6 @@
 exports.names = ['.worstdjs'];
 exports.hidden = true;
-exports.enabled = true;
+exports.enabled = false;
 exports.matchStart = false;
 exports.handler = function (data) {
     //db.all('SELECT username, down from (SELECT userid, sum(downvotes) as down FROM PLAYS GROUP BY userid) a INNER JOIN USERS ON a.userid = USERS.userid ORDER BY down desc LIMIT 5', function (error, rows) {

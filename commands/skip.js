@@ -9,3 +9,4 @@ exports.handler = function (data) {
         bot.moderateDeleteChat(data.id);
     }
 };
+

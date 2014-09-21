@@ -4,7 +4,7 @@ exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;
 exports.handler = function (data) {
-    //db.get('SELECT fact from FACTS WHERE category = ? ORDER BY RANDOM() LIMIT 1', ['cat'], function (err, row) {
-    //    bot.sendChat(row['fact']);
-    //})
+    request('http://catfacts-api.appspot.com/api/facts', function (error, response, body) {
+        bot.sendChat(JSON.parse(body).facts[0]);
+    });
 };

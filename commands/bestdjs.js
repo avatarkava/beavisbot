@@ -2,7 +2,7 @@
 
 exports.names = ['.bestdjs'];
 exports.hidden = false;
-exports.enabled = true;
+exports.enabled = false;
 exports.matchStart = false;
 exports.handler = function (data) {
     //db.all('SELECT username, up from (SELECT userid, sum(upvotes) as up FROM PLAYS GROUP BY userid) a INNER JOIN USERS ON a.userid = USERS.userid ORDER BY up desc LIMIT 5', function (error, rows) {

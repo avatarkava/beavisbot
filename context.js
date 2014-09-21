@@ -179,15 +179,15 @@ module.exports = function (options) {
         var message = moment.utc(timestamp).fromNow(ago);
 
         if (moment().isAfter(moment(timestamp).add(24, 'hours'))) {
-            message += ' (' + moment.utc(timestamp, 'YYYY-MM-DD HH:mm:ss').calendar() + ')';
+            message += ' (' + moment.utc(timestamp).calendar() + ')';
         }
 
         return message;
     };
 
     secondsSince = function (timestamp) {
-        var now = moment();
-        timestamp = moment(timestamp, 'YYYY-MM-DD HH:mm:ss');
+        var now = moment.utc();
+        timestamp = moment.utc(timestamp);
         return now.diff(timestamp, 'seconds');
     };
 
