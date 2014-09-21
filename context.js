@@ -61,9 +61,9 @@ module.exports = function (options) {
         .hasMany(Play);
     User
         .hasMany(Karma)
-        .hasMany(Karma, {foreignKey: 'modUserId'})
+        .hasMany(Karma, {foreignKey: 'mod_user_id'})
         .hasMany(Play)
-        .hasMany(RoomEvent, {foreignKey: 'modUserId'});
+        .hasMany(RoomEvent, {foreignKey: 'mod_user_id'});
 
     sequelize.sync()
         .success(function () {

@@ -103,7 +103,7 @@ function runBot(error, auth) {
                 // Restore spot in line if user has been gone < 10 mins
                 if (!newUser && secondsSince(dbUser.last_seen) <= 600 && secondsSince(dbUser.last_seen) > 60 && dbUser.last_wait_list_position != -1 && bot.getWaitListPosition(data.id) != dbUser.last_wait_list_position) {
                     bot.moderateAddDJ(data.id, function () {
-                        if (dbUser.last_wait_list_position <= room.djs.length && bot.getWaitListPosition(data.id) != dbUser.last_wait_list_position) {
+                        if (dbUser.last_wait_list_position < bot.getWaitList().length && bot.getWaitListPosition(data.id) != dbUser.last_wait_list_position) {
                             bot.moderateMoveDJ(data.id, dbUser.last_wait_list_position);
                         }
                         setTimeout(function () {
@@ -398,7 +398,11 @@ function runBot(error, auth) {
             command.handler(data);
         }
         else if (data.message.indexOf('@' + bot.getUser().username) > -1) {
-            botMentionResponse(data);
+            mentionResponse(data);
+        }
+        else if (data.message.indexOf('.') === 0) {
+            // @TODO - Build the list of possible commands on init() instead of querying every time
+            chatResponse(data);
         }
     }
 
@@ -432,30 +436,32 @@ function runBot(error, auth) {
 
     function suggestNewSongMetadata(valueToCorrect) {
         media = bot.getMedia();
-        request('http://developer.echonest.com/api/v4/song/search?api_key=' + config.apiKeys.echoNest + '&format=json&results=1&combined=' + S(valueToCorrect).escapeHTML().stripPunctuation().s, function (error, response, body) {
-            logger.info('echonest body', body);
-            if (error) {
-                bot.sendChat('An error occurred while connecting to EchoNest.');
-                bot.error('EchoNest error', error);
-            } else {
-                response = JSON.parse(body).response;
-
-                room.media.suggested = {
-                    author: response.songs[0].artist_name,
-                    title: response.songs[0].title
-                };
-
-                // log
-                logger.info('[EchoNest] Original: "' + media.author + '" - "' + media.title + '". Suggestion: "' + room.media.suggested.author + '" - "' + room.media.suggested.title);
-
-                if (media.author != room.media.suggested.author || media.title != room.media.suggested.title) {
-                    bot.sendChat('Hey, the metadata for this song looks wrong! Suggested Artist: "' + room.media.suggested.author + '". Title: "' + room.media.suggested.title + '". Type ".fixsong yes" to use the suggested tags.');
-                }
-            }
-        });
+        // @FIXME - don't use the room. construct.
+        //request('http://developer.echonest.com/api/v4/song/search?api_key=' + config.apiKeys.echoNest + '&format=json&results=1&combined=' + S(valueToCorrect).escapeHTML().stripPunctuation().s, function (error, response, body) {
+        //    logger.info('echonest body', body);
+        //    if (error) {
+        //        bot.sendChat('An error occurred while connecting to EchoNest.');
+        //        bot.error('EchoNest error', error);
+        //    } else {
+        //        response = JSON.parse(body).response;
+        //
+        //        room.media.suggested = {
+        //            author: response.songs[0].artist_name,
+        //            title: response.songs[0].title
+        //        };
+        //
+        //        // log
+        //        logger.info('[EchoNest] Original: "' + media.author + '" - "' + media.title + '". Suggestion: "' + room.media.suggested.author + '" - "' + room.media.suggested.title);
+        //
+        //        if (media.author != room.media.suggested.author || media.title != room.media.suggested.title) {
+        //            bot.sendChat('Hey, the metadata for this song looks wrong! Suggested Artist: "' + room.media.suggested.author + '". Title: "' + room.media.suggested.title + '". Type ".fixsong yes" to use the suggested tags.');
+        //        }
+        //    }
+        //});
     }
 
-    function botMentionResponse(data) {
+    function mentionResponse(data) {
+        // @FIXME - Eliminate this once you add them to the db with type = 'mention'
         var strings = [
             "What year is it?",
             "/me regards {sender} with an alarmed expression.",
@@ -506,5 +512,19 @@ function runBot(error, auth) {
         var randomIndex = _.random(0, strings.length - 1);
         var message = strings[randomIndex];
         bot.sendChat(message.replace('{sender}', data.from.username));
+    }
+
+    function chatResponse(data) {
+        EventResponse.find({where: Sequelize.and({event_type: 'chat', trigger: data.message.substring(1), is_active: true}), order: Sequelize.RANDOM})
+            .success(function (row) {
+                if (row === null) {
+                    return;
+                }
+                else {
+                    logger.info(JSON.stringify(row, null, 2));
+                    bot.sendChat(row.response.replace('{sender}', data.from.username));
+                }
+
+            });
     }
 }

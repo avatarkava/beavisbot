@@ -1,4 +1,3 @@
-// cat facts!
 exports.names = ['.catfact', '.catfacts'];
 exports.hidden = true;
 exports.enabled = true;
