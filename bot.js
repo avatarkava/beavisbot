@@ -25,13 +25,31 @@ function runBot(error, auth) {
         if (config.responses.botConnect !== "") {
             bot.sendChat(config.responses.botConnect);
         }
-        if (bot.getMedia() != null && config.wootSongs == 'ALL') {
-            bot.woot();
-        }
 
         bot.getUsers().forEach(function (user) {
             addUserToDb(user);
         });
+
+        playing = bot.getMedia();
+
+        if (playing != null) {
+            if (config.wootSongs == 'ALL') {
+                bot.woot();
+            }
+
+            var songData = {
+                id: playing.id,
+                author: playing.author,
+                title: playing.title,
+                format: playing.format,
+                cid: playing.cid,
+                duration: playing.duration,
+                image: playing.image
+            };
+            Song.findOrCreate({id: playing.id}, songData).success(function (song) {
+                song.updateAttributes(songData);
+            });
+        }
     });
 
     bot.on('chat', function (data) {
@@ -44,7 +62,7 @@ function runBot(error, auth) {
 
         data.message = data.message.trim();
         // Let people stay active with single-char, but don't let it spam up chat.
-        if (data.message == '.') {
+        if (data.message === '.') {
             bot.moderateDeleteChat(data.id);
         }
         else {
@@ -189,27 +207,27 @@ function runBot(error, auth) {
 
                     var position = bot.getWaitListPosition(dj.id);
 
-                    //db.run('UPDATE USERS SET lastWaitListPosition = ? WHERE userid = ?', [position, dj.id]);
+                    if (dbUser !== null) {
 
-                    // Only bug idle people if the bot has been running for as long as the minimum idle time
-
-                    if (secondsSince(dbUser.last_active) >= maxIdleTime && moment().isAfter(moment(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
-                        logger.warning('[IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
-                        if (dbUser.warns > 0) {
-                            bot.moderateRemoveDJ(dj.id);
-                            bot.sendChat('@' + dbUser.username + ' ' + config.responses.activeDJRemoveMessage);
-                            //db.run('UPDATE DISCIPLINE SET warns = 0, removes = removes + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
+                        // Only bug idle people if the bot has been running for as long as the minimum idle time
+                        if (secondsSince(dbUser.last_active) >= maxIdleTime && moment().isAfter(moment(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
+                            logger.warning('[IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
+                            if (dbUser.warns > 0) {
+                                bot.moderateRemoveDJ(dj.id);
+                                bot.sendChat('@' + dbUser.username + ' ' + config.responses.activeDJRemoveMessage);
+                                //db.run('UPDATE DISCIPLINE SET warns = 0, removes = removes + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
+                            }
+                            else if (position > 1) {
+                                //db.run('UPDATE DISCIPLINE SET warns = warns + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
+                                idleDJs.push(dbUser.username);
+                            }
                         }
-                        else if (position > 1) {
-                            //db.run('UPDATE DISCIPLINE SET warns = warns + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
-                            idleDJs.push(dbUser.username);
+                        else {
+                            if (dj.role > 1) {
+                                roomHasActiveMods = true;
+                            }
+                            logger.info('[ACTIVE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                         }
-                    }
-                    else {
-                        if (dj.role > 1) {
-                            roomHasActiveMods = true;
-                        }
-                        logger.info('[ACTIVE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                     }
 
                     if (z === idleWaitList.length) {
@@ -240,6 +258,7 @@ function runBot(error, auth) {
                 id: data.lastPlay.media.id,
                 author: data.lastPlay.media.author,
                 title: data.lastPlay.media.title,
+                slug: data.lastPlay.media.author + '-' + data.lastPlay.media.title,
                 format: data.lastPlay.media.format,
                 cid: data.lastPlay.media.cid,
                 duration: data.lastPlay.media.duration,
@@ -516,9 +535,9 @@ function runBot(error, auth) {
 
     function chatResponse(data) {
         EventResponse.find({
-                where: Sequelize.and({event_type: 'chat', trigger: data.message.substring(1), is_active: true}),
-                order: 'RAND()'
-            })
+            where: Sequelize.and({event_type: 'chat', trigger: data.message.substring(1), is_active: true}),
+            order: 'RAND()'
+        })
             .success(function (row) {
                 if (row === null) {
                     return;

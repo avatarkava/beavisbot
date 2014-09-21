@@ -3,13 +3,7 @@ module.exports = function (sequelize, Sequelize) {
         id: {type: Sequelize.INTEGER.UNSIGNED, primaryKey: true},
         author: {type: Sequelize.STRING, allowNull: false},
         title: {type: Sequelize.STRING, allowNull: false},
-        slug: {
-            type: Sequelize.STRING,
-            allowNull: false,
-            set: function (v) {
-                // @todo - slugify the string
-            }
-        },
+        slug: {type: Sequelize.STRING, allowNull: false},
         release_date: {type: Sequelize.DATE},
         tags: {type: Sequelize.STRING},
         format: {type: Sequelize.INTEGER.UNSIGNED, defaultValue: 1},
@@ -19,6 +13,16 @@ module.exports = function (sequelize, Sequelize) {
         is_banned: {type: Sequelize.BOOLEAN, defaultValue: 0}
     }, {
         underscored: true,
-        tableName: 'songs'
+        tableName: 'songs',
+        setterMethods: {
+            title: function (v) {
+                var formattedSlug = S(v + '-' + this.getDataValue('author')).slugify().s;
+                this.setDataValue('slug', formattedSlug);
+                return this.setDataValue('title', v);
+            },
+            slug: function (v) {
+                return this.setDataValue('slug', S(v).slugify().s);
+            }
+        }
     });
 }

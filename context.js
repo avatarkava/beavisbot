@@ -42,18 +42,9 @@ module.exports = function (options) {
     /**
      * Build up the models and relations
      */
-    var models = [
-        'EventResponse',
-        'Karma',
-        'Play',
-        'RoomEvent',
-        'Song',
-        'SongResponse',
-        'User'
-    ];
-
+    var models = ['EventResponse', 'Karma', 'Play', 'RoomEvent', 'Song', 'SongResponse', 'User'];
     models.forEach(function (model) {
-        this[model] = sequelize.import('models/' + model);
+        this[model] = sequelize.import('models/' + model + '.js');
     });
 
     // @TODO - Is it better to declare these directly in the model?
