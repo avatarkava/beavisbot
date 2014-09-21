@@ -254,8 +254,6 @@ function runBot(error, auth) {
         // Write previous song data to DB
         if (data.lastPlay.media != null) {
 
-            logger.warning(JSON.stringify(data.lastPlay, null, 2));
-
             var songData = {
                 id: data.lastPlay.media.id,
                 author: data.lastPlay.media.author,
