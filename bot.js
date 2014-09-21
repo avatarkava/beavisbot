@@ -515,7 +515,10 @@ function runBot(error, auth) {
     }
 
     function chatResponse(data) {
-        EventResponse.find({where: Sequelize.and({event_type: 'chat', trigger: data.message.substring(1), is_active: true}), order: Sequelize.RANDOM})
+        EventResponse.find({
+                where: Sequelize.and({event_type: 'chat', trigger: data.message.substring(1), is_active: true}),
+                order: 'RAND()'
+            })
             .success(function (row) {
                 if (row === null) {
                     return;
