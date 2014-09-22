@@ -7,7 +7,7 @@ module.exports = function (sequelize, Sequelize) {
         release_date: {type: Sequelize.DATE},
         tags: {type: Sequelize.STRING},
         format: {type: Sequelize.INTEGER.UNSIGNED, defaultValue: 1},
-        cid: {type: Sequelize.STRING, allowNull: false, unique: true},
+        cid: {type: Sequelize.STRING, allowNull: false},
         duration: {type: Sequelize.INTEGER.UNSIGNED},
         image: {type: Sequelize.STRING},
         is_banned: {type: Sequelize.BOOLEAN, defaultValue: 0}

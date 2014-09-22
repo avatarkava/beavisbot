@@ -252,7 +252,7 @@ function runBot(error, auth) {
         }
 
         // Write previous song data to DB
-        if (data.lastPlay.media != null) {
+        if (data.lastPlay.media !== null) {
 
             var songData = {
                 id: data.lastPlay.media.id,
@@ -263,18 +263,21 @@ function runBot(error, auth) {
                 duration: data.lastPlay.media.duration,
                 image: data.lastPlay.media.image
             };
+
             Song.findOrCreate({id: data.lastPlay.media.id, cid: data.lastPlay.media.cid}, songData).success(function (song) {
                 song.updateAttributes(songData);
 
-                Play.create({
-                    user_id: data.lastPlay.dj.id,
-                    song_id: data.lastPlay.media.id,
-                    positive: data.lastPlay.score.positive,
-                    negative: data.lastPlay.score.negative,
-                    grabs: data.lastPlay.score.grabs,
-                    listeners: data.lastPlay.score.listeners,
-                    skipped: data.lastPlay.score.skipped
-                });
+                if (data.lastPlay.dj !== null) {
+                    Play.create({
+                        user_id: data.lastPlay.dj.id,
+                        song_id: data.lastPlay.media.id,
+                        positive: data.lastPlay.score.positive,
+                        negative: data.lastPlay.score.negative,
+                        grabs: data.lastPlay.score.grabs,
+                        listeners: data.lastPlay.score.listeners,
+                        skipped: data.lastPlay.score.skipped
+                    });
+                }
 
             });
         }
