@@ -17,6 +17,7 @@ exports.handler = function (data) {
         var formPayload = {
             text: '@channel - ' + data.from.username + ' requested help in https://plug.dj/' + config.roomName + " \n`" + message + "`",
             username: bot.getUser().username,
+            link_names: 1,
             channel: config.slack.default.channel,
             icon_url: config.slack.default.icon_url
         }
