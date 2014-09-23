@@ -103,7 +103,7 @@ function runBot(error, auth) {
 
                 // Restore spot in line if user has been gone < 15 mins
                 var position = bot.getWaitListPosition(data.id);
-                if (!newUser && secondsSince(dbUser.last_seen) <= 900 && (position === -1 || (position > -1 && position > dbUser.waitlist_position))) {
+                if (!newUser && dbUser.waitlist_position > -1 && secondsSince(dbUser.last_seen) <= 900 && (position === -1 || (position > -1 && position > dbUser.waitlist_position))) {
                     bot.moderateAddDJ(data.id, function () {
                         if (dbUser.waitlist_position < bot.getWaitList().length && position !== dbUser.waitlist_position) {
                             bot.moderateMoveDJ(data.id, dbUser.waitlist_position);
