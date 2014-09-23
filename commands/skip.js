@@ -4,9 +4,8 @@ exports.enabled = true;
 exports.matchStart = false;
 exports.handler = function (data) {
     if (data.from.role > 1 || data.from.id == bot.getDJ().id) {
+
         logger.warning('[SKIP] ' + data.from.username + ' skipped ' + bot.getDJ().username);
-        bot.moderateForceSkip();
-        bot.moderateDeleteChat(data.id);
 
         if (data.from.id !== bot.getDJ().id) {
             var userData = {
@@ -17,6 +16,9 @@ exports.handler = function (data) {
             };
             Karma.create(userData);
         }
+
+        bot.moderateForceSkip();
+        bot.moderateDeleteChat(data.id);
     }
 };
 

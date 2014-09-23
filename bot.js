@@ -30,26 +30,6 @@ function runBot(error, auth) {
             addUserToDb(user);
         });
 
-        playing = bot.getMedia();
-
-        if (playing != null) {
-            if (config.wootSongs == 'ALL') {
-                bot.woot();
-            }
-
-            var songData = {
-                id: playing.id,
-                author: playing.author,
-                title: playing.title,
-                format: playing.format,
-                cid: playing.cid,
-                duration: playing.duration,
-                image: playing.image
-            };
-            Song.findOrCreate({id: playing.id, cid: playing.cid}, songData).success(function (song) {
-                song.updateAttributes(songData);
-            });
-        }
     });
 
     bot.on('chat', function (data) {
@@ -175,13 +155,46 @@ function runBot(error, auth) {
             logger.success('[EVENT] ADVANCE ', JSON.stringify(data, null, 2));
         }
 
-        if (data.currentDJ != null && data.media != null) {
-            logger.success('********************************************************************');
-            logger.success('[SONG]', data.currentDJ.username + ' played: ' + data.media.author + ' - ' + data.media.title);
-            User.update({waitlist_position: 0}, {id: data.currentDJ.id});
+        // Write previous play data to DB
+        if (data.lastPlay.media !== null && data.lastPlay.dj !== null) {
+            Play.create({
+                user_id: data.lastPlay.dj.id,
+                song_id: data.lastPlay.media.id,
+                positive: data.lastPlay.score.positive,
+                negative: data.lastPlay.score.negative,
+                grabs: data.lastPlay.score.grabs,
+                listeners: data.lastPlay.score.listeners,
+                skipped: data.lastPlay.score.skipped
+            });
         }
 
         if (data.media != null) {
+
+            if (data.currentDJ != null) {
+                logger.success('********************************************************************');
+                logger.success('[SONG]', data.currentDJ.username + ' played: ' + data.media.author + ' - ' + data.media.title);
+                User.update({waitlist_position: -1}, {id: data.currentDJ.id});
+            }
+
+            // Perform automatic song metadata correction
+            if (config.autoSuggestCorrections) {
+                correctMetadata();
+            }
+
+            // Write current song data to DB
+            var songData = {
+                id: data.media.id,
+                author: data.media.author,
+                title: data.media.title,
+                format: data.media.format,
+                cid: data.media.cid,
+                duration: data.media.duration,
+                image: data.media.image
+            };
+            Song.findOrCreate({id: data.media.id, cid: data.media.cid}, songData).success(function (song) {
+                song.updateAttributes(songData);
+            });
+
             if (config.wootSongs == 'ALL') {
                 bot.woot();
             }
@@ -204,11 +217,6 @@ function runBot(error, auth) {
                     }
                 }
             });
-
-            // Perform automatic song metadata correction
-            if (config.autoSuggestCorrections) {
-                correctMetadata();
-            }
 
             var maxIdleTime = config.activeDJTimeoutMins * 60;
             var idleDJs = [];
@@ -268,13 +276,13 @@ function runBot(error, auth) {
 
                         // Only police this if there aren't any mods around
                         if (!roomHasActiveMods && config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
-                            logger.warning('[SKIP] Skipped ' + data.dj.username + ' spinning a song of ' + data.media.duration + ' seconds');
-                            bot.sendChat('Sorry @' + data.dj.username + ', this song is over our maximum room length of ' + (config.maxSongLengthSecs / 60) + ' minutes.');
+                            logger.warning('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a song of ' + data.media.duration + ' seconds');
+                            bot.sendChat('Sorry @' + data.currentDJ.username + ', this song is over our maximum room length of ' + (config.maxSongLengthSecs / 60) + ' minutes.');
                             bot.moderateForceSkip();
                             var userData = {
                                 type: 'skip',
                                 details: 'Skipped for playing a song of ' + data.media.duration + ' (room configured for max of ' + config.maxSongLengthSecs + ')',
-                                user_id: dj.id,
+                                user_id: data.currentDJ.id,
                                 mod_user_id: bot.getUser().id
                             };
                             Karma.create(userData);
@@ -285,37 +293,6 @@ function runBot(error, auth) {
                 });
             });
 
-        }
-
-        // Write previous song data to DB
-        if (data.lastPlay.media !== null) {
-
-            var songData = {
-                id: data.lastPlay.media.id,
-                author: data.lastPlay.media.author,
-                title: data.lastPlay.media.title,
-                format: data.lastPlay.media.format,
-                cid: data.lastPlay.media.cid,
-                duration: data.lastPlay.media.duration,
-                image: data.lastPlay.media.image
-            };
-
-            Song.findOrCreate({id: data.lastPlay.media.id, cid: data.lastPlay.media.cid}, songData).success(function (song) {
-                song.updateAttributes(songData);
-
-                if (data.lastPlay.dj !== null) {
-                    Play.create({
-                        user_id: data.lastPlay.dj.id,
-                        song_id: data.lastPlay.media.id,
-                        positive: data.lastPlay.score.positive,
-                        negative: data.lastPlay.score.negative,
-                        grabs: data.lastPlay.score.grabs,
-                        listeners: data.lastPlay.score.listeners,
-                        skipped: data.lastPlay.score.skipped
-                    });
-                }
-
-            });
         }
 
     });
