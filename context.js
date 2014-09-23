@@ -39,12 +39,10 @@ module.exports = function (options) {
         }
     });
 
-    /**
-     * Build up the models and relations
-     */
+    // Build up the models and relations
     var models = ['EventResponse', 'Karma', 'Play', 'RoomEvent', 'Song', 'SongResponse', 'User'];
     models.forEach(function (model) {
-        this[model] = sequelize.import('models/' + model + '.js');
+        this[model] = sequelize.import('./models/' + model + '.js');
     });
 
     // @TODO - Is it better to declare these directly in the model?
@@ -58,22 +56,6 @@ module.exports = function (options) {
 
     sequelize.sync()
         .success(function () {
-            // @FIXME - Surely there's a more elegant way to do this, right?
-            /*
-             var sequelize_fixtures = require('sequelize-fixtures'),
-             fixtureModels = {
-             EventResponse: EventResponse,
-             Karma: Karma,
-             Play: Play,
-             RoomEvent: RoomEvent,
-             Song: Song,
-             SongResponse: SongResponse,
-             User: User
-             };
-             sequelize_fixtures.loadFile('fixtures/*.json', fixtureModels, function () {
-             // doStuffAfterLoading();
-             });
-             */
         })
         .error(function (error) {
 

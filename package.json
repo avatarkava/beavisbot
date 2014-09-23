@@ -1,7 +1,7 @@
 {
     "name": "BeavisBot",
-    "description": "A customizable plug.dj room bot based off of sparklebot by sharedferret",
-    "version": "1.0.0",
+    "description": "A customizable plug.dj room bot",
+    "version": "2.0.0",
     "keywords": ["turntable.fm", "turntable", "plug.dj", "plug"],
     "repository": {
         "type": "git",
@@ -18,7 +18,7 @@
     "dependencies": {
         "plugapi": "git://github.com/plugCubed/plugAPI.git#develop",
         "request": "*",
-        "sequelize": "*",
+        "sequelize": "1.*",
         "mysql": "*",
         "sqlite3": "*",
         "string": "*",
