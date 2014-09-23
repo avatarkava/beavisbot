@@ -68,7 +68,7 @@ function runBot(error, auth) {
         else {
             handleCommand(data);
         }
-        User.update({last_active: new Date()}, {id: data.from.id});
+        User.update({last_active: new Date(), last_seen: new Date()}, {id: data.from.id});
     });
 
     bot.on('userJoin', function (data) {
@@ -82,7 +82,7 @@ function runBot(error, auth) {
         if (data.username !== bot.getUser().username) {
             User.find(data.id).success(function (dbUser) {
 
-                if (dbUser == null) {
+                if (dbUser === null) {
                     message = config.responses.welcome.newUser.replace('{username}', data.username);
                     newUser = true;
                     logger.info('[JOIN]', data.username + ' is a first-time visitor to the room!');
@@ -111,18 +111,25 @@ function runBot(error, auth) {
                             bot.sendChat(message)
                         }, 5000);
                     }
-                    else if (config.welcomeUsers == "ALL" && secondsSince(dbUser.last_seen) >= 600) {
+                    else if (config.welcomeUsers == "ALL" && secondsSince(dbUser.last_active) >= 900 && secondsSince(dbUser.last_seen) >= 900) {
                         setTimeout(function () {
                             bot.sendChat(message)
                         }, 5000);
                     }
                 }
 
-                // Restore spot in line if user has been gone < 10 mins
-                if (!newUser && secondsSince(dbUser.last_seen) <= 600 && secondsSince(dbUser.last_seen) > 60 && dbUser.last_wait_list_position != -1 && bot.getWaitListPosition(data.id) != dbUser.last_wait_list_position) {
+                // Restore spot in line if user has been gone < 15 mins
+                if (!newUser && dbUser.last_wait_list_position !== -1 && bot.getWaitListPosition(data.id) >= dbUser.last_wait_list_position && secondsSince(dbUser.last_seen) <= 900) {
                     bot.moderateAddDJ(data.id, function () {
-                        if (dbUser.last_wait_list_position < bot.getWaitList().length && bot.getWaitListPosition(data.id) != dbUser.last_wait_list_position) {
+                        if (dbUser.last_wait_list_position < bot.getWaitList().length && bot.getWaitListPosition(data.id) !== dbUser.last_wait_list_position) {
                             bot.moderateMoveDJ(data.id, dbUser.last_wait_list_position);
+                            var userData = {
+                                type: 'restored',
+                                details: 'Restored to position ' + dbUser.last_wait_list_position + ' (disconnected for ' + timeSince(dbUser.last_seen) + ')',
+                                user_id: data.id,
+                                mod_user_id: bot.getUser().id
+                            };
+                            Karma.create(userData);
                         }
                         setTimeout(function () {
                             bot.sendChat('/me put @' + data.username + ' back in line :thumbsup:')
@@ -151,7 +158,7 @@ function runBot(error, auth) {
         if (user) {
             logger.info('[GRAB]', user.username + ' grabbed this song');
         }
-        User.update({last_active: new Date()}, {id: data});
+        User.update({last_active: new Date(), last_seen: new Date()}, {id: data});
     });
 
     bot.on('vote', function (data) {
@@ -159,6 +166,7 @@ function runBot(error, auth) {
         if (config.verboseLogging && user) {
             logger.info('[VOTE]', user.username + ': ' + data.v);
         }
+        User.update({last_seen: new Date()}, {id: data.i});
     });
 
     bot.on('advance', function (data) {
@@ -212,13 +220,26 @@ function runBot(error, auth) {
                         // Only bug idle people if the bot has been running for as long as the minimum idle time
                         if (secondsSince(dbUser.last_active) >= maxIdleTime && moment().isAfter(moment(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
                             logger.warning('[IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
+                            // @FIXME - Check vs. the Karma table
                             if (dbUser.warns > 0) {
                                 bot.moderateRemoveDJ(dj.id);
                                 bot.sendChat('@' + dbUser.username + ' ' + config.responses.activeDJRemoveMessage);
-                                //db.run('UPDATE DISCIPLINE SET warns = 0, removes = removes + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
+                                var userData = {
+                                    type: 'remove',
+                                    details: 'Removed from position ' + position + ': AFK for ' + timeSince(dbUser.last_active, true),
+                                    user_id: dj.id,
+                                    mod_user_id: bot.getUser().id
+                                };
+                                Karma.create(userData);
                             }
                             else if (position > 1) {
-                                //db.run('UPDATE DISCIPLINE SET warns = warns + 1, lastAction = CURRENT_TIMESTAMP WHERE userid = ?', [dj.id]);
+                                var userData = {
+                                    type: 'warn',
+                                    details: 'Warned in position ' + position + ': AFK for ' + timeSince(dbUser.last_active, true),
+                                    user_id: dj.id,
+                                    mod_user_id: bot.getUser().id
+                                };
+                                Karma.create(userData);
                                 idleDJs.push(dbUser.username);
                             }
                         }
@@ -242,6 +263,13 @@ function runBot(error, auth) {
                             logger.warning('[SKIP] Skipped ' + data.dj.username + ' spinning a song of ' + data.media.duration + ' seconds');
                             bot.sendChat('Sorry @' + data.dj.username + ', this song is over our maximum room length of ' + (config.maxSongLengthSecs / 60) + ' minutes.');
                             bot.moderateForceSkip();
+                            var userData = {
+                                type: 'skip',
+                                details: 'Skipped for playing a song of ' + data.media.duration + ' (room configured for max of ' + config.maxSongLengthSecs + ')',
+                                user_id: dj.id,
+                                mod_user_id: bot.getUser().id
+                            };
+                            Karma.create(userData);
 
                         }
                     }
@@ -322,6 +350,11 @@ function runBot(error, auth) {
             last_seen: new Date()
         };
         User.findOrCreate({id: user.id}, userData).success(function (dbUser) {
+
+            // Reset the user's AFK timer if they've been gone for long enough (so we don't reset on disconnects)
+            if (secondsSince(dbUser.last_seen) >= 900) {
+                userData.last_active = new Date();
+            }
             dbUser.updateAttributes(userData);
         });
 
@@ -333,7 +366,6 @@ function runBot(error, auth) {
         //db.get('SELECT userid FROM USERS WHERE username = ?', [user.username], function (error, row) {
         //    if (row != null && row.userid.length > 10) {
         //        logger.warning('Converting userid for ' + user.username + ': ' + row.userid + ' => ' + user.id);
-        //        //db.run('DELETE FROM DISCIPLINE WHERE userid = ?', [row.userid]);
         //        //db.run('UPDATE PLAYS SET userid = ? WHERE userid = ?', [user.id, row.userid]);
         //        //db.run('UPDATE USERS SET userid = ? WHERE userid = ?', [user.id, row.userid], function () {
         //        //    callback(true);
@@ -356,8 +388,16 @@ function runBot(error, auth) {
             mehWaitList.forEach(function (dj) {
                 if (dj.vote === -1) {
                     logger.warning('[REMOVE] Removed ' + dj.username + ' from wait list for mehing');
+                    var position = bot.getWaitListPosition(dj.id);
                     bot.moderateRemoveDJ(dj.id);
                     bot.sendChat('@' + dj.username + ', voting MEH/Chato/:thumbsdown: while in line is prohibited. Check .rules.');
+                    var userData = {
+                        type: 'remove',
+                        details: 'Removed from position ' + position + ' for mehing',
+                        user_id: dj.id,
+                        mod_user_id: bot.getUser().id
+                    };
+                    Karma.create(userData);
                 }
             });
         }
@@ -545,7 +585,6 @@ function runBot(error, auth) {
                     return;
                 }
                 else {
-                    logger.info(JSON.stringify(row, null, 2));
                     bot.sendChat(row.response.replace('{sender}', data.from.username));
                 }
 

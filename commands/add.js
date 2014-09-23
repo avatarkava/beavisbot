@@ -7,11 +7,12 @@ exports.handler = function (data) {
         bot.moderateDeleteChat(data.id);
         var input = data.message.split(' ');
         var username = _.rest(input, 1).join(' ').trim();
-        if (username) {
-            user = _.findWhere(bot.getUsers(), {username: username.substring(1)});
+        var usernameFormatted = S(username).chompLeft('@').s;
+        if (usernameFormatted) {
+            user = _.findWhere(bot.getUsers(), {username: usernameFormatted});
             if (user && bot.getWaitListPosition(user.id) === -1) {
                 bot.moderateAddDJ(user.id, function () {
-                    logger.info('[ADD] ' + data.from.username + ' added ' + username + ' to waitlist.');
+                    logger.info('[ADD] ' + data.from.username + ' added ' + usernameFormatted + ' to waitlist.');
                 });
             }
         }

@@ -7,6 +7,16 @@ exports.handler = function (data) {
         logger.warning('[SKIP] ' + data.from.username + ' skipped ' + bot.getDJ().username);
         bot.moderateForceSkip();
         bot.moderateDeleteChat(data.id);
+
+        if (data.from.id !== bot.getDJ().id) {
+            var userData = {
+                type: 'skip',
+                details: 'Skipped by ' + data.from.username,
+                user_id: bot.getDJ().id,
+                mod_user_id: data.from.id
+            };
+            Karma.create(userData);
+        }
     }
 };
 
