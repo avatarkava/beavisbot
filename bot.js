@@ -119,13 +119,14 @@ function runBot(error, auth) {
                 }
 
                 // Restore spot in line if user has been gone < 15 mins
-                if (!newUser && dbUser.last_wait_list_position !== -1 && bot.getWaitListPosition(data.id) >= dbUser.last_wait_list_position && secondsSince(dbUser.last_seen) <= 900) {
+                var position = bot.getWaitListPosition(data.id);
+                if (!newUser && secondsSince(dbUser.last_seen) <= 900 && (position === -1 || position > dbUser.waitlist_position)) {
                     bot.moderateAddDJ(data.id, function () {
-                        if (dbUser.last_wait_list_position < bot.getWaitList().length && bot.getWaitListPosition(data.id) !== dbUser.last_wait_list_position) {
-                            bot.moderateMoveDJ(data.id, dbUser.last_wait_list_position);
+                        if (dbUser.waitlist_position < bot.getWaitList().length && position !== dbUser.waitlist_position) {
+                            bot.moderateMoveDJ(data.id, dbUser.waitlist_position);
                             var userData = {
                                 type: 'restored',
-                                details: 'Restored to position ' + dbUser.last_wait_list_position + ' (disconnected for ' + timeSince(dbUser.last_seen) + ')',
+                                details: 'Restored to position ' + dbUser.waitlist_position + ' (disconnected for ' + timeSince(dbUser.last_seen) + ')',
                                 user_id: data.id,
                                 mod_user_id: bot.getUser().id
                             };
@@ -177,7 +178,7 @@ function runBot(error, auth) {
         if (data.currentDJ != null && data.media != null) {
             logger.success('********************************************************************');
             logger.success('[SONG]', data.currentDJ.username + ' played: ' + data.media.author + ' - ' + data.media.title);
-            User.update({last_wait_list_position: 0}, {id: data.currentDJ.id});
+            User.update({waitlist_position: 0}, {id: data.currentDJ.id});
         }
 
         if (data.media != null) {
@@ -185,17 +186,24 @@ function runBot(error, auth) {
                 bot.woot();
             }
 
-            // DOL Checks: Specific quirky bot messages (feel free to nuke)
-            if (data.media.author == 'U2') {
-                bot.sendChat(':boom:');
-            }
-            else if (data.media.author == 'Wing') {
-                bot.sendChat('OH MY GOD MY EARS! :hear_no_evil:')
-                bot.meh();
-            }
-            else if (data.media.author == 'Extreme' || data.media.title == 'To Be With You' || data.media.title == 'Winds of Change' || data.media.title == 'Under the Bridge') {
-                bot.sendChat('What is this dreck?');
-            }
+            SongResponse.find({
+                where: Sequelize.or(
+                    Sequelize.and({media_type: 'author', trigger: {like: data.media.author}, is_active: true}),
+                    Sequelize.and({media_type: 'title', trigger: {like: data.media.title}, is_active: true})
+                )
+            }).success(function (row) {
+                if (row !== null) {
+                    if (row.response != '') {
+                        bot.sendChat(row.response);
+                    }
+                    if (row.rate === 1) {
+                        bot.woot();
+                    }
+                    else if (row.rate === -1) {
+                        bot.meh();
+                    }
+                }
+            });
 
             // Perform automatic song metadata correction
             if (config.autoSuggestCorrections) {
@@ -320,7 +328,7 @@ function runBot(error, auth) {
         curUserList = bot.getUsers();
         curUserList.forEach(function (dj) {
             var position = bot.getWaitListPosition(dj.id);
-            User.update({last_wait_list_position: position}, {id: dj.id});
+            User.update({waitlist_position: position}, {id: dj.id});
         });
     });
 
@@ -346,7 +354,6 @@ function runBot(error, auth) {
             role: user.role,
             level: user.level,
             joined: user.joined,
-            last_wait_list_position: bot.getWaitListPosition(user.id),
             last_seen: new Date()
         };
         User.findOrCreate({id: user.id}, userData).success(function (dbUser) {
@@ -354,6 +361,7 @@ function runBot(error, auth) {
             // Reset the user's AFK timer if they've been gone for long enough (so we don't reset on disconnects)
             if (secondsSince(dbUser.last_seen) >= 900) {
                 userData.last_active = new Date();
+                userData.waitlist_position = -1;
             }
             dbUser.updateAttributes(userData);
         });

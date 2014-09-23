@@ -33,16 +33,17 @@ exports.handler = function (data) {
         }
 
         switch (duration) {
-            case 'HOUR':
-                apiDuration = 60;
-                break;
             case 'DAY':
                 apiDuration = 1440;
                 break;
             case 'PERMA':
-            default:
                 apiDuration = -1;
                 break;
+            case 'HOUR':
+            default:
+                apiDuration = 60;
+                break;
+
         }
 
         //db.get('SELECT * FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE username = ?', [username.substring(1)], function (error, row) {
