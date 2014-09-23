@@ -27,7 +27,7 @@ function runBot(error, auth) {
         }
 
         bot.getUsers().forEach(function (user) {
-            addUserToDb(user);
+            //addUserToDb(user);
         });
 
     });
@@ -49,8 +49,8 @@ function runBot(error, auth) {
             else {
                 handleCommand(data);
             }
-        
-            User.update({last_active: new Date(), last_seen: new Date()}, {id: data.from.id});
+
+            User.update({last_active: new Date(), last_seen: new Date()}, {where: {id: data.from.id}});
         }
     });
 
@@ -63,7 +63,7 @@ function runBot(error, auth) {
         var message = "";
 
         if (data.username !== bot.getUser().username) {
-            User.find(data.id).success(function (dbUser) {
+            User.find(data.id).on('success', function (dbUser) {
 
                 if (dbUser === null) {
                     message = config.responses.welcome.newUser.replace('{username}', data.username);
@@ -128,7 +128,7 @@ function runBot(error, auth) {
 
     bot.on('userLeave', function (data) {
         logger.info('[LEAVE]', 'User left: ' + data.username);
-        User.update({last_seen: new Date()}, {id: data.id});
+        User.update({last_seen: new Date()}, {where: {id: data.id}});
     });
 
     bot.on('userUpdate', function (data) {
@@ -142,7 +142,7 @@ function runBot(error, auth) {
         if (user) {
             logger.info('[GRAB]', user.username + ' grabbed this song');
         }
-        User.update({last_active: new Date(), last_seen: new Date()}, {id: data});
+        User.update({last_active: new Date(), last_seen: new Date()}, {where: {id: data}});
     });
 
     bot.on('vote', function (data) {
@@ -150,7 +150,7 @@ function runBot(error, auth) {
         if (config.verboseLogging && user) {
             logger.info('[VOTE]', user.username + ': ' + data.v);
         }
-        User.update({last_seen: new Date()}, {id: data.i});
+        User.update({last_seen: new Date()}, {where: {id: data.i}});
     });
 
     bot.on('advance', function (data) {
@@ -176,7 +176,7 @@ function runBot(error, auth) {
             if (data.currentDJ != null) {
                 logger.success('********************************************************************');
                 logger.success('[SONG]', data.currentDJ.username + ' played: ' + data.media.author + ' - ' + data.media.title);
-                User.update({waitlist_position: -1}, {id: data.currentDJ.id});
+                User.update({waitlist_position: -1}, {where: {id: data.currentDJ.id}});
             }
 
             // Perform automatic song metadata correction
@@ -194,7 +194,8 @@ function runBot(error, auth) {
                 duration: data.media.duration,
                 image: data.media.image
             };
-            Song.findOrCreate({id: data.media.id, cid: data.media.cid}, songData).success(function (song) {
+
+            Song.findOrCreate({where: {id: data.media.id, cid: data.media.cid}, defaults: songData}).spread(function (song) {
                 song.updateAttributes(songData);
             });
 
@@ -207,7 +208,7 @@ function runBot(error, auth) {
                     Sequelize.and({media_type: 'author', trigger: {like: data.media.author}, is_active: true}),
                     Sequelize.and({media_type: 'title', trigger: {like: data.media.title}, is_active: true})
                 )
-            }).success(function (row) {
+            }).on('success', function (row) {
                 if (row !== null) {
                     if (row.response != '') {
                         bot.sendChat(row.response);
@@ -228,7 +229,7 @@ function runBot(error, auth) {
 
             idleWaitList = bot.getWaitList();
             idleWaitList.forEach(function (dj) {
-                User.find(dj.id).success(function (dbUser) {
+                User.find(dj.id).on('success', function (dbUser) {
 
                     z++;
 
@@ -308,7 +309,7 @@ function runBot(error, auth) {
         curUserList = bot.getUsers();
         curUserList.forEach(function (dj) {
             var position = bot.getWaitListPosition(dj.id);
-            User.update({waitlist_position: position}, {id: dj.id});
+            User.update({waitlist_position: position}, {where: {id: dj.id}});
         });
     });
 
@@ -336,7 +337,7 @@ function runBot(error, auth) {
             joined: user.joined,
             last_seen: new Date()
         };
-        User.findOrCreate({id: user.id}, userData).success(function (dbUser) {
+        User.findOrCreate({where: {id: user.id}, defaults: userData}).spread(function (dbUser) {
 
             // Reset the user's AFK timer if they've been gone for long enough (so we don't reset on disconnects)
             if (secondsSince(dbUser.last_seen) >= 900) {
@@ -568,7 +569,7 @@ function runBot(error, auth) {
             where: Sequelize.and({event_type: 'chat', trigger: data.message.substring(1), is_active: true}),
             order: 'RAND()'
         })
-            .success(function (row) {
+            .on('success', function (row) {
                 if (row === null) {
                     return;
                 }

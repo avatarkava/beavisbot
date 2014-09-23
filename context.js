@@ -42,23 +42,20 @@ module.exports = function (options) {
     // Build up the models and relations
     var models = ['EventResponse', 'Karma', 'Play', 'RoomEvent', 'Song', 'SongResponse', 'User'];
     models.forEach(function (model) {
-        this[model] = sequelize.import('./models/' + model + '.js');
+        this[model] = sequelize.import(__dirname + '/models/' + model);
     });
 
     // @TODO - Is it better to declare these directly in the model?
-    Song
-        .hasMany(Play);
-    User
-        .hasMany(Karma)
-        .hasMany(Karma, {foreignKey: 'mod_user_id'})
-        .hasMany(Play)
-        .hasMany(RoomEvent, {foreignKey: 'mod_user_id'});
+    Song.hasMany(Play);
+    User.hasMany(Karma);
+    User.hasMany(Karma, {foreignKey: 'mod_user_id'});
+    User.hasMany(Play);
+    User.hasMany(RoomEvent, {foreignKey: 'mod_user_id'});
 
     sequelize.sync()
-        .success(function () {
+        .on('success', function () {
         })
-        .error(function (error) {
-
+        .on('error', function (error) {
         });
 
     package = require(path.resolve(__dirname, 'package.json'));

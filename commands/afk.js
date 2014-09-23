@@ -14,7 +14,7 @@ exports.handler = function (data) {
         logger.warning(JSON.stringify(waitlist, null, 2));
 
         waitlist.forEach(function (dj) {
-            User.find(dj.id).success(function (dbUser) {
+            User.find(dj.id).on('success', function (dbUser) {
                 z++;
                 if (secondsSince(dbUser.last_active) >= maxIdleTime) {
                     logger.warning('[IDLE] ' + z + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));

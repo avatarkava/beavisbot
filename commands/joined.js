@@ -14,7 +14,7 @@ exports.handler = function (data) {
     usernameFormatted = S(username).chompLeft('@').s;
 
 
-    User.find({where: {username: usernameFormatted}}).success(function (row) {
+    User.find({where: {username: usernameFormatted}}).on('success', function (row) {
         if (row === null) {
             bot.sendChat(usernameFormatted + ' was not found.');
         } else {
