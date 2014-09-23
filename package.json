@@ -19,6 +19,7 @@
         "plugapi": "git://github.com/plugCubed/plugAPI.git#develop",
         "request": "*",
         "sequelize": "1.*",
+        "jquery": "< 1.9",
         "mysql": "*",
         "sqlite3": "*",
         "string": "*",
