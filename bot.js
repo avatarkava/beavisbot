@@ -40,15 +40,18 @@ function runBot(error, auth) {
             logger.info('[CHAT]', data.from.username + ': ' + data.message);
         }
 
-        data.message = data.message.trim();
-        // Let people stay active with single-char, but don't let it spam up chat.
-        if (data.message === '.') {
-            bot.moderateDeleteChat(data.id);
+        if (data.from !== undefined) {
+            data.message = data.message.trim();
+            // Let people stay active with single-char, but don't let it spam up chat.
+            if (data.message === '.') {
+                bot.moderateDeleteChat(data.id);
+            }
+            else {
+                handleCommand(data);
+            }
+        
+            User.update({last_active: new Date(), last_seen: new Date()}, {id: data.from.id});
         }
-        else {
-            handleCommand(data);
-        }
-        User.update({last_active: new Date(), last_seen: new Date()}, {id: data.from.id});
     });
 
     bot.on('userJoin', function (data) {
