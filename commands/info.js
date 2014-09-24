@@ -31,13 +31,13 @@ exports.handler = function (data) {
                 birthday = row.birthday;
                 level = row.level;
                 slug = row.slug;
-            }
 
-            message = username + ' - Level ' + level + ' - Joined ' + joined;
-            if (level > 4) {
-                message += ' - https://plug.dj/@/' + slug;
+                message = username + ' - Level ' + level + ' - Joined ' + joined;
+                if (level > 4) {
+                    message += ' - https://plug.dj/@/' + slug;
+                }
+                bot.sendChat(message);
             }
-            bot.sendChat(message);
         });
     }
 };
