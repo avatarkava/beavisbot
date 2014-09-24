@@ -11,6 +11,12 @@ exports.handler = function (data) {
         username = data.from.username;
         joined = timeSince(data.from.joined);
         level = data.from.level;
+
+        message = username + ' - Level ' + level + ' - Joined ' + joined;
+        if (level > 4) {
+            message += ' - https://plug.dj/@/' + S(username).slugify().s;
+        }
+        bot.sendChat(message);
     }
     else {
 
@@ -20,18 +26,17 @@ exports.handler = function (data) {
         User.find({where: {username: username}}).on('success', function (row) {
             if (row === null) {
                 bot.sendChat(username + ' was not found.');
-                return;
             } else {
                 joined = timeSince(row.joined);
                 birthday = row.birthday;
                 level = row.level;
             }
+
+            message = username + ' - Level ' + level + ' - Joined ' + joined;
+            if (level > 4) {
+                message += ' - https://plug.dj/@/' + S(username).slugify().s;
+            }
+            bot.sendChat(message);
         });
     }
-
-    message = username + ' - Level ' + level + ': joined ' + joined;
-    if (level > 4) {
-        message += ' - https://plug.dj/@/' + S(username).slugify().s;
-    }
-    bot.sendChat(message);
 };
