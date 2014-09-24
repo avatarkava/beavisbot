@@ -306,7 +306,7 @@ function runBot(error, auth) {
             logger.success('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
         }
 
-        curUserList = bot.getWaitList();
+        curUserList = bot.getUsers();
         curUserList.forEach(function (dj) {
             var position = bot.getWaitListPosition(dj.id);
             User.update({waitlist_position: position}, {where: {id: dj.id}});
