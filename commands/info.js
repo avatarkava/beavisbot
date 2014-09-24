@@ -14,13 +14,13 @@ exports.handler = function (data) {
 
         message = username + ' - Level ' + level + ' - Joined ' + joined;
         if (level > 4) {
-            message += ' - https://plug.dj/@/' + S(username).slugify().s;
+            message += ' - https://plug.dj/@/' + data.from.slug;
         }
         bot.sendChat(message);
     }
     else {
 
-        usernameRaw = params.join(' ').trim()
+        usernameRaw = params.join(' ').trim();
         username = S(usernameRaw).chompLeft('@').s;
 
         User.find({where: {username: username}}).on('success', function (row) {
@@ -30,11 +30,12 @@ exports.handler = function (data) {
                 joined = timeSince(row.joined);
                 birthday = row.birthday;
                 level = row.level;
+                slug = row.slug;
             }
 
             message = username + ' - Level ' + level + ' - Joined ' + joined;
             if (level > 4) {
-                message += ' - https://plug.dj/@/' + S(username).slugify().s;
+                message += ' - https://plug.dj/@/' + slug;
             }
             bot.sendChat(message);
         });
