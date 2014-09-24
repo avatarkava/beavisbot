@@ -3,7 +3,7 @@
  * adapted from SimplePlugScript by Enyxx - arkaenyx(at)gmail(dot)com
  * This work is under CreativeCommons BY-NC-SA 3.0
  * http://creativecommons.org/licenses/by-nc-sa/3.0/legalcode*/
-nxVersion = "1.26";
+nxVersion = "1.27";
 notice = "ButtheadScript v" + nxVersion + " by AvatarKava!<br />- Options in the plug menu (top left)<br />- Type /cornholio for commands";
 forceReload = false;
 var nx = {
@@ -328,7 +328,7 @@ var nx = {
             return b.username == a.username ? null : b
         })
     }, resetAFK: function (a) {
-        for (i = 0; i < AFKArray.length; i++) a.un = AFKArray[i].username && (AFKArray[i].Stime = new Date)
+        for (i = 0; i < AFKArray.length; i++) a.un == AFKArray[i].username && (AFKArray[i].Stime = new Date)
     }, convertMS: function (a) {
         var b, c, e;
         e = Math.floor(a / 1E3);
