@@ -65,15 +65,15 @@ if ($_POST['team_id'] == $config->slack->pm2->team_id && $_POST['token'] == $con
             break;
         case 'help':
         default:
-            $message = "To control me, you need to type " . $trigger_word . " followed by one of the commands below.
-                    E.g. <" . $trigger_word . "status> to show my on/offline status
+            $message = "To control me, you need to type `" . $trigger_word . "` followed by one of the commands below.
+                    E.g. `" . $trigger_word . " status` to show my on/offline status
                     Available commands are:
-                    *status* — Show my online/offline status.
-                    *start* — Start me up f I'm offline.
-                    *stop* — Shut me down.
-                    *restart* — Restart me.
-                    *log #* — Show the last # things I see in my consle (default 10).
-                    *help* — Display this lst";
+                    `status` — Show my online/offline status.
+                    `start` — Start me up f I'm offline.
+                    `stop` — Shut me down.
+                    `restart` — Restart me.
+                    `log #` — Show the last # things I see in my consle (default 10).
+                    `help` — Display this lst";
     }
 }
 
