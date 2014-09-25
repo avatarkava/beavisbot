@@ -18,8 +18,12 @@ config.json
 roomState.json
 
 *.sqlite
-!sample.sqlite
-test.js
-migrate.sql
 
+!sample.sqlite
+migrate.sql
+test.js
 .idea
+
+web/p3.php
+web/slack-webhook.php
+images/*

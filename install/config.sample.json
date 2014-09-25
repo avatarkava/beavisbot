@@ -28,6 +28,11 @@
         "default": {
             "channel":"#general",
             "iconUrl": ""
+        },
+        "pm2": {
+            "instance_name": "beavisbot",
+            "token": "xxx",
+            "team_id": "xxx"
         }
     },
     "responses": {
