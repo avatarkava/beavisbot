@@ -23,20 +23,20 @@ $trigger_word = $_POST['trigger_word'];
 $text = trim(str_replace($trigger_word, '', $text));
 list($command, $parameters) = explode(' ', $text, 1);
 
-if (1 || $_POST['channel_id'] == 'XXX' && $_POST['token'] == 'XXX') {
+if (1) { // || $_POST['channel_id'] == 'XXX' && $_POST['token'] == 'XXX') {
     switch ($command) {
         case 'reload':
         case 'reset':
         case 'restart':
         case 'start':
             shell_exec('pm2 restart ' . $pm2_name);
-            $message = 'Restarting ' . $pm2_name;
+            $message = "I'm restarting...";
             break;
         case 'die':
         case 'kill':
         case 'stop':
             shell_exec('pm2 stop ' . $pm2_name);
-            $message = 'Shutting down ' . $pm2_name;
+            $message = "I'm shutting down...";
             break;
         case 'status':
             $output = shell_exec('pm2 jlist');
@@ -47,7 +47,7 @@ if (1 || $_POST['channel_id'] == 'XXX' && $_POST['token'] == 'XXX') {
             //if ($result = shell_exec('tail -n ' . $line[0] . ' /home/harajuku/.pm2/logs/Beavis-out-2.log')) {
             //    $text = $result;
             //}
-            $message = "I don't do anything yet";
+            $message = "I don't do anything yet!";
             break;
         case 'help':
         default:
@@ -68,7 +68,6 @@ if (1 || $_POST['channel_id'] == 'XXX' && $_POST['token'] == 'XXX') {
 // Return data
 $json = [
     'text'       => $message,
-    'username'   => $username,
     'link_names' => 1
 ];
-return json_encode($json);
+echo json_encode($json);
