@@ -7,6 +7,12 @@ header('Content-Type: application/json');
 
 $config = json_decode(file_get_contents('../config.json'));
 $pm2_name = $config->slack->pm2->instance_name;
+$pm2_path = $config->slack->pm2->bin_path;
+$pm2_log_path = $config->slack->pm2->log_path;
+
+// You made need the below commands in order to get this working on your specific operating system
+// $pm2_name = $pm2_name . ' 2>&1';
+// $pm2_path = 'HOME="${HOME:=/root}" ' . $pm2_path;
 
 // Deal with expected incoming data from $_POST
 $token        = $_POST['token'];
@@ -21,33 +27,41 @@ $trigger_word = $_POST['trigger_word'];
 
 // Strip the trigger word from text
 $text = trim(str_replace($trigger_word, '', $text));
-list($command, $parameters) = explode(' ', $text, 1);
+list($command, $parameters) = explode(' ', $text, 2);
 
-if (1) { // || $_POST['channel_id'] == 'XXX' && $_POST['token'] == 'XXX') {
+if ($_POST['team_id'] == $config->slack->pm2->team_id && $_POST['token'] == $config->slack->pm2->token) {
     switch ($command) {
         case 'reload':
         case 'reset':
         case 'restart':
-        case 'start':
-            shell_exec('pm2 restart ' . $pm2_name);
+            $result = shell_exec($pm2_path . ' restart ' . $pm2_name);
             $message = "I'm restarting...";
             break;
         case 'die':
         case 'kill':
         case 'stop':
-            shell_exec('pm2 stop ' . $pm2_name);
+            $result = shell_exec($pm2_path . ' stop ' . $pm2_name);
             $message = "I'm shutting down...";
             break;
         case 'status':
-            $output = shell_exec('pm2 jlist');
+            $output = shell_exec($pm2_path . ' jlist');
             $json   = json_decode($output);
-            $message = "I'm currently " . $json[2]->pm2_env->status . " and have restarted " . $json[2]->pm2_env->restart_time . " times.";
+            file_put_contents('output.txt', $output);
+            $message = "I'm currently " . $json[0]->pm2_env->status . " and have restarted " . $json[0]->pm2_env->restart_time . " times.";
+            break;
         case 'log':
-            //preg_match('/\d+/', $post, $line);
-            //if ($result = shell_exec('tail -n ' . $line[0] . ' /home/harajuku/.pm2/logs/Beavis-out-2.log')) {
-            //    $text = $result;
-            //}
-            $message = "I don't do anything yet!";
+            if (intval($parameters) > 0 && intval($parameters) < 1000) {
+                $lines = intval($parameters);
+            }
+            else {
+                $lines = 10;
+            }
+            $result = shell_exec('tail -n ' . $lines . ' ' . $pm2_log_path . ' 2>&1');
+            $message = "Here are the last $lines lines from my log:\n```" . $result . "```";
+            break;
+        case 'start':
+            $result = shell_exec($pm2_path . ' restart ' . $pm2_name);
+            $message = "I'm starting...";
             break;
         case 'help':
         default:
@@ -55,13 +69,11 @@ if (1) { // || $_POST['channel_id'] == 'XXX' && $_POST['token'] == 'XXX') {
                     E.g. <" . $trigger_word . "status> to show my on/offline status
                     Available commands are:
                     *status* — Show my online/offline status.
-                    *start* — Start me up if I'm offline.
+                    *start* — Start me up f I'm offline.
                     *stop* — Shut me down.
                     *restart* — Restart me.
-                    *restart time* — Show how many times I've rebooted myself.
-                    *log* — Show the last 10 things I see in my console.
-                    *log #* — Show the last # things I see in my console.
-                    *help* — Display this list";
+                    *log #* — Show the last # things I see in my consle (default 10).
+                    *help* — Display this lst";
     }
 }
 
