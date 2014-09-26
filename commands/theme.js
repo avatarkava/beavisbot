@@ -1,6 +1,6 @@
 exports.names = ['.theme'];
 exports.hidden = false;
-exports.enabled = false;
+exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function (data) {
 
