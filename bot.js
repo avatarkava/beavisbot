@@ -76,13 +76,11 @@ function runBot(error, auth) {
                 }
 
                 // Greet with the theme if it's not the default
-                //db.get("SELECT value AS 'theme', username, timestamp FROM SETTINGS s INNER JOIN USERS ON s.userid = USERS.userid WHERE name = ? LIMIT 1", ['theme'], function (error, row) {
-                //    if (row != null && row.theme != config.responses.theme) {
-                //        regExp = new RegExp(/^(.*?)[.?!-]\s/);
-                //        matches = regExp.exec(row.theme);
-                //        message += ' Theme: ' + matches[0] + ' .theme for details!';
-                //    }
-                //});
+                RoomEvent.find({where: {type: 'theme', starts_at: {lte: new Date()}, ends_at: {gte: new Date()}}}).on('success', function (row) {
+                    if (row !== null) {
+                        message += ' Theme: ' + row.title + ' - .theme for details!';
+                    }
+                });
 
                 if (!roomHasActiveMods) {
                     message += ' Type .help if you need it!';

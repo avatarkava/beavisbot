@@ -26,17 +26,12 @@ exports.handler = function (data) {
         //    });
     }
     else {
-        //db.get("SELECT value AS 'theme', username, timestamp FROM SETTINGS s INNER JOIN USERS ON s.userid = USERS.userid WHERE name = ? LIMIT 1", ['theme'], function (error, row) {
-        //    if (row != null) {
-        //        message = row.theme;
-        //        if (data.from.role > 2) {
-        //            message += ' (set ' + timeSince(row.timestamp) + ' by ' + row.username + ')';
-        //        }
-        //        bot.sendChat('/me ' + message);
-        //
-        //    } else {
-        //        bot.sendChat('/me ' + config.responses.theme);
-        //    }
-        //});
+        RoomEvent.find({where: {type: 'theme', starts_at: {lte: new Date()}, ends_at: {gte: new Date()}}}).on('success', function (row) {
+            if (row === null) {
+                bot.sendChat('/me ' + config.responses.theme);
+            } else {
+                bot.sendChat('/me ' + row.title + ' - ' + row.details);
+            }
+        });
     }
 };
