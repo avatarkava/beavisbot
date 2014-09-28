@@ -72,7 +72,7 @@ function runBot(error, auth) {
                 }
                 else {
                     message = config.responses.welcome.oldUser.replace('{username}', data.username);
-                    logger.info('[JOIN]', data.username + ' last seen ' + secondsSince(dbUser.last_seen) + ' seconds ago (' + dbUser.last_seen + ')');
+                    logger.info('[JOIN]', data.username + ' last seen ' + timeSince(dbUser.last_seen));
                 }
 
                 // Greet with the theme if it's not the default
@@ -174,6 +174,7 @@ function runBot(error, auth) {
 
             if (data.currentDJ != null) {
                 logger.success('********************************************************************');
+                logger.success('[UPTIME]', 'Bot online ' + timeSince(startupTimestamp, true));
                 logger.success('[SONG]', data.currentDJ.username + ' played: ' + data.media.author + ' - ' + data.media.title);
             }
 
@@ -237,28 +238,36 @@ function runBot(error, auth) {
                         // Only bug idle people if the bot has been running for as long as the minimum idle time
                         if (secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
                             logger.warning('[IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
-                            // @FIXME - Check vs. the Karma table
-                            if (dbUser.warns > 0) {
-                                bot.moderateRemoveDJ(dj.id);
-                                bot.sendChat('@' + dbUser.username + ' ' + config.responses.activeDJRemoveMessage);
-                                var userData = {
-                                    type: 'remove',
-                                    details: 'Removed from position ' + position + ': AFK for ' + timeSince(dbUser.last_active, true),
+                            Karma.find({
+                                where: {
                                     user_id: dj.id,
-                                    mod_user_id: bot.getUser().id
-                                };
-                                Karma.create(userData);
-                            }
-                            else if (position > 1) {
-                                var userData = {
                                     type: 'warn',
-                                    details: 'Warned in position ' + position + ': AFK for ' + timeSince(dbUser.last_active, true),
-                                    user_id: dj.id,
-                                    mod_user_id: bot.getUser().id
-                                };
-                                Karma.create(userData);
-                                idleDJs.push(dbUser.username);
-                            }
+                                    created_at: {gte: moment.utc().subtract(config.activeDJTimeoutMins, 'minutes').toDate()}
+                                }
+                            }).on('success', function (row) {
+
+                                if (row != null) {
+                                    bot.moderateRemoveDJ(dj.id);
+                                    bot.sendChat('@' + dbUser.username + ' ' + config.responses.activeDJRemoveMessage);
+                                    var userData = {
+                                        type: 'remove',
+                                        details: 'Removed from position ' + position + ': AFK for ' + timeSince(dbUser.last_active, true),
+                                        user_id: dj.id,
+                                        mod_user_id: bot.getUser().id
+                                    };
+                                    Karma.create(userData);
+                                }
+                                else if (position > 1) {
+                                    var userData = {
+                                        type: 'warn',
+                                        details: 'Warned in position ' + position + ': AFK for ' + timeSince(dbUser.last_active, true),
+                                        user_id: dj.id,
+                                        mod_user_id: bot.getUser().id
+                                    };
+                                    Karma.create(userData);
+                                    idleDJs.push(dbUser.username);
+                                }
+                            });
                         }
                         else {
                             if (dj.role > 1) {
@@ -325,6 +334,10 @@ function runBot(error, auth) {
             else {
                 User.update({waitlist_position: -1}, {where: {id: user.id}});
             }
+            if (config.verboseLogging) {
+                logger.info('Wait List Update', user.username + ' => ' + position);
+            }
+
         });
         User.update({waitlist_position: -1}, {
             where: {
