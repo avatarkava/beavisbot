@@ -3,10 +3,10 @@ var fs = require('fs');
 path = require('path')
 var config = require(path.resolve(__dirname, 'config.json'));
 
-var roomHasActiveMods = false;
-var startupTimestamp = new Date();
-
 runBot(false, config.auth);
+
+var roomHasActiveMods = false;
+var startupTimestamp = moment.utc().toDate();
 
 function runBot(error, auth) {
     if (error) {
@@ -27,7 +27,7 @@ function runBot(error, auth) {
         }
 
         bot.getUsers().forEach(function (user) {
-            addUserToDb(user);
+            updateDbUser(user);
         });
 
     });
@@ -120,7 +120,7 @@ function runBot(error, auth) {
                 }
 
             });
-            addUserToDb(data);
+            updateDbUser(data);
         }
     })
 
@@ -148,13 +148,14 @@ function runBot(error, auth) {
         if (config.verboseLogging && user) {
             logger.info('[VOTE]', user.username + ': ' + data.v);
         }
-        User.update({last_seen: new Date()}, {where: {id: data.i}});
     });
 
     bot.on('advance', function (data) {
         if (config.verboseLogging) {
             logger.success('[EVENT] ADVANCE ', JSON.stringify(data, null, 2));
         }
+
+        saveWaitList();
 
         // Write previous play data to DB
         if (data.lastPlay.media !== null && data.lastPlay.dj !== null) {
@@ -174,7 +175,6 @@ function runBot(error, auth) {
             if (data.currentDJ != null) {
                 logger.success('********************************************************************');
                 logger.success('[SONG]', data.currentDJ.username + ' played: ' + data.media.author + ' - ' + data.media.title);
-                User.update({waitlist_position: -1}, {where: {id: data.currentDJ.id}});
             }
 
             // Perform automatic song metadata correction
@@ -192,7 +192,6 @@ function runBot(error, auth) {
                 duration: data.media.duration,
                 image: data.media.image
             };
-
             Song.findOrCreate({where: {id: data.media.id, cid: data.media.cid}, defaults: songData}).spread(function (song) {
                 song.updateAttributes(songData);
             });
@@ -236,7 +235,7 @@ function runBot(error, auth) {
                     if (dbUser !== null) {
 
                         // Only bug idle people if the bot has been running for as long as the minimum idle time
-                        if (secondsSince(dbUser.last_active) >= maxIdleTime && moment().isAfter(moment(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
+                        if (secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
                             logger.warning('[IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                             // @FIXME - Check vs. the Karma table
                             if (dbUser.warns > 0) {
@@ -303,12 +302,7 @@ function runBot(error, auth) {
         if (config.verboseLogging) {
             logger.success('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
         }
-
-        curUserList = bot.getUsers();
-        curUserList.forEach(function (dj) {
-            var position = bot.getWaitListPosition(dj.id);
-            User.update({waitlist_position: position}, {where: {id: dj.id}});
-        });
+        saveWaitList();
     });
 
     if (config.requireWootInLine || config.activeDJTimeoutMins > 0) {
@@ -319,7 +313,29 @@ function runBot(error, auth) {
     bot.on('error', reconnect);
 
 
-    function addUserToDb(user) {
+    function saveWaitList() {
+
+        var userList = bot.getUsers();
+        userList.forEach(function (user) {
+            var position = bot.getWaitListPosition(user.id);
+            // user last seen in 900 seconds
+            if (position > 0) {
+                User.update({waitlist_position: position, last_seen: moment.utc().toDate()}, {where: {id: user.id}});
+            }
+            else {
+                User.update({waitlist_position: -1}, {where: {id: user.id}});
+            }
+        });
+        User.update({waitlist_position: -1}, {
+            where: {
+                last_seen: {lte: moment.utc().subtract(15, 'minutes').toDate()},
+                last_active: {lte: moment.utc().subtract(15, 'minutes').toDate()}
+            }
+        });
+
+    }
+
+    function updateDbUser(user) {
 
         var userData = {
             id: user.id,
@@ -340,7 +356,7 @@ function runBot(error, auth) {
             // Reset the user's AFK timer if they've been gone for long enough (so we don't reset on disconnects)
             if (secondsSince(dbUser.last_seen) >= 900) {
                 userData.last_active = new Date();
-                userData.waitlist_position = -1;
+                userData.waitlist_position = bot.getWaitListPosition(user.id)
             }
             dbUser.updateAttributes(userData);
         });

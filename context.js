@@ -148,7 +148,7 @@ module.exports = function (options) {
         ago = typeof ago !== 'undefined' ? ago : false;
         var message = moment.utc(timestamp).fromNow(ago);
 
-        if (moment().isAfter(moment(timestamp).add(24, 'hours'))) {
+        if (moment().isAfter(moment.utc(timestamp).add(24, 'hours'))) {
             message += ' (' + moment.utc(timestamp).calendar() + ')';
         }
 
