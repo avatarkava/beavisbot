@@ -36,11 +36,11 @@ function runBot(error, auth) {
         if (config.verboseLogging) {
             logger.info('[CHAT]', JSON.stringify(data, null, 2));
         }
-        else if (data.from !== undefined) {
+        else if (data.from !== undefined && data.from !== null) {
             logger.info('[CHAT]', data.from.username + ': ' + data.message);
         }
 
-        if (data.from !== undefined) {
+        if (data.from !== undefined && data.from !== null) {
             data.message = data.message.trim();
             // Let people stay active with single-char, but don't let it spam up chat.
             if (data.message === '.') {
