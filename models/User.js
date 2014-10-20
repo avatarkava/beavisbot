@@ -19,6 +19,15 @@ module.exports = function (sequelize, Sequelize) {
         last_active: {type: Sequelize.DATE, defaultValue: Sequelize.NOW}
     }, {
         underscored: true,
-        tableName: 'users'
+        tableName: 'users',
+        setterMethods: {
+            username: function (v) {
+                this.setDataValue('slug', S(v).slugify().s);
+                return this.setDataValue('username', v);
+            },
+            slug: function (v) {
+                return this.setDataValue('slug', S(v).slugify().s);
+            }
+        }
     });
 }

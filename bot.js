@@ -277,30 +277,26 @@ function runBot(error, auth) {
                             logger.info('[ACTIVE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                         }
                     }
-
-                    if (z === idleWaitList.length) {
-
-                        if (idleDJs.length > 0) {
-                            var idleDJsList = idleDJs.join(' @');
-                            bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
-                        }
-
-                        // Only police this if there aren't any mods around
-                        if (!roomHasActiveMods && config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
-                            logger.warning('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a song of ' + data.media.duration + ' seconds');
-                            bot.sendChat('Sorry @' + data.currentDJ.username + ', this song is over our maximum room length of ' + (config.maxSongLengthSecs / 60) + ' minutes.');
-                            bot.moderateForceSkip();
-                            var userData = {
-                                type: 'skip',
-                                details: 'Skipped for playing a song of ' + data.media.duration + ' (room configured for max of ' + config.maxSongLengthSecs + ')',
-                                user_id: data.currentDJ.id,
-                                mod_user_id: bot.getUser().id
-                            };
-                            Karma.create(userData);
-
-                        }
+                }).then(function () {
+                    if (idleDJs.length > 0) {
+                        var idleDJsList = idleDJs.join(' @');
+                        bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
                     }
 
+                    // Only police this if there aren't any mods around
+                    if (!roomHasActiveMods && config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
+                        logger.warning('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a song of ' + data.media.duration + ' seconds');
+                        bot.sendChat('Sorry @' + data.currentDJ.username + ', this song is over our maximum room length of ' + (config.maxSongLengthSecs / 60) + ' minutes.');
+                        bot.moderateForceSkip();
+                        var userData = {
+                            type: 'skip',
+                            details: 'Skipped for playing a song of ' + data.media.duration + ' (room configured for max of ' + config.maxSongLengthSecs + ')',
+                            user_id: data.currentDJ.id,
+                            mod_user_id: bot.getUser().id
+                        };
+                        Karma.create(userData);
+
+                    }
                 });
             });
 
@@ -365,6 +361,7 @@ function runBot(error, auth) {
             joined: user.joined,
             last_seen: new Date()
         };
+
         User.findOrCreate({where: {id: user.id}, defaults: userData}).spread(function (dbUser) {
 
             // Reset the user's AFK timer if they've been gone for long enough (so we don't reset on disconnects)
@@ -373,6 +370,8 @@ function runBot(error, auth) {
                 userData.waitlist_position = bot.getWaitListPosition(user.id)
             }
             dbUser.updateAttributes(userData);
+        }).catch(function (err) {
+            logger.error('Error occurred', err);
         });
 
         //convertAPIUserID(user, function () {});
@@ -475,10 +474,10 @@ function runBot(error, auth) {
 
             command.handler(data);
         }
-        else if (data.message.indexOf('@' + bot.getUser().username) > -1) {
+        else if (!config.quietMode && data.message.indexOf('@' + bot.getUser().username) > -1) {
             mentionResponse(data);
         }
-        else if (data.message.indexOf('.') === 0) {
+        else if (!config.quietMode && data.message.indexOf('.') === 0) {
             // @TODO - Build the list of possible commands on init() instead of querying every time
             chatResponse(data);
         }
