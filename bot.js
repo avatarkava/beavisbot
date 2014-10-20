@@ -107,7 +107,7 @@ function runBot(error, auth) {
                             bot.moderateMoveDJ(data.id, dbUser.waitlist_position);
                             var userData = {
                                 type: 'restored',
-                                details: 'Restored to position ' + dbUser.waitlist_position + ' (disconnected for ' + timeSince(dbUser.last_seen) + ')',
+                                details: 'Restored to position ' + dbUser.waitlist_position + ' (disconnected for ' + timeSince(dbUser.last_seen, true) + ')',
                                 user_id: data.id,
                                 mod_user_id: bot.getUser().id
                             };
@@ -247,6 +247,7 @@ function runBot(error, auth) {
                             }).on('success', function (row) {
 
                                 if (row != null) {
+                                    logger.warning('[IDLE]', dbUser.username + ' was last warned ' + timeSince(row.created_at));
                                     bot.moderateRemoveDJ(dj.id);
                                     bot.sendChat('@' + dbUser.username + ' ' + config.responses.activeDJRemoveMessage);
                                     var userData = {
