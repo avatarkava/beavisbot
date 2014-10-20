@@ -277,27 +277,28 @@ function runBot(error, auth) {
                             logger.info('[ACTIVE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                         }
                     }
-                }).then(function () {
-                    if (idleDJs.length > 0) {
-                        var idleDJsList = idleDJs.join(' @');
-                        bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
-                    }
-
-                    // Only police this if there aren't any mods around
-                    if (!roomHasActiveMods && config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
-                        logger.warning('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a song of ' + data.media.duration + ' seconds');
-                        bot.sendChat('Sorry @' + data.currentDJ.username + ', this song is over our maximum room length of ' + (config.maxSongLengthSecs / 60) + ' minutes.');
-                        bot.moderateForceSkip();
-                        var userData = {
-                            type: 'skip',
-                            details: 'Skipped for playing a song of ' + data.media.duration + ' (room configured for max of ' + config.maxSongLengthSecs + ')',
-                            user_id: data.currentDJ.id,
-                            mod_user_id: bot.getUser().id
-                        };
-                        Karma.create(userData);
-
-                    }
                 });
+            }).then(function () {
+                logger.error(JSON.stringify(idleDJs, null, 2));
+                if (idleDJs.length > 0) {
+                    var idleDJsList = idleDJs.join(' @');
+                    bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
+                }
+
+                // Only police this if there aren't any mods around
+                if (!roomHasActiveMods && config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
+                    logger.warning('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a song of ' + data.media.duration + ' seconds');
+                    bot.sendChat('Sorry @' + data.currentDJ.username + ', this song is over our maximum room length of ' + (config.maxSongLengthSecs / 60) + ' minutes.');
+                    bot.moderateForceSkip();
+                    var userData = {
+                        type: 'skip',
+                        details: 'Skipped for playing a song of ' + data.media.duration + ' (room configured for max of ' + config.maxSongLengthSecs + ')',
+                        user_id: data.currentDJ.id,
+                        mod_user_id: bot.getUser().id
+                    };
+                    Karma.create(userData);
+
+                }
             });
 
         }
