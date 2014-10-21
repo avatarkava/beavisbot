@@ -65,7 +65,7 @@ function runBot(error, auth) {
         if (data.username !== bot.getUser().username) {
             User.find(data.id).on('success', function (dbUser) {
 
-                if (dbUser === null) {
+                if (dbUser == null) {
                     message = config.responses.welcome.newUser.replace('{username}', data.username);
                     newUser = true;
                     logger.info('[JOIN]', data.username + ' is a first-time visitor to the room!');
