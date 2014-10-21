@@ -240,7 +240,7 @@ function runBot(error, auth) {
                 }).on('success', function (dbUser) {
                     var position = bot.getWaitListPosition(dj.id);
                     if (dbUser !== null) {
-                        if (1 || secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
+                        if (secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
                             logger.warning('[IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                             if (dbUser.Karmas.length > 0) {
                                 logger.warning('[IDLE]', dbUser.username + ' was last warned ' + timeSince(dbUser.Karmas[0].created_at));
