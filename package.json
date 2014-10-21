@@ -23,6 +23,7 @@
         "sqlite3": "*",
         "string": "*",
         "underscore": "*",
+        "bluebird": "*",
         "moment": "*"
     },
     "devDependencies": {

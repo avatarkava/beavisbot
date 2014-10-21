@@ -2,6 +2,7 @@ module.exports = function (options) {
     var PlugAPI = require('plugapi');
 
     Sequelize = require('sequelize');
+    Promise = require('bluebird');
 
     bot = new PlugAPI(options.auth);
     config = options.config;
@@ -48,9 +49,9 @@ module.exports = function (options) {
     // @TODO - Is it better to declare these directly in the model?
     Song.hasMany(Play);
     User.hasMany(Karma);
-    User.hasMany(Karma, {foreignKey: 'mod_user_id'});
+    User.hasMany(Karma, {as: 'ModUser', foreignKey: 'mod_user_id'});
     User.hasMany(Play);
-    User.hasMany(RoomEvent, {foreignKey: 'mod_user_id'});
+    User.hasMany(RoomEvent, {as: 'ModUser', foreignKey: 'mod_user_id'});
 
     sequelize.sync()
         .on('success', function () {
