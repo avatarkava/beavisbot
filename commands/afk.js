@@ -1,7 +1,7 @@
 exports.names = ['.afk', '.afkdjs'];
 exports.hidden = true;
 exports.enabled = true;
-exports.matchStart = false;
+exports.matchStart = true;
 exports.handler = function (data) {
 
     var input = data.message.split(' ');
@@ -14,6 +14,8 @@ exports.handler = function (data) {
 
             User.update({last_active: new Date(), last_seen: new Date()}, {where: {username: usernameFormatted}});
             bot.sendChat("/me reset the idle timer for " + usernameFormatted);
+            logger.info('[IDLE]', data.from.username + ' reset the idle timer for ' + usernameFormatted);
+
 
         }
         else {
