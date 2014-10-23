@@ -9,7 +9,7 @@ exports.handler = function (data) {
     if (data.from.role > 1 && config.activeDJTimeoutMins > 0) {
 
         if (input.length >= 2) {
-            username = _.initial(username, 1).join(' ').trim();
+            var username = _.rest(input, 1);
             var usernameFormatted = S(username).chompLeft('@').s;
 
             User.update({last_active: new Date(), last_seen: new Date()}, {where: {username: usernameFormatted}});
