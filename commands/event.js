@@ -1,6 +1,6 @@
 exports.names = ['.event', '.calendar'];
 exports.hidden = false;
-exports.enabled = false;
+exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function (data) {
 
@@ -23,7 +23,7 @@ exports.handler = function (data) {
     }
     else {
 
-        RoomEvent.find({where: {type: 'event', starts_at: {lte: moment.add(1, 'month').toDate()}}}).on('success', function (row) {
+        RoomEvent.find({where: {type: 'event', starts_at: {lte: moment.utc().add(1, 'month').toDate()}}}).on('success', function (row) {
             if (row === null) {
                 bot.sendChat('/me No events currently scheduled.');
             } else {
