@@ -9,10 +9,6 @@ exports.handler = function (data) {
 
     if (data.from.role > 2 && event) {
 
-        if (event == 'reset' || event == 'clear') {
-            event = 'No events currently scheduled.'
-        }
-
         //db.run('REPLACE INTO SETTINGS (name, value, userid, timestamp) VALUES (?, ?, ?, CURRENT_TIMESTAMP)', ['event', event, data.from.id],
         //    function (error) {
         //        if (error) {
@@ -26,17 +22,13 @@ exports.handler = function (data) {
         //    });
     }
     else {
-        //db.get("SELECT value AS 'event', username, timestamp FROM SETTINGS s INNER JOIN USERS ON s.userid = USERS.userid WHERE name = ? LIMIT 1", ['event'], function (error, row) {
-        //    if (row != null) {
-        //        message = row.event;
-        //        if (data.from.role > 2) {
-        //            message += ' (set ' + timeSince(row.timestamp) + ' by ' + row.username + ')';
-        //        }
-        //        bot.sendChat('/me ' + message);
-        //
-        //    } else {
-        //        bot.sendChat('No events currently scheduled.');
-        //    }
-        //});
+
+        RoomEvent.find({where: {type: 'event', starts_at: {lte: new Date('+1 month')}}}).on('success', function (row) {
+            if (row === null) {
+                bot.sendChat('/me No events currently scheduled.');
+            } else {
+                bot.sendChat('/me ' + row.title + ' - ' + row.details);
+            }
+        });
     }
 };
