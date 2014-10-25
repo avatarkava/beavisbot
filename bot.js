@@ -155,7 +155,7 @@ function runBot(error, auth) {
             bot.sendChat('@' + user.username + ', voting meh while in line is prohibited. Please woot or leave the wait list.');
             setTimeout(function (user) {
                 var mehWaitList = bot.getWaitList();
-                var user = _.findWhere(users, {username: user.username});
+                var user = _.findWhere(mehWaitList, {username: user.username});
                 if (user.vote === -1) {
                     logger.warning('[REMOVE] Removed ' + user.username + ' from wait list for mehing');
                     var position = bot.getWaitListPosition(user.id);
