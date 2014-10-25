@@ -3,9 +3,6 @@ exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function (data) {
-    //users = bot.getUsers();
-    //var randomNumber = _.random(1, users.length);
-    //bot.sendChat(":bell: Now serving customer #" + randomNumber + " - hey there, " + users[(randomNumber - 1)].username + "!");
 
     var input = data.message.split(' ');
     var mins = 1;
@@ -26,7 +23,7 @@ exports.handler = function (data) {
             getActiveUsers(mins, function (activeUsers) {
                 var randomNumber = _.random(1, activeUsers.length);
                 var winner = activeUsers[(randomNumber - 1)]
-                bot.sendChat(":tada: " + winner + " emerges victorious!");
+                bot.sendChat(":tada: @" + winner + " emerges victorious!");
                 position = 2;
                 users = bot.getUsers();
                 var user = _.findWhere(users, {username: winner});

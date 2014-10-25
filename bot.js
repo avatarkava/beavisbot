@@ -155,7 +155,7 @@ function runBot(error, auth) {
             logger.success('[EVENT] ADVANCE ', JSON.stringify(data, null, 2));
         }
 
-        saveWaitList();
+        saveWaitList(true);
 
         // Write previous play data to DB
         if (data.lastPlay.media !== null && data.lastPlay.dj !== null) {
@@ -303,7 +303,7 @@ function runBot(error, auth) {
         if (config.verboseLogging) {
             logger.success('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
         }
-        saveWaitList();
+        saveWaitList(false);
     });
 
     if (config.requireWootInLine || config.activeDJTimeoutMins > 0) {
@@ -314,9 +314,14 @@ function runBot(error, auth) {
     bot.on('error', reconnect);
 
 
-    function saveWaitList() {
+    function saveWaitList(wholeRoom) {
 
-        var userList = bot.getUsers();
+        if (wholeRoom) {
+            var userList = bot.getUsers();
+        }
+        else {
+            var userList = bot.getWaitList();
+        }
         userList.forEach(function (user) {
             var position = bot.getWaitListPosition(user.id);
             // user last seen in 900 seconds
