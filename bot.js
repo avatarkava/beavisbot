@@ -152,7 +152,7 @@ function runBot(error, auth) {
         }
 
         if (config.prohibitMehInLine && data.v === -1) {
-            bot.sendChat('@' + user.username + ', voting meh while in line is prohibited. Please woot or leave the wait list.');
+            bot.sendChat('@' + user.username + ', voting MEH while in line is prohibited. Please woot or leave the wait list.');
             setTimeout(function () {
                 removeIfMehing(user.username);
             }, 10 * 1000);
@@ -413,7 +413,7 @@ function runBot(error, auth) {
     function removeIfMehing(mehUsername) {
         var mehWaitList = bot.getWaitList();
         var mehUser = _.findWhere(mehWaitList, {username: mehUsername});
-        if (mehUser.vote === -1) {
+        if (mehUser !== undefined && mehUser.vote === -1) {
             logger.warning('[REMOVE] Removed ' + mehUser.username + ' from wait list for mehing');
             var position = bot.getWaitListPosition(mehUser.id);
             bot.moderateRemoveDJ(mehUser.id);
