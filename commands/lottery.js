@@ -16,14 +16,14 @@ exports.handler = function (data) {
             mins = parseInt(_.last(input, 1));
         }
         else {
-            mins = 1;
+            mins = 5;
         }
 
         bot.sendChat('Lottery starting in ' + mins + ' minutes!  Chat during the next ' + mins + ' minutes to enter!');
 
         setTimeout(function () {
             // Only select from users active during the lottery
-            var activeUsers = getActiveUsers(mins, function () {
+            getActiveUsers(mins, function (activeUsers) {
                 var randomNumber = _.random(1, activeUsers.length);
                 var winner = activeUsers[(randomNumber - 1)]
                 bot.sendChat(":tada: " + winner + " emerges victorious!");
