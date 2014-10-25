@@ -19,35 +19,32 @@ exports.handler = function (data) {
             mins = 1;
         }
 
-
         bot.sendChat('Lottery starting in ' + mins + ' minutes!  Chat any time in the next ' + mins + ' to enter!');
 
-        // Only select from users active during the lottery
-
         setTimeout(function () {
-            var activeUsers = getActiveUsers(maxIdleTime);
-            var randomNumber = _.random(1, activeUsers.length);
-            var winner = activeUsers[(randomNumber - 1)]
-            bot.sendChat(":tada: " + winner + " emerges victorious!");
-            position = 2;
-            users = bot.getUsers();
-            var user = _.findWhere(users, {username: winner});
-            if (user !== undefined) {
-                var currentPosition = bot.getWaitListPosition(user.id);
-                if (currentPosition === -1) {
-                    bot.moderateAddDJ(user.id, function () {
-                        if (position <= bot.getWaitList().length) {
-                            bot.moderateMoveDJ(user.id, position);
-                        }
-                    });
+            // Only select from users active during the lottery
+            var activeUsers = getActiveUsers(mins, function () {
+                var randomNumber = _.random(1, activeUsers.length);
+                var winner = activeUsers[(randomNumber - 1)]
+                bot.sendChat(":tada: " + winner + " emerges victorious!");
+                position = 2;
+                users = bot.getUsers();
+                var user = _.findWhere(users, {username: winner});
+                if (user !== undefined) {
+                    var currentPosition = bot.getWaitListPosition(user.id);
+                    if (currentPosition === -1) {
+                        bot.moderateAddDJ(user.id, function () {
+                            if (position <= bot.getWaitList().length) {
+                                bot.moderateMoveDJ(user.id, position);
+                            }
+                        });
+                    }
+                    else if (currentPosition > 0 && currentPosition > position) {
+                        bot.moderateMoveDJ(user.id, position);
+                    }
+                    logger.info('[LOTTO] Moving ' + winner + ' to position: ' + position);
                 }
-                else if (currentPosition > 0 && currentPosition > position) {
-                    bot.moderateMoveDJ(user.id, position);
-                }
-                logger.info('[LOTTO] Moving ' + winner + ' to position: ' + position);
-            }
-
+            });
         }, mins * 60 * 1000);
-
     }
 };

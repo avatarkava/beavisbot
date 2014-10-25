@@ -162,7 +162,7 @@ module.exports = function (options) {
         return now.diff(timestamp, 'seconds');
     };
 
-    getActiveUsers = function (maxIdleMins) {
+    getActiveUsers = function (maxIdleMins, callback) {
         var activeUsers = [];
 
         Promise.map(bot.getUsers(), function (dj) {
@@ -174,7 +174,7 @@ module.exports = function (options) {
                 }
             });
         }).then(function () {
-            return activeUsers;
+            callback(activeUsers);
         });
     }
 
