@@ -19,7 +19,7 @@ exports.handler = function (data) {
             mins = 1;
         }
 
-        bot.sendChat('Lottery starting in ' + mins + ' minutes!  Chat any time in the next ' + mins + ' to enter!');
+        bot.sendChat('Lottery starting in ' + mins + ' minutes!  Chat during the next ' + mins + ' minutes to enter!');
 
         setTimeout(function () {
             // Only select from users active during the lottery
