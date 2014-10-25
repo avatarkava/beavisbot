@@ -162,7 +162,7 @@ module.exports = function (options) {
         return now.diff(timestamp, 'seconds');
     };
 
-    getActiveWaitList = function (maxIdleMins, startPosition, callback) {
+    getActiveDJs = function (maxIdleMins, startPosition, callback) {
         var activeUsers = [];
         if (startPosition === undefined) {
             startPosition = 0;
