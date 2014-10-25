@@ -150,6 +150,28 @@ function runBot(error, auth) {
         if (config.verboseLogging && user) {
             logger.info('[VOTE]', user.username + ': ' + data.v);
         }
+
+        if (config.prohibitMehInLine && data.v === -1) {
+            bot.sendChat('@' + user.username + ', voting meh while in line is prohibited. Please woot or leave the wait list.');
+            setTimeout(function (user) {
+                var mehWaitList = bot.getWaitList();
+                var user = _.findWhere(users, {username: user.username});
+                if (user.vote === -1) {
+                    logger.warning('[REMOVE] Removed ' + user.username + ' from wait list for mehing');
+                    var position = bot.getWaitListPosition(user.id);
+                    bot.moderateRemoveDJ(user.id);
+                    bot.sendChat('@' + user.username + ', voting MEH/Chato/:thumbsdown: while in line is prohibited. Check .rules.');
+                    var userData = {
+                        type: 'remove',
+                        details: 'Removed from position ' + position + ' for mehing',
+                        user_id: user.id,
+                        mod_user_id: bot.getUser().id
+                    };
+                    Karma.create(userData);
+                }
+
+            }, 10 * 1000);
+        }
     });
 
     bot.on('advance', function (data) {
@@ -401,24 +423,6 @@ function runBot(error, auth) {
 
     function monitorDJList() {
 
-        if (config.prohibitMehInLine) {
-            mehWaitList = bot.getWaitList();
-            mehWaitList.forEach(function (dj) {
-                if (dj.vote === -1) {
-                    logger.warning('[REMOVE] Removed ' + dj.username + ' from wait list for mehing');
-                    var position = bot.getWaitListPosition(dj.id);
-                    bot.moderateRemoveDJ(dj.id);
-                    bot.sendChat('@' + dj.username + ', voting MEH/Chato/:thumbsdown: while in line is prohibited. Check .rules.');
-                    var userData = {
-                        type: 'remove',
-                        details: 'Removed from position ' + position + ' for mehing',
-                        user_id: dj.id,
-                        mod_user_id: bot.getUser().id
-                    };
-                    Karma.create(userData);
-                }
-            });
-        }
     }
 
     function initializeModules(auth) {
