@@ -112,10 +112,12 @@ function runBot(error, auth) {
                                 mod_user_id: bot.getUser().id
                             };
                             Karma.create(userData);
+
+                            setTimeout(function () {
+                                bot.sendChat('/me put @' + data.username + ' back in line :thumbsup:')
+                            }, 5000);
                         }
-                        setTimeout(function () {
-                            bot.sendChat('/me put @' + data.username + ' back in line :thumbsup:')
-                        }, 5000);
+
                     });
                 }
 
