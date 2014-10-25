@@ -155,16 +155,16 @@ function runBot(error, auth) {
             bot.sendChat('@' + user.username + ', voting meh while in line is prohibited. Please woot or leave the wait list.');
             setTimeout(function (user) {
                 var mehWaitList = bot.getWaitList();
-                var user = _.findWhere(mehWaitList, {username: user.username});
-                if (user.vote === -1) {
-                    logger.warning('[REMOVE] Removed ' + user.username + ' from wait list for mehing');
-                    var position = bot.getWaitListPosition(user.id);
-                    bot.moderateRemoveDJ(user.id);
-                    bot.sendChat('@' + user.username + ', voting MEH/Chato/:thumbsdown: while in line is prohibited. Check .rules.');
+                var mehUser = _.findWhere(mehWaitList, {username: user.username});
+                if (mehUser.vote === -1) {
+                    logger.warning('[REMOVE] Removed ' + mehUser.username + ' from wait list for mehing');
+                    var position = bot.getWaitListPosition(mehUser.id);
+                    bot.moderateRemoveDJ(mehUser.id);
+                    bot.sendChat('@' + mehUser.username + ', voting MEH/Chato/:thumbsdown: while in line is prohibited. Check .rules.');
                     var userData = {
                         type: 'remove',
                         details: 'Removed from position ' + position + ' for mehing',
-                        user_id: user.id,
+                        user_id: mehUser.id,
                         mod_user_id: bot.getUser().id
                     };
                     Karma.create(userData);
