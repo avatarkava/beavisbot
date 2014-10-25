@@ -162,10 +162,13 @@ module.exports = function (options) {
         return now.diff(timestamp, 'seconds');
     };
 
-    getActiveUsers = function (maxIdleMins, callback) {
+    getActiveWaitList = function (maxIdleMins, startPosition, callback) {
         var activeUsers = [];
+        if (startPosition === undefined) {
+            startPosition = 0;
+        }
 
-        Promise.map(bot.getUsers(), function (dj) {
+        Promise.map(_.rest(bot.getDJs(), startPosition), function (dj) {
             return User.find({where: {id: dj.id}}).on('success', function (dbUser) {
                 if (dbUser !== null && dbUser.id !== bot.getUser().id) {
                     if (secondsSince(dbUser.last_active) <= (maxIdleMins * 60)) {
