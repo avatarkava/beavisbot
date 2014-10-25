@@ -162,5 +162,21 @@ module.exports = function (options) {
         return now.diff(timestamp, 'seconds');
     };
 
+    getActiveUsers = function (maxIdleMins) {
+        var activeUsers = [];
+
+        Promise.map(bot.getUsers(), function (dj) {
+            return User.find({where: {id: dj.id}}).on('success', function (dbUser) {
+                if (dbUser !== null) {
+                    if (secondsSince(dbUser.last_active) <= (maxIdleMins * 60)) {
+                        activeUsers.push(dbUser.username);
+                    }
+                }
+            });
+        }).then(function () {
+            return activeUsers;
+        });
+    }
+
 
 };

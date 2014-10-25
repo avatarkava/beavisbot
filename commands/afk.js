@@ -21,10 +21,6 @@ exports.handler = function (data) {
         else {
             var maxIdleTime = config.activeDJTimeoutMins * 60;
             idleDJs = [];
-            z = 0;
-
-            waitlist = bot.getDJs();
-            logger.warning(JSON.stringify(waitlist, null, 2));
 
             Promise.map(bot.getWaitList(), function (dj) {
                 return User.find({where: {id: dj.id}}).on('success', function (dbUser) {
