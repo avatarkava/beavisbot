@@ -151,7 +151,7 @@ function runBot(error, auth) {
             logger.info('[VOTE]', user.username + ': ' + data.v);
         }
 
-        if (config.prohibitMehInLine && data.v === -1) {
+        if (config.prohibitMehInLine && data.v === -1 && bot.getWaitListPosition(data.i) > 0) {
             bot.sendChat('@' + user.username + ', voting MEH while in line is prohibited. Please woot or leave the wait list.');
             setTimeout(function () {
                 removeIfMehing(user.username);
