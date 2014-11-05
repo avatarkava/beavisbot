@@ -1,4 +1,4 @@
-exports.names = ['.lottery'];
+exports.names = ['.lottery', '.roulette'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
@@ -16,20 +16,29 @@ exports.handler = function (data) {
             mins = 5;
         }
 
+        // Sanity check!
+        if (mins < 1) {
+            mins = 1;
+        }
+
         bot.sendChat('Wait list lottery in ' + mins + ' minutes!  Join the line and chat within ' + mins + ' minutes to enter!');
 
         setTimeout(function () {
             // Only select from users active during the lottery
-            getActiveDJs(mins, 2, function (activeDJs) {
+            getActiveDJs(mins, 1, function (activeDJs) {
                 var randomNumber = _.random(1, activeDJs.length);
                 var winner = activeDJs[(randomNumber - 1)]
                 bot.sendChat(":tada: @" + winner + " emerges victorious!");
-                position = 2;
                 users = bot.getUsers();
                 var user = _.findWhere(users, {username: winner});
                 if (user !== undefined) {
                     var currentPosition = bot.getWaitListPosition(user.id);
-                    if (currentPosition > 2 && currentPosition > position) {
+                    if (input[0] === '.roulette') {
+                        position = _.random(1, currentPosition - 1);
+                    } else {
+                        position = 1;
+                    }
+                    if (currentPosition > 1 && currentPosition > position) {
                         bot.moderateMoveDJ(user.id, position);
                         logger.info('[LOTTO] Moving ' + winner + ' to position: ' + position);
                     }
