@@ -142,7 +142,6 @@ function runBot(error, auth) {
         if (user) {
             logger.info('[GRAB]', user.username + ' grabbed this song');
         }
-        User.update({last_active: new Date(), last_seen: new Date()}, {where: {id: data}});
     });
 
     bot.on('vote', function (data) {
