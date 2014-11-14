@@ -23,7 +23,3 @@ roomState.json
 migrate.sql
 test.js
 .idea
-
-web/p3.php
-web/slack-webhook.php
-images/*
