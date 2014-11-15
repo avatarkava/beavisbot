@@ -345,15 +345,15 @@ function runBot(error, auth) {
     bot.on('close', reconnect);
     bot.on('error', reconnect);
 
-    bot.tcpListen(6666, 'localhost');
-    bot.on('tcpConnect', function (socket) {
-        socket.write('You connected succesfully!');
-    });
-    bot.on('tcpMessage', function (socket, msg) {
-        socket.write('I received your message');
-        logger.info('[SOCKET] ' + msg);
-        handleCommand(msg);
-    });
+    //bot.tcpListen(6666, 'localhost');
+    //bot.on('tcpConnect', function (socket) {
+    //    socket.write('You connected succesfully!');
+    //});
+    //bot.on('tcpMessage', function (socket, msg) {
+    //    socket.write('I received your message');
+    //    logger.info('[SOCKET] ' + msg);
+    //    handleCommand(msg);
+    //});
 
 
     function saveWaitList(wholeRoom) {
