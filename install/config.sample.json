@@ -1,6 +1,7 @@
 {
     "roomName": "room-name-slug-from-url",
     "superAdmin": "YourUsername",
+    "roomStateFile": false,
     "auth": {
         "email": "account-email-address@tld.com",
         "password": "account-password"

@@ -7,6 +7,7 @@ module.exports = function (options) {
     bot = new PlugAPI(options.auth);
     config = options.config;
     logger = PlugAPI.getLogger('Bot');
+    fs = require('fs');
 
     if (config.verboseLogging) {
         logLevel = logger.info;

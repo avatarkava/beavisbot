@@ -165,6 +165,30 @@ function runBot(error, auth) {
 
         saveWaitList(true);
 
+        // Writes current room state to outfile so it can be used for the web
+        if (config.roomStateFile) {
+
+            var JSONstats = {}
+
+            JSONstats.media = bot.getMedia();
+            JSONstats.dj = bot.getDJ();
+            JSONstats.waitlist = bot.getWaitList();
+            JSONstats.users = bot.getUsers();
+            JSONstats.staff = bot.getStaff();
+
+            fs.writeFile(
+                config.roomStateFile,
+                JSON.stringify(JSONstats, null, 2),
+                function (err) {
+                    if (err) {
+                        logger.error(err);
+                        return console.log(err);
+                    }
+                }
+            );
+
+        }
+
         // Write previous play data to DB
         if (data.lastPlay.media !== null && data.lastPlay.dj !== null) {
             Play.create({
