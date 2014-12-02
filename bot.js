@@ -6,7 +6,6 @@ var config = require(path.resolve(__dirname, 'config.json'));
 runBot(false, config.auth);
 
 var roomHasActiveMods = false;
-var startupTimestamp = moment.utc().toDate();
 
 function runBot(error, auth) {
     if (error) {

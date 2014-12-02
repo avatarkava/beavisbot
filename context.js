@@ -146,6 +146,8 @@ module.exports = function (options) {
     moment.relativeTimeThreshold('d', 30);
     moment.relativeTimeThreshold('M', 12);
 
+    startupTimestamp = moment.utc().toDate();
+
     /**
      * Custom functions accessible to commands
      */

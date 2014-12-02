@@ -60,5 +60,7 @@
     "activeDJTimeoutMins": 60,
     "maxSongLengthSecs": 420,
     "verboseLogging": false,
+    "quietMode": false,
+    "chatRandomnessPercentage": 5,
     "migrateOldPlugDatabase": false
 }
