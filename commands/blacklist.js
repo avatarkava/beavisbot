@@ -1,7 +1,7 @@
 exports.names = ['.blacklist'];
 exports.hidden = true;
 exports.enabled = true;
-exports.matchStart = true;
+exports.matchStart = false;
 exports.handler = function (data) {
     if (data.from.role > 1) {
 

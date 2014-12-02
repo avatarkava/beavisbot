@@ -312,18 +312,21 @@ function runBot(error, auth) {
                 }
 
                 // Skip if the song has been blacklisted
-                Song.find({where: {id: data.media.id, cid: data.media.cid, is_banned: true}}).on('success', function (row) {
-                    logger.warning('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (id: ' + data.media.id + ')');
-                    bot.sendChat('Sorry @' + data.currentDJ.username + ', this song has been blacklisted (NSFW video or Out of Range) in our song database.');
-                    bot.moderateForceSkip();
-                    var userData = {
-                        type: 'skip',
-                        details: 'Skipped for playing a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (id: ' + data.media.id + ')',
-                        user_id: data.currentDJ.id,
-                        mod_user_id: bot.getUser().id
-                    };
-                    Karma.create(userData);
-                });
+                /*
+                 Song.find({where: {id: data.media.id, cid: data.media.cid, is_banned: true}}).on('success', function (row) {
+                 // need to only do this if results!
+                 logger.warning('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (id: ' + data.media.id + ')');
+                 bot.sendChat('Sorry @' + data.currentDJ.username + ', this song has been blacklisted (NSFW video or Out of Range) in our song database.');
+                 bot.moderateForceSkip();
+                 var userData = {
+                 type: 'skip',
+                 details: 'Skipped for playing a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (id: ' + data.media.id + ')',
+                 user_id: data.currentDJ.id,
+                 mod_user_id: bot.getUser().id
+                 };
+                 Karma.create(userData);
+                 });
+                 */
 
                 // Only police this if there aren't any mods around
                 if (!roomHasActiveMods && config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
@@ -594,19 +597,38 @@ function runBot(error, auth) {
     }
 
     function mentionResponse(data) {
-        EventResponse.find({
-            where: Sequelize.and({event_type: 'mention', is_active: true}),
-            order: 'RAND()'
-        })
-            .on('success', function (row) {
-                if (row === null) {
-                    return;
+        // How much ADHD does the bot have?
+        if (!config.chatRandomnessPercentage) {
+            chatRandomnessPercentage = 5;
+        } else {
+            chatRandomnessPercentage = config.chatRandomnessPercentage;
+        }
+
+        if (_.random(1, 100) > chatRandomnessPercentage) {
+            cleverMessage = data.message.replace('@' + bot.getUser().username, '').trim();
+            cleverbot.write(cleverMessage, function (response) {
+                if (config.verboseLogging) {
+                    logger.info('[CLEVERBOT]', JSON.stringify(response, null, 2));
                 }
-                else {
-                    bot.sendChat(row.response.replace('{sender}', data.from.username));
-                }
+                bot.sendChat(response.message);
 
             });
+        }
+        else {
+            EventResponse.find({
+                where: Sequelize.and({event_type: 'mention', is_active: true}),
+                order: 'RAND()'
+            })
+                .on('success', function (row) {
+                    if (row === null) {
+                        return;
+                    }
+                    else {
+                        bot.sendChat(row.response.replace('{sender}', data.from.username));
+                    }
+
+                });
+        }
     }
 
     function chatResponse(data) {

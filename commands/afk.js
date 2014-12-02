@@ -18,6 +18,9 @@ exports.handler = function (data) {
 
 
         }
+        else if (secondsSince(startupTimestamp) < config.activeDJTimeoutMins * 60) {
+            bot.sendChat("I've been connected less than " + config.activeDJTimeoutMins + " minutes");
+        }
         else {
             var maxIdleTime = config.activeDJTimeoutMins * 60;
             idleDJs = [];

@@ -24,7 +24,8 @@
         "string": "*",
         "underscore": "*",
         "bluebird": "*",
-        "moment": "*"
+        "moment": "*",
+        "cleverbot-node": "*"
     },
     "devDependencies": {
         "sequelize-fixtures": "*"
