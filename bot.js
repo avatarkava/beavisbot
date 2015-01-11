@@ -360,29 +360,30 @@ function runBot(error, auth) {
     bot.on('close', reconnect);
     bot.on('error', reconnect);
 
-    bot.tcpListen(8899, '166.78.31.68');
 
-    bot.on('tcpConnect', function (socket) {
-        logger.info('[TCP] Connected!');
-    });
-
-    bot.on('tcpMessage', function (socket, msg) {
-        if (typeof msg !== "undefined" && msg.length > 2) {
-            logger.info('[TCP] ' + msg);
-            // Convert into same format as incoming chat messages through the UI
-            var data = {
-                message: msg,
-                from: bot.getUser()
-            };
-
-            if (data.message.indexOf('.') === 0) {
-                handleCommand(data);
-            }
-            else {
-                bot.sendChat(msg);
-            }
-        }
-    });
+    //bot.tcpListen(8899, '166.78.31.68');
+    //
+    //bot.on('tcpConnect', function (socket) {
+    //    logger.info('[TCP] Connected!');
+    //});
+    //
+    //bot.on('tcpMessage', function (socket, msg) {
+    //    if (typeof msg !== "undefined" && msg.length > 2) {
+    //        logger.info('[TCP] ' + msg);
+    //        // Convert into same format as incoming chat messages through the UI
+    //        var data = {
+    //            message: msg,
+    //            from: bot.getUser()
+    //        };
+    //
+    //        if (data.message.indexOf('.') === 0) {
+    //            handleCommand(data);
+    //        }
+    //        else {
+    //            bot.sendChat(msg);
+    //        }
+    //    }
+    //});
 
 
     function saveWaitList(wholeRoom) {
