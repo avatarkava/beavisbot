@@ -41,6 +41,12 @@ function runBot(error, auth) {
 
         if (data.from !== undefined && data.from !== null) {
             data.message = data.message.trim();
+            //if (data.msg == '.') {
+            //    bot.moderateDeleteChat(data.id);
+            //}
+            //else {
+            //    handleCommand(data);
+            //}
             handleCommand(data);
             User.update({last_active: new Date(), last_seen: new Date()}, {where: {id: data.from.id}});
         }

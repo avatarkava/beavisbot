@@ -21,7 +21,7 @@ exports.handler = function (data) {
         bot.sendChat("The song " + media.title + " has been blacklisted.");
 
         bot.moderateForceSkip();
-        bot.moderateDeleteChat(data.id);
+        //bot.moderateDeleteChat(data.id);
     }
 };
 

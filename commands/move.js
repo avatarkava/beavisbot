@@ -4,7 +4,7 @@ exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function (data) {
     if (data.from.role > 1) {
-        bot.moderateDeleteChat(data.id);
+        //bot.moderateDeleteChat(data.id);
         var input = data.message.split(' ');
         if (input.length >= 3) {
             var username = _.rest(input, 1);
