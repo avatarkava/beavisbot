@@ -357,12 +357,10 @@ function runBot(error, auth) {
     bot.tcpListen(8899, '166.78.31.68');
 
     bot.on('tcpConnect', function (socket) {
-        socket.write('You connected succesfully!');
         logger.info('[TCP] Connected!');
     });
 
     bot.on('tcpMessage', function (socket, msg) {
-        socket.write('I received your message');
         logger.info('[TCP] ' + msg);
         handleCommand(msg);
     });
