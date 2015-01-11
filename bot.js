@@ -369,7 +369,11 @@ function runBot(error, auth) {
     bot.on('tcpMessage', function (socket, msg) {
         if (typeof msg !== "undefined" && msg.length > 2) {
             logger.info('[TCP] ' + msg);
-            handleCommand(msg);
+            var data = {
+                message: msg,
+                from: bot.getUser()
+            };
+            handleCommand(data);
         }
     });
 
