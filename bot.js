@@ -41,14 +41,7 @@ function runBot(error, auth) {
 
         if (data.from !== undefined && data.from !== null) {
             data.message = data.message.trim();
-            // Let people stay active with single-char, but don't let it spam up chat.
-            if (data.message === '.') {
-                bot.moderateDeleteChat(data.id);
-            }
-            else {
-                handleCommand(data);
-            }
-
+            handleCommand(data);
             User.update({last_active: new Date(), last_seen: new Date()}, {where: {id: data.from.id}});
         }
     });
@@ -361,15 +354,18 @@ function runBot(error, auth) {
     bot.on('close', reconnect);
     bot.on('error', reconnect);
 
-    //bot.tcpListen(6666, 'localhost');
-    //bot.on('tcpConnect', function (socket) {
-    //    socket.write('You connected succesfully!');
-    //});
-    //bot.on('tcpMessage', function (socket, msg) {
-    //    socket.write('I received your message');
-    //    logger.info('[SOCKET] ' + msg);
-    //    handleCommand(msg);
-    //});
+    bot.tcpListen(8899, '166.78.31.68');
+
+    bot.on('tcpConnect', function (socket) {
+        socket.write('You connected succesfully!');
+        logger.info('[TCP] Connected!');
+    });
+
+    bot.on('tcpMessage', function (socket, msg) {
+        socket.write('I received your message');
+        logger.info('[TCP] ' + msg);
+        handleCommand(msg);
+    });
 
 
     function saveWaitList(wholeRoom) {
