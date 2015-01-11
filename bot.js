@@ -369,11 +369,18 @@ function runBot(error, auth) {
     bot.on('tcpMessage', function (socket, msg) {
         if (typeof msg !== "undefined" && msg.length > 2) {
             logger.info('[TCP] ' + msg);
+            // Convert into same format as incoming chat messages through the UI
             var data = {
                 message: msg,
                 from: bot.getUser()
             };
-            handleCommand(data);
+
+            if (data.message.indexOf('.') === 0) {
+                handleCommand(data);
+            }
+            else {
+                bot.sendChat(msg);
+            }
         }
     });
 
