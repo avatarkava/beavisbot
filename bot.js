@@ -361,8 +361,10 @@ function runBot(error, auth) {
     });
 
     bot.on('tcpMessage', function (socket, msg) {
-        logger.info('[TCP] ' + msg);
-        handleCommand(msg);
+        if (typeof msg !== "undefined" && msg.length > 2) {
+            logger.info('[TCP] ' + msg);
+            handleCommand(msg);
+        }
     });
 
 
