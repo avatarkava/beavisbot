@@ -283,6 +283,7 @@ function runBot(error, auth) {
                                     mod_user_id: bot.getUser().id
                                 };
                                 Karma.create(userData);
+                                User.update({waitlist_position: -1}, {where: {id: dj.id}});
                             }
                             else if (position > 1) {
                                 var userData = {
@@ -361,29 +362,29 @@ function runBot(error, auth) {
     bot.on('error', reconnect);
 
 
-    //bot.tcpListen(8899, '166.78.31.68');
-    //
-    //bot.on('tcpConnect', function (socket) {
-    //    logger.info('[TCP] Connected!');
-    //});
-    //
-    //bot.on('tcpMessage', function (socket, msg) {
-    //    if (typeof msg !== "undefined" && msg.length > 2) {
-    //        logger.info('[TCP] ' + msg);
-    //        // Convert into same format as incoming chat messages through the UI
-    //        var data = {
-    //            message: msg,
-    //            from: bot.getUser()
-    //        };
-    //
-    //        if (data.message.indexOf('.') === 0) {
-    //            handleCommand(data);
-    //        }
-    //        else {
-    //            bot.sendChat(msg);
-    //        }
-    //    }
-    //});
+    bot.tcpListen(8899, '166.78.31.68');
+
+    bot.on('tcpConnect', function (socket) {
+        logger.info('[TCP] Connected!');
+    });
+
+    bot.on('tcpMessage', function (socket, msg) {
+        if (typeof msg !== "undefined" && msg.length > 2) {
+            logger.info('[TCP] ' + msg);
+            // Convert into same format as incoming chat messages through the UI
+            var data = {
+                message: msg,
+                from: bot.getUser()
+            };
+
+            if (data.message.indexOf('.') === 0) {
+                handleCommand(data);
+            }
+            else {
+                bot.sendChat(msg);
+            }
+        }
+    });
 
 
     function saveWaitList(wholeRoom) {
@@ -488,6 +489,7 @@ function runBot(error, auth) {
                 mod_user_id: bot.getUser().id
             };
             Karma.create(userData);
+            User.update({waitlist_position: -1}, {where: {id: mehUser.id}});
         }
     }
 
@@ -623,7 +625,7 @@ function runBot(error, auth) {
                 if (config.verboseLogging) {
                     logger.info('[CLEVERBOT]', JSON.stringify(response, null, 2));
                 }
-                bot.sendChat(response.message);
+                bot.sendChat('@' + data.from.username + ': ' + response.message);
 
             });
         }

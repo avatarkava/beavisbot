@@ -25,6 +25,7 @@ exports.handler = function (data) {
             };
             Karma.create(userData);
             logger.warning('[REMOVE] ' + data.from.username + ' removed ' + usernameFormatted + ' from wait list');
+            User.update({waitlist_position: -1}, {where: {id: user.id}});
         }
     }
 };
