@@ -23,7 +23,7 @@ exports.handler = function (data) {
     }
     else {
 
-        RoomEvent.find({where: {type: 'event', starts_at: {lte: moment.utc().add(1, 'month').toDate()}}}).on('success', function (row) {
+        RoomEvent.find({where: {type: 'event', starts_at: {lte: moment.utc().add(1, 'month').toDate()}, ends_at: {gte: new Date()}}}).on('success', function (row) {
             if (row === null) {
                 bot.sendChat('/me No events currently scheduled.');
             } else {
