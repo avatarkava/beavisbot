@@ -4,7 +4,7 @@ exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function (data) {
     if (data.from.role > 1) {
-        bot.moderateDeleteChat(data.id);
+        //bot.moderateDeleteChat(data.id);
         var input = data.message.split(' ');
         var username = _.rest(input, 1).join(' ').trim();
         var usernameFormatted = S(username).chompLeft('@').s;
@@ -25,6 +25,7 @@ exports.handler = function (data) {
             };
             Karma.create(userData);
             logger.warning('[REMOVE] ' + data.from.username + ' removed ' + usernameFormatted + ' from wait list');
+            User.update({waitlist_position: -1}, {where: {id: user.id}});
         }
     }
 };
