@@ -11,7 +11,7 @@ exports.handler = function (data) {
             bot.sendChat('/me No events currently scheduled.');
         } else {
             if (row.starts_at >= moment.utc().toDate()) {
-                row.details = timeUntil(row.starts_at) + ' ' + row.details;
+                row.title = timeUntil(row.starts_at) + ' ' + row.title;
             }
             bot.sendChat('/me ' + row.title + ' - ' + row.details);
         }
