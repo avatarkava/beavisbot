@@ -333,7 +333,7 @@ function runBot(error, auth) {
                  */
 
                 // Only police this if there aren't any mods around
-                if (!roomHasActiveMods && config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
+                if (config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
                     logger.warning('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a song of ' + data.media.duration + ' seconds');
                     bot.sendChat('Sorry @' + data.currentDJ.username + ', this song is over our maximum room length of ' + (config.maxSongLengthSecs / 60) + ' minutes.');
                     bot.moderateForceSkip();
