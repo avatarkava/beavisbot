@@ -162,6 +162,11 @@ module.exports = function (options) {
         return message;
     };
 
+    timeUntil = function (timestamp) {
+        var message = moment.utc(timestamp).fromNow();
+        return '(in ' + message + ')';
+    };
+
     secondsSince = function (timestamp) {
         var now = moment.utc();
         timestamp = moment.utc(timestamp);

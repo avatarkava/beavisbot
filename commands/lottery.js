@@ -22,10 +22,10 @@ exports.handler = function (data) {
         }
 
         if (input[0] === '.roulette') {
-            bot.sendChat('Wait list roulette in ' + mins + ' minutes!  Join the line and chat within ' + mins + ' minutes to enter.  Winner gets moved up a random number of spots!');
+            bot.sendChat('Wait list roulette in ' + mins + ' minutes!  Join the line and chat within ' + mins + ' minutes to enter.  Winner gets moved up a random number of spots! @djs');
         }
         else {
-            bot.sendChat('Wait list lottery in ' + mins + ' minutes!  Join the line and chat within ' + mins + ' minutes to enter.  Winner gets the #1 spot!');
+            bot.sendChat('Wait list lottery in ' + mins + ' minutes!  Join the line and chat within ' + mins + ' minutes to enter.  Winner gets the #1 spot! @djs');
         }
 
         setTimeout(function () {

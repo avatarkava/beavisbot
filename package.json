@@ -16,16 +16,17 @@
         "node": ">= 0.6.0"
     },
     "dependencies": {
-        "plugapi": "git://github.com/plugCubed/plugAPI.git#develop",
+        "plugapi": "git://github.com/plugCubed/plugAPI.git",
         "request": "*",
-        "sequelize": "2.*",
+        "sequelize": "*",
         "mysql": "*",
         "sqlite3": "*",
         "string": "*",
         "underscore": "*",
         "bluebird": "*",
         "moment": "*",
-        "cleverbot-node": "*"
+        "cleverbot-node": "*",
+        "node-datatable": "git://github.com/jpravetz/node-datatable.git"
     },
     "devDependencies": {
         "sequelize-fixtures": "*"

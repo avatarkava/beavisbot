@@ -74,9 +74,14 @@ function runBot(error, auth) {
                 }
 
                 // Greet with the theme if it's not the default
-                RoomEvent.find({where: {type: 'theme', starts_at: {lte: new Date()}, ends_at: {gte: new Date()}}}).on('success', function (row) {
+                RoomEvent.find({where: {starts_at: {lte: new Date()}, ends_at: {gte: new Date()}}}).on('success', function (row) {
                     if (row !== null) {
-                        message += ' Theme: ' + row.title + ' - .theme for details!';
+                        if (row.type == 'event') {
+                            message += ' ** SPECIAL EVENT ** ' + row.title + ' - .event for details!';
+                        }
+                        else if (row.type == 'theme') {
+                            message += ' Theme: ' + row.title + ' - .theme for details!';
+                        }
                     }
                 });
 
@@ -545,6 +550,9 @@ function runBot(error, auth) {
             if (config.verboseLogging) {
                 logger.info('[COMMAND]', JSON.stringify(data, null, 2));
             }
+
+            // Don't allow @mention to the bot - prevent loopback
+            data.message = data.message.replace('@' + bot.getUser().username, '');
 
             command.handler(data);
         }
