@@ -10,6 +10,9 @@ exports.handler = function (data) {
         if (row === null) {
             bot.sendChat('/me No events currently scheduled.');
         } else {
+            if (row.starts_at >= moment.utc().toDate()) {
+                row.details += ' ' + timeUntil(row.starts_at);
+            }
             bot.sendChat('/me ' + row.title + ' - ' + row.details);
         }
     });
