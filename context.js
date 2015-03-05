@@ -164,7 +164,7 @@ module.exports = function (options) {
 
     timeUntil = function (timestamp) {
         var message = moment.utc(timestamp).fromNow();
-        return '(in ' + message + ')';
+        return '(Starting in ' + message + ')';
     };
 
     secondsSince = function (timestamp) {
