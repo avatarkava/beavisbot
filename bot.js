@@ -6,6 +6,7 @@ var config = require(path.resolve(__dirname, 'config.json'));
 runBot(false, config.auth);
 
 var roomHasActiveMods = false;
+var skipTimer;
 
 function runBot(error, auth) {
     if (error) {
@@ -217,6 +218,14 @@ function runBot(error, auth) {
             if (config.autoSuggestCorrections) {
                 correctMetadata();
             }
+
+            // Auto skip for "stuck" songs
+            clearTimeout(skipTimer);
+            skipTimer = setTimeout(function () {
+                if (bot.getMedia().cid == data.media.cid) {
+                    bot.moderateForceSkip();
+                }
+            }, (data.media.duration + 5) * 1000);
 
             // Write current song data to DB
             var songData = {
