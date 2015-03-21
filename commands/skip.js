@@ -3,7 +3,7 @@ exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;
 exports.handler = function (data) {
-    if (data.from.role > 1 || data.from.id == bot.getDJ().id) {
+    if (data.from.role > 1 || data.from.id == bot.getDJ().id || (config.allowRDJSkip && data.from.role == 1)) {
 
         media = bot.getMedia();
 

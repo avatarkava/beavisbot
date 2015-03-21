@@ -376,7 +376,9 @@ function runBot(error, auth) {
     bot.on('error', reconnect);
 
 
-    bot.tcpListen(8899, '166.78.31.68');
+    if (config.telnet.listenOnIp && config.telnet.listenOnPort) {
+        bot.tcpListen(config.telnet.listenOnPort, config.telnet.listenOnIp);
+    }
 
     bot.on('tcpConnect', function (socket) {
         logger.info('[TCP] Connected!');

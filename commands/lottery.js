@@ -22,11 +22,15 @@ exports.handler = function (data) {
         }
 
         if (input[0] === '.roulette') {
-            bot.sendChat('Wait list roulette in ' + mins + ' minutes!  Join the line and chat within ' + mins + ' minutes to enter.  Winner gets moved up a random number of spots! @djs');
+            bot.sendChat('Wait list roulette in ' + mins + ' minutes! Join the line and chat within ' + mins + ' minutes to enter.  Winner gets moved up a random number of spots! @djs');
         }
         else {
-            bot.sendChat('Wait list lottery in ' + mins + ' minutes!  Join the line and chat within ' + mins + ' minutes to enter.  Winner gets the #1 spot! @djs');
+            bot.sendChat('Wait list lottery in ' + mins + ' minutes! Join the line and chat within ' + mins + ' minutes to enter.  Winner gets the #1 spot! @djs');
         }
+
+        setTimeout(function () {
+            bot.sendChat("@djs contest ending in ONE MINUTE - join the line and chat to enter!");
+        }, (mins - 1) * 60 * 1000);
 
         setTimeout(function () {
             // Only select from users active during the lottery
