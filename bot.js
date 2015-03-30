@@ -64,7 +64,11 @@ function runBot(error, auth) {
         if (data.username !== bot.getUser().username) {
             User.find(data.id).on('success', function (dbUser) {
 
-                if (dbUser == null) {
+                if (data.username == config.superAdmin && config.responses.welcome.superAdmin != null) {
+                    message = config.responses.welcome.superAdmin.replace('{username}', data.username);
+                    logger.info('[JOIN]', data.username + ' last seen ' + timeSince(dbUser.last_seen));
+                }
+                else if (dbUser == null) {
                     message = config.responses.welcome.newUser.replace('{username}', data.username);
                     newUser = true;
                     logger.info('[JOIN]', data.username + ' is a first-time visitor to the room!');
