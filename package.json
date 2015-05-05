@@ -18,7 +18,7 @@
     "dependencies": {
         "plugapi": "git://github.com/plugCubed/plugAPI.git",
         "request": "*",
-        "sequelize": "*",
+        "sequelize": "2.0.*",
         "mysql": "*",
         "sqlite3": "*",
         "string": "*",

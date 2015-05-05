@@ -35,22 +35,28 @@ exports.handler = function (data) {
         setTimeout(function () {
             // Only select from users active during the lottery
             getActiveDJs(mins, 1, function (activeDJs) {
-                var randomNumber = _.random(1, activeDJs.length);
-                var winner = activeDJs[(randomNumber - 1)]
-                bot.sendChat(":tada: @" + winner + " emerges victorious!");
-                users = bot.getUsers();
-                var user = _.findWhere(users, {username: winner});
-                if (user !== undefined) {
-                    var currentPosition = bot.getWaitListPosition(user.id);
-                    if (input[0] === '.roulette') {
-                        position = _.random(1, currentPosition - 1);
-                    } else {
-                        position = 1;
+                if(activeDJs.length > 0) {
+                    var randomNumber = _.random(1, activeDJs.length);
+                    var winner = activeDJs[(randomNumber - 1)]
+                    bot.sendChat(":tada: @" + winner + " emerges victorious!");
+                    users = bot.getUsers();
+                    var user = _.findWhere(users, {username: winner});
+                    if (user !== undefined) {
+                        var currentPosition = bot.getWaitListPosition(user.id);
+                        if (input[0] === '.roulette') {
+                            position = _.random(1, currentPosition - 1);
+                        } else {
+                            position = 1;
+                        }
+                        if (currentPosition > 1 && currentPosition > position) {
+                            bot.moderateMoveDJ(user.id, position);
+                            logger.info('[LOTTO] Moving ' + winner + ' to position: ' + position);
+                        }
                     }
-                    if (currentPosition > 1 && currentPosition > position) {
-                        bot.moderateMoveDJ(user.id, position);
-                        logger.info('[LOTTO] Moving ' + winner + ' to position: ' + position);
-                    }
+                }
+                else {
+                    bot.sendChat(":thumbsdown: No one is eligible to win the contest.");
+                    logger.info('[LOTTO] No one is eligible to win the contest.');
                 }
             });
         }, mins * 60 * 1000);

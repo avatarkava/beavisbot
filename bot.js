@@ -226,7 +226,7 @@ function runBot(error, auth) {
             // Auto skip for "stuck" songs
             clearTimeout(skipTimer);
             skipTimer = setTimeout(function () {
-                if (bot.getMedia().cid == data.media.cid) {
+                if (bot.getMedia() && bot.getMedia().cid == data.media.cid) {
                     bot.moderateForceSkip();
                 }
             }, (data.media.duration + 5) * 1000);
