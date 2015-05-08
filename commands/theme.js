@@ -11,7 +11,7 @@ exports.handler = function (data) {
         order: [['starts_at', 'ASC']],
         limit: 3
     }).on('success', function (rows) {
-        if (rows === null) {
+        if (rows.length === 0) {
             bot.sendChat('/me ' + config.responses.theme);
         } else {
             bot.sendChat('/me ' + rows.map(function (row) {

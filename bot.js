@@ -82,10 +82,10 @@ function runBot(error, auth) {
                 RoomEvent.find({where: {starts_at: {lte: new Date()}, ends_at: {gte: new Date()}}}).on('success', function (row) {
                     if (row !== null) {
                         if (row.type == 'event') {
-                            message += ' ** SPECIAL EVENT ** ' + row.title + ' - .event for details!';
+                            message += ' :star: SPECIAL EVENT :star: ' + row.title + ' (.event for details)';
                         }
                         else if (row.type == 'theme') {
-                            message += ' Theme: ' + row.title + ' - .theme for details!';
+                            message += ' Theme: ' + row.title + ' (.theme for details)';
                         }
                     }
                 });
