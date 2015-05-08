@@ -15,15 +15,19 @@ exports.handler = function (data) {
             bot.sendChat('/me No events currently scheduled.');
         } else {
             bot.sendChat('/me ' + rows.map(function (row) {
-                    if (row.starts_at >= moment.utc().toDate()) {
-                        row.title = timeUntil(row.starts_at) + ' ' + row.title;
+                    var message = row.title;
+                    if (row.details !== null) {
+                        message += ' - ' + row.details;
                     }
-                    if (row.details === null) {
-                        return row.title;
+
+                    if (row.starts_at > moment.utc().toDate()) {
+                        message += ' ' + timeUntil(row.starts_at, 'starting');
                     }
-                    else {
-                        return row.title + ' - ' + row.details;
+                    else if (row.starts_at <= moment.utc().toDate()) {
+                        message += ' ' + timeUntil(row.ends_at, 'ending');
                     }
+
+                    return message;
                 }).join(' • '));
         }
     });
