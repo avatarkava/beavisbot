@@ -6,15 +6,25 @@ exports.handler = function (data) {
 
     var input = data.message.split(' ');
 
-    RoomEvent.find({where: {type: 'theme', starts_at: {lte: moment.utc().add(1, 'day').toDate()}, ends_at: {gte: new Date()}}}).on('success', function (row) {
-        if (row === null) {
+    RoomEvent.findAll({
+        where: {type: 'theme', starts_at: {lte: moment.utc().add(1, 'day').toDate()}, ends_at: {gte: new Date()}},
+        order: [['starts_at', 'ASC']],
+        limit: 3
+    }).on('success', function (rows) {
+        if (rows === null) {
             bot.sendChat('/me ' + config.responses.theme);
         } else {
-            if (row.starts_at >= moment.utc().toDate()) {
-                row.details = timeUntil(row.starts_at) + ' ' + row.details;
-            }
-            bot.sendChat('/me ' + row.title + ' - ' + row.details);
+            bot.sendChat('/me ' + rows.map(function (row) {
+                    if (row.starts_at >= moment.utc().toDate()) {
+                        row.title = timeUntil(row.starts_at) + ' ' + row.title;
+                    }
+                    if (row.details === null) {
+                        return row.title;
+                    }
+                    else {
+                        return row.title + ' - ' + row.details;
+                    }
+                }).join(' • '));
         }
     });
-
 };

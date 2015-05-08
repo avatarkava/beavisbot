@@ -162,9 +162,15 @@ module.exports = function (options) {
         return message;
     };
 
-    timeUntil = function (timestamp) {
+    timeUntil = function (timestamp, starting) {
         var message = moment.utc(timestamp).fromNow();
-        return '(Starting ' + message + ')';
+        if(starting) {
+            return '(Starting ' + message + ')';
+        }
+        else {
+            return '(' + message + ')';
+        }
+
     };
 
     secondsSince = function (timestamp) {
