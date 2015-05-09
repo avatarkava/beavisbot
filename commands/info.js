@@ -19,7 +19,6 @@ exports.handler = function (data) {
         if (row === null) {
             bot.sendChat(username + ' was not found.');
         } else {
-            logger.info('[DEBUG]', row);
             joined = timeSince(row.joined);
             birthday = row.birthday;
             level = row.level;

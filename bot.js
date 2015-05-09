@@ -20,7 +20,7 @@ function runBot(error, auth) {
 
     bot.on('roomJoin', function (data) {
 
-        logger.success('[INIT] Joined room:' + data);
+        logger.success('[INIT] Joined room: ' + data);
 
         if (config.responses.botConnect !== "") {
             bot.sendChat(config.responses.botConnect);
@@ -328,24 +328,21 @@ function runBot(error, auth) {
                     bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
                 }
 
-                // Skip if the song has been blacklisted
-                /*
-                 Song.find({where: {id: data.media.id, cid: data.media.cid, is_banned: true}}).on('success', function (row) {
-                 // need to only do this if results!
-                 logger.warning('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (id: ' + data.media.id + ')');
-                 bot.sendChat('Sorry @' + data.currentDJ.username + ', this song has been blacklisted (NSFW video or Out of Range) in our song database.');
-                 bot.moderateForceSkip();
-                 var userData = {
-                 type: 'skip',
-                 details: 'Skipped for playing a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (id: ' + data.media.id + ')',
-                 user_id: data.currentDJ.id,
-                 mod_user_id: bot.getUser().id
-                 };
-                 Karma.create(userData);
-                 });
-                 */
+                Song.find({where: {id: data.media.id, cid: data.media.cid, is_banned: true}}).on('success', function (row) {
+                    if (row !== null) {
+                        logger.warning('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (id: ' + data.media.id + ')');
+                        bot.sendChat('Sorry @' + data.currentDJ.username + ', this video has been blacklisted in our song database.');
+                        bot.moderateForceSkip();
+                        var userData = {
+                            type: 'skip',
+                            details: 'Skipped for playing a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (id: ' + data.media.id + ')',
+                            user_id: data.currentDJ.id,
+                            mod_user_id: bot.getUser().id
+                        };
+                        Karma.create(userData);
+                    }
+                });
 
-                // Only police this if there aren't any mods around
                 if (config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
                     logger.warning('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a song of ' + data.media.duration + ' seconds');
                     bot.sendChat('Sorry @' + data.currentDJ.username + ', this song is over our maximum room length of ' + (config.maxSongLengthSecs / 60) + ' minutes.');
@@ -455,7 +452,7 @@ function runBot(error, auth) {
         };
 
         // This only gets passed some of the time
-        if(user.slug !== undefined) {
+        if (user.slug !== undefined) {
             userData.slug = user.slug;
         }
 
