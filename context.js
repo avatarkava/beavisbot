@@ -189,7 +189,7 @@ module.exports = function (options) {
             return User.find({where: {id: dj.id}}).on('success', function (dbUser) {
                 if (dbUser !== null && dbUser.id !== bot.getUser().id) {
                     if (secondsSince(dbUser.last_active) <= (maxIdleMins * 60)) {
-                        activeUsers.push(dbUser.username);
+                        activeUsers.push(dbUser.id);
                     }
                 }
             });

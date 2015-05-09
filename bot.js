@@ -130,7 +130,7 @@ function runBot(error, auth) {
                 }
 
             });
-            updateDbUser(data);
+            updateDbUser(bot.getUser(data.id));
         }
     })
 
@@ -443,7 +443,6 @@ function runBot(error, auth) {
         var userData = {
             id: user.id,
             username: user.username,
-            slug: user.slug,
             language: user.language,
             avatar_id: user.avatarID,
             badge: user.badge,
@@ -452,8 +451,13 @@ function runBot(error, auth) {
             role: user.role,
             level: user.level,
             joined: user.joined,
-            last_seen: new Date()
+            last_seen: new Date(),
         };
+
+        // This only gets passed some of the time
+        if(user.slug !== undefined) {
+            userData.slug = user.slug;
+        }
 
         User.findOrCreate({where: {id: user.id}, defaults: userData}).spread(function (dbUser) {
 

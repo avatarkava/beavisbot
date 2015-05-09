@@ -9,35 +9,28 @@ exports.handler = function (data) {
 
     if (params.length < 1) {
         username = data.from.username;
-        joined = timeSince(data.from.joined);
-        level = data.from.level;
-
-        message = username + ' - Level ' + level + ' - Joined ' + joined;
-        if (level > 4) {
-            message += ' - https://plug.dj/@/' + data.from.slug;
-        }
-        bot.sendChat(message);
     }
     else {
-
         usernameRaw = params.join(' ').trim();
         username = S(usernameRaw).chompLeft('@').s;
-
-        User.find({where: {username: username}}).on('success', function (row) {
-            if (row === null) {
-                bot.sendChat(username + ' was not found.');
-            } else {
-                joined = timeSince(row.joined);
-                birthday = row.birthday;
-                level = row.level;
-                slug = row.slug;
-
-                message = username + ' - Level ' + level + ' - Joined ' + joined;
-                if (level > 4) {
-                    message += ' - https://plug.dj/@/' + slug;
-                }
-                bot.sendChat(message);
-            }
-        });
     }
+
+    User.find({where: {username: username}}).on('success', function (row) {
+        if (row === null) {
+            bot.sendChat(username + ' was not found.');
+        } else {
+            logger.info('[DEBUG]', row);
+            joined = timeSince(row.joined);
+            birthday = row.birthday;
+            level = row.level;
+            slug = row.slug;
+
+            message = username + ' - Level ' + level + ' - Joined ' + joined;
+            if (level > 4) {
+                message += ' - https://plug.dj/@/' + slug;
+            }
+            bot.sendChat(message);
+        }
+    });
+
 };

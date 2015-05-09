@@ -38,9 +38,9 @@ exports.handler = function (data) {
                 if(activeDJs.length > 0) {
                     var randomNumber = _.random(1, activeDJs.length);
                     var winner = activeDJs[(randomNumber - 1)]
-                    bot.sendChat(":tada: @" + winner + " emerges victorious!");
+                    bot.sendChat(":tada: @" + bot.getUser(winner).username + " emerges victorious!");
                     users = bot.getUsers();
-                    var user = _.findWhere(users, {username: winner});
+                    var user = _.findWhere(users, {id: winner});
                     if (user !== undefined) {
                         var currentPosition = bot.getWaitListPosition(user.id);
                         if (input[0] === '.roulette') {
@@ -50,7 +50,7 @@ exports.handler = function (data) {
                         }
                         if (currentPosition > 1 && currentPosition > position) {
                             bot.moderateMoveDJ(user.id, position);
-                            logger.info('[LOTTO] Moving ' + winner + ' to position: ' + position);
+                            logger.info('[LOTTO] Moving ' + user.username + ' to position: ' + position);
                         }
                     }
                 }
