@@ -35,7 +35,7 @@ module.exports = function (options) {
         });
     }
 
-    sequelize.authenticate().complete(function (err) {
+    sequelize.authenticate().then(function (err) {
         if (err) {
             logger.error('Unable to connect to the database:', err);
         }
@@ -57,11 +57,7 @@ module.exports = function (options) {
     User.hasMany(Play);
     User.hasMany(RoomEvent, {as: 'ModUser', foreignKey: 'mod_user_id'});
 
-    sequelize.sync()
-        .on('success', function () {
-        })
-        .on('error', function (error) {
-        });
+    sequelize.sync();
 
     package = require(path.resolve(__dirname, 'package.json'));
     request = require('request');
@@ -164,7 +160,7 @@ module.exports = function (options) {
 
     timeUntil = function (timestamp, prefixMessage) {
         var message = moment.utc(timestamp).fromNow();
-        if(prefixMessage !== undefined) {
+        if (prefixMessage !== undefined) {
             return '(' + prefixMessage + ' ' + message + ')';
         }
         else {
@@ -186,7 +182,7 @@ module.exports = function (options) {
         }
 
         Promise.map(_.rest(bot.getDJs(), startPosition), function (dj) {
-            return User.find({where: {id: dj.id}}).on('success', function (dbUser) {
+            return User.find({where: {id: dj.id}}).then(function (dbUser) {
                 if (dbUser !== null && dbUser.id !== bot.getUser().id) {
                     if (secondsSince(dbUser.last_active) <= (maxIdleMins * 60)) {
                         activeUsers.push(dbUser.id);

@@ -62,7 +62,7 @@ function runBot(error, auth) {
         var message = "";
 
         if (data.username !== bot.getUser().username) {
-            User.find(data.id).on('success', function (dbUser) {
+            User.findById(data.id).then(function (dbUser) {
 
                 if (data.username == config.superAdmin && config.responses.welcome.superAdmin != null) {
                     message = config.responses.welcome.superAdmin.replace('{username}', data.username);
@@ -79,7 +79,7 @@ function runBot(error, auth) {
                 }
 
                 // Greet with the theme if it's not the default
-                RoomEvent.find({where: {starts_at: {lte: new Date()}, ends_at: {gte: new Date()}}}).on('success', function (row) {
+                RoomEvent.find({where: {starts_at: {lte: new Date()}, ends_at: {gte: new Date()}}}).then(function (row) {
                     if (row !== null) {
                         if (row.type == 'event') {
                             message += ' :star: SPECIAL EVENT :star: ' + row.title + ' (.event for details)';
@@ -254,7 +254,7 @@ function runBot(error, auth) {
                     Sequelize.and({media_type: 'author', trigger: {like: data.media.author}, is_active: true}),
                     Sequelize.and({media_type: 'title', trigger: {like: data.media.title}, is_active: true})
                 )
-            }).on('success', function (row) {
+            }).then(function (row) {
                 if (row !== null) {
                     if (row.response != '') {
                         bot.sendChat(row.response);
@@ -285,7 +285,7 @@ function runBot(error, auth) {
                         limit: 1,
                         order: [['created_at', 'DESC']]
                     }
-                }).on('success', function (dbUser) {
+                }).then(function (dbUser) {
                     var position = bot.getWaitListPosition(dj.id);
                     if (dbUser !== null) {
                         if (secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
@@ -328,7 +328,7 @@ function runBot(error, auth) {
                     bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
                 }
 
-                Song.find({where: {id: data.media.id, cid: data.media.cid, is_banned: true}}).on('success', function (row) {
+                Song.find({where: {id: data.media.id, cid: data.media.cid, is_banned: true}}).then(function (row) {
                     if (row !== null) {
                         logger.warning('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (id: ' + data.media.id + ')');
                         bot.sendChat('Sorry @' + data.currentDJ.username + ', this video has been blacklisted in our song database.');
@@ -658,7 +658,7 @@ function runBot(error, auth) {
                 where: Sequelize.and({event_type: 'mention', is_active: true}),
                 order: 'RAND()'
             })
-                .on('success', function (row) {
+                .then(function (row) {
                     if (row === null) {
                         return;
                     }
@@ -675,7 +675,7 @@ function runBot(error, auth) {
             where: Sequelize.and({event_type: 'chat', trigger: data.message.substring(1), is_active: true}),
             order: 'RAND()'
         })
-            .on('success', function (row) {
+            .then(function (row) {
                 if (row === null) {
                     return;
                 }

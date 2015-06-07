@@ -13,18 +13,18 @@ exports.handler = function (data) {
     username = params.join(' ').trim()
     usernameFormatted = S(username).chompLeft('@').s;
 
-    user = _.findWhere(bot.getUsers(), {username: usernameFormatted});
-    if (user) {
-        bot.sendChat(usernameFormatted + ' is in the room!');
-    }
-    else {
-        User.find({where: {username: usernameFormatted}}).on('success', function (row) {
-            if (row === null) {
-                bot.sendChat(usernameFormatted + ' was not found.');
-            } else {
+    User.find({where: {username: usernameFormatted}}).then(function (row) {
+        if (row === null) {
+            bot.sendChat(usernameFormatted + ' was not found.');
+        } else {
+            user = _.findWhere(bot.getUsers(), {username: usernameFormatted});
+            if (user) {
+                bot.sendChat(usernameFormatted + ' is in the room and was last active ' + timeSince(row.last_active));
+            }
+            else {
                 bot.sendChat(row.username + ' was last seen ' + timeSince(row.last_seen));
             }
-        });
-    }
+        }
+    });
 
 };

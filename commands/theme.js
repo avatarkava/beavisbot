@@ -4,13 +4,13 @@ exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function (data) {
 
-    var input = data.message.split(' ');
+    //var input = data.message.split(' ');
 
     RoomEvent.findAll({
         where: {type: 'theme', starts_at: {lte: moment.utc().add(1, 'day').toDate()}, ends_at: {gte: new Date()}},
         order: [['starts_at', 'ASC']],
         limit: 3
-    }).on('success', function (rows) {
+    }).then(function (rows) {
         if (rows.length === 0) {
             bot.sendChat('/me ' + config.responses.theme);
         } else {

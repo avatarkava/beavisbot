@@ -26,7 +26,7 @@ exports.handler = function (data) {
             idleDJs = [];
 
             Promise.map(bot.getWaitList(), function (dj) {
-                return User.find({where: {id: dj.id}}).on('success', function (dbUser) {
+                return User.find({where: {id: dj.id}}).then(function (dbUser) {
                     var position = bot.getWaitListPosition(dj.id);
                     if (dbUser !== null) {
                         if (secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
