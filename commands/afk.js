@@ -30,12 +30,12 @@ exports.handler = function (data) {
                     var position = bot.getWaitListPosition(dj.id);
                     if (dbUser !== null) {
                         if (secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
-                            logger.warning('[IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
+                            logger.warning('[WL-IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                             idleDJs.push(dbUser.username);
 
                         }
                         else {
-                            logger.info('[ACTIVE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
+                            logger.info('[WL-ACTIVE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                         }
                     }
                 });

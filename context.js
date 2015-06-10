@@ -11,6 +11,7 @@ module.exports = function (options) {
 
     var Cleverbot = require('cleverbot-node');
     cleverbot = new Cleverbot;
+    cleverbot.prepare();
 
     if (config.verboseLogging) {
         logLevel = logger.info;

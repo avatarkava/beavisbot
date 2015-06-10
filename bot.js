@@ -289,9 +289,9 @@ function runBot(error, auth) {
                     var position = bot.getWaitListPosition(dj.id);
                     if (dbUser !== null) {
                         if (secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
-                            logger.warning('[IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
+                            logger.warning('[WL-IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                             if (dbUser.Karmas.length > 0) {
-                                logger.warning('[IDLE]', dbUser.username + ' was last warned ' + timeSince(dbUser.Karmas[0].created_at));
+                                logger.warning('[WL-IDLE]', dbUser.username + ' was last warned ' + timeSince(dbUser.Karmas[0].created_at));
                                 bot.moderateRemoveDJ(dj.id);
                                 bot.sendChat('@' + dbUser.username + ' ' + config.responses.activeDJRemoveMessage);
                                 var userData = {
@@ -318,7 +318,7 @@ function runBot(error, auth) {
                             if (dj.role > 1) {
                                 roomHasActiveMods = true;
                             }
-                            logger.info('[ACTIVE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
+                            logger.info('[WL-ACTIVE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                         }
                     }
                 });
