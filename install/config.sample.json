@@ -56,15 +56,15 @@
         "activeDJRemoveMessage": "Everyone is welcome to AFK and listen to the music but we ask that if you wish to DJ you must be able to at the very least respond to an @ mention in chat.",
         "wootReminder": "Help us maintain an active, positive environment! Wooting all songs while in line to DJ is required. For auto-woot info, click the music note at the top left of the page."
     },
-    "autoSuggestCorrections": false,
-    "welcomeUsers": "ALL",
-    "wootSongs": "NONE",
-    "requireWootInLine": false,
-    "prohibitMehInLine": true,
     "activeDJTimeoutMins": 60,
-    "maxSongLengthSecs": 420,
-    "verboseLogging": false,
-    "quietMode": false,
+    "activeDJTimeoutMins": 60,
+    "autoSuggestCorrections": false,
     "chatRandomnessPercentage": 5,
-    "migrateOldPlugDatabase": false
+    "maxSongLengthSecs": 420,
+    "prohibitMehInLine": true,
+    "quietMode": false,
+    "requireWootInLine": false,
+    "verboseLogging": false,
+    "welcomeUsers": "ALL",
+    "wootSongs": "NONE"
 }

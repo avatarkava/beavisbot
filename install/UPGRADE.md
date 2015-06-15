@@ -28,7 +28,6 @@ IF STAYING ON SQLITE
 ========================
 4. Step 4 - Import this dump into the new sqlite database side by side w/ the new schema
     > sqlite3 YourNewDatabase.sqlite < migrate.sql
-5. Step 5 - change the migrateOldPlugDatabase parameter in config.json to 'true'
 
 IF CONVERTING TO MYSQL
 ========================
@@ -41,4 +40,4 @@ IF CONVERTING TO MYSQL
 5. Step 5 - import the resulting file into your MySQL database
     * Some lines may fail due to bad data.  Since this is set up to be transactional, fix the lines as you go
 
-6. Step 6 - change the migrateOldPlugDatabase parameter in config.json to 'true'
+6. Check out the migrate.sql file to merge the songs down when using different CIDs (new plug system)

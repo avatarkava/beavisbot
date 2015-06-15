@@ -77,12 +77,14 @@ CREATE TABLE `songs` (
 `tags`  varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL ,
 `format`  int(10) UNSIGNED NULL DEFAULT 1 ,
 `cid`  varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
+`plug_id` int(10) UNSIGNED NULL DEFAULT NULL ,
 `duration`  int(10) UNSIGNED NULL DEFAULT NULL ,
 `image`  varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL ,
 `is_banned`  tinyint(1) NULL DEFAULT 0 ,
 `created_at`  datetime NOT NULL ,
 `updated_at`  datetime NOT NULL ,
-PRIMARY KEY (`id`)
+PRIMARY KEY (`id`) ,
+UNIQUE KEY `format_cid` (`format`,`cid`)
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=latin1 COLLATE=latin1_swedish_ci
@@ -121,6 +123,7 @@ CREATE TABLE `users` (
 `level`  int(11) UNSIGNED NULL DEFAULT 0 ,
 `experience_points`  int(11) UNSIGNED NULL DEFAULT 0 ,
 `plug_points`  int(11) UNSIGNED NULL DEFAULT 0 ,
+`custom_points`  int(11) UNSIGNED NULL DEFAULT 0 ,
 `joined`  datetime NULL DEFAULT NULL ,
 `birthday`  datetime NULL DEFAULT NULL ,
 `waitlist_position`  int(11) NULL DEFAULT '-1' ,

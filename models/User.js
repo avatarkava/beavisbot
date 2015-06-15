@@ -12,6 +12,7 @@ module.exports = function (sequelize, Sequelize) {
         level: {type: Sequelize.INTEGER.UNSIGNED, defaultValue: 0},
         experience_points: {type: Sequelize.INTEGER.UNSIGNED, defaultValue: 0},
         plug_points: {type: Sequelize.INTEGER.UNSIGNED, defaultValue: 0},
+        custom_points: {type: Sequelize.INTEGER.UNSIGNED, defaultValue: 0},
         joined: {type: Sequelize.DATE, defaultValue: Sequelize.NOW},
         birthday: {type: Sequelize.DATE},
         waitlist_position: {type: Sequelize.INTEGER, defaultValue: -1},

@@ -11,13 +11,13 @@ exports.handler = function (data) {
 
         var userData = {
             type: 'blacklist',
-            details: 'Blacklisted ' + media.title + ' CID ' + media.id + ' by ' + data.from.username,
+            details: 'Blacklisted ' + media.title + ' CID ' + media.cid + ' by ' + data.from.username,
             user_id: bot.getDJ().id,
             mod_user_id: data.from.id
         };
         Karma.create(userData);
 
-        Song.update({is_banned: 1}, {where: {id: media.id}});
+        Song.update({is_banned: 1}, {where: {format: media.format, cid: media.cid}});
         bot.sendChat("The song " + media.title + " has been blacklisted.");
 
         bot.moderateForceSkip();

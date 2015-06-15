@@ -199,14 +199,18 @@ function runBot(error, auth) {
 
         // Write previous play data to DB
         if (data.lastPlay.media !== null && data.lastPlay.dj !== null) {
-            Play.create({
-                user_id: data.lastPlay.dj.id,
-                song_id: data.lastPlay.media.id,
-                positive: data.lastPlay.score.positive,
-                negative: data.lastPlay.score.negative,
-                grabs: data.lastPlay.score.grabs,
-                listeners: data.lastPlay.score.listeners,
-                skipped: data.lastPlay.score.skipped
+            Song.find({where: {format: data.media.format, cid: data.media.cid}}).then(function (song) {
+                if (song !== null) {
+                    Play.create({
+                        user_id: data.lastPlay.dj.id,
+                        song_id: song.id,
+                        positive: data.lastPlay.score.positive,
+                        negative: data.lastPlay.score.negative,
+                        grabs: data.lastPlay.score.grabs,
+                        listeners: data.lastPlay.score.listeners,
+                        skipped: data.lastPlay.score.skipped
+                    });
+                }
             });
         }
 
@@ -233,7 +237,7 @@ function runBot(error, auth) {
 
             // Write current song data to DB
             var songData = {
-                id: data.media.id,
+                plug_id: data.media.id,
                 author: data.media.author,
                 title: data.media.title,
                 format: data.media.format,
@@ -241,7 +245,7 @@ function runBot(error, auth) {
                 duration: data.media.duration,
                 image: data.media.image
             };
-            Song.findOrCreate({where: {id: data.media.id, cid: data.media.cid}, defaults: songData}).spread(function (song) {
+            Song.findOrCreate({where: {format: data.media.format, cid: data.media.cid}, defaults: songData}).spread(function (song) {
                 song.updateAttributes(songData);
             });
 
@@ -328,14 +332,14 @@ function runBot(error, auth) {
                     bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
                 }
 
-                Song.find({where: {id: data.media.id, cid: data.media.cid, is_banned: true}}).then(function (row) {
+                Song.find({where: {format: data.media.format, cid: data.media.cid, is_banned: true}}).then(function (row) {
                     if (row !== null) {
-                        logger.warning('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (id: ' + data.media.id + ')');
+                        logger.warning('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (cid: ' + data.media.cid + ')');
                         bot.sendChat('Sorry @' + data.currentDJ.username + ', this video has been blacklisted in our song database.');
                         bot.moderateForceSkip();
                         var userData = {
                             type: 'skip',
-                            details: 'Skipped for playing a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (id: ' + data.media.id + ')',
+                            details: 'Skipped for playing a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (cid: ' + data.media.cid + ')',
                             user_id: data.currentDJ.id,
                             mod_user_id: bot.getUser().id
                         };
@@ -468,23 +472,6 @@ function runBot(error, auth) {
             logger.error('Error occurred', err);
         });
 
-        //convertAPIUserID(user, function () {});
-
-    }
-
-    function convertAPIUserID(user, callback) {
-        //db.get('SELECT userid FROM USERS WHERE username = ?', [user.username], function (error, row) {
-        //    if (row != null && row.userid.length > 10) {
-        //        logger.warning('Converting userid for ' + user.username + ': ' + row.userid + ' => ' + user.id);
-        //        //db.run('UPDATE PLAYS SET userid = ? WHERE userid = ?', [user.id, row.userid]);
-        //        //db.run('UPDATE USERS SET userid = ? WHERE userid = ?', [user.id, row.userid], function () {
-        //        //    callback(true);
-        //        //});
-        //    }
-        //    else {
-        //        callback(true);
-        //    }
-        //});
     }
 
     function reconnect() {

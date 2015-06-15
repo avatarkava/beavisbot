@@ -8,7 +8,7 @@ exports.handler = function (data) {
     if (data.message.length > 10) {
         songId = data.message.substring(10);
     } else if (media != null) {
-        songId = media.id;
+        songId = media.cid;
     } else {
         bot.sendChat('No song playing.');
         return;

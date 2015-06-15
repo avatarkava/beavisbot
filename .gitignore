@@ -20,6 +20,5 @@ roomState.json
 *.sqlite
 
 !sample.sqlite
-migrate.sql
 test.js
 .idea
