@@ -349,11 +349,16 @@ function runBot(error, auth) {
 
                 if (config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
                     logger.warning('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a song of ' + data.media.duration + ' seconds');
-                    bot.sendChat('Sorry @' + data.currentDJ.username + ', this song is over our maximum room length of ' + (config.maxSongLengthSecs / 60) + ' minutes.');
+                    var maxLengthMins = Math.floor(config.maxSongLengthSecs / 60);
+                    var maxLengthSecs = config.maxSongLengthSecs % 60;
+                    if (maxLengthSecs < 10) {
+                        maxLengthSecs = "0" + maxLengthSecs;
+                    }
+                    bot.sendChat('Sorry @' + data.currentDJ.username + ', this song is over our maximum room length of ' + maxLengthMins + ':' + maxLengthSecs + '.');
                     bot.moderateForceSkip();
                     var userData = {
                         type: 'skip',
-                        details: 'Skipped for playing a song of ' + data.media.duration + ' (room configured for max of ' + config.maxSongLengthSecs + ')',
+                        details: 'Skipped for playing a song of ' + data.media.duration + ' (room configured for max of ' + config.maxSongLengthSecs + 's)',
                         user_id: data.currentDJ.id,
                         mod_user_id: bot.getUser().id
                     };
