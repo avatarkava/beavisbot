@@ -54,83 +54,85 @@ function runBot(error, auth) {
     });
 
     bot.on('userJoin', function (data) {
-        if (config.verboseLogging) {
-            logger.info('[JOIN]', JSON.stringify(data, null, 2));
-        }
+        if (!data.guest) {
+            if (config.verboseLogging) {
+                logger.info('[JOIN]', JSON.stringify(data, null, 2));
+            }
 
-        var newUser = false;
-        var message = "";
+            var newUser = false;
+            var message = "";
 
-        if (data.username !== bot.getUser().username) {
-            User.findById(data.id).then(function (dbUser) {
+            if (data.username !== bot.getUser().username) {
+                User.findById(data.id).then(function (dbUser) {
 
-                if (data.username == config.superAdmin && config.responses.welcome.superAdmin != null) {
-                    message = config.responses.welcome.superAdmin.replace('{username}', data.username);
-                    logger.info('[JOIN]', data.username + ' last seen ' + timeSince(dbUser.last_seen));
-                }
-                else if (dbUser == null) {
-                    message = config.responses.welcome.newUser.replace('{username}', data.username);
-                    newUser = true;
-                    logger.info('[JOIN]', data.username + ' is a first-time visitor to the room!');
-                }
-                else {
-                    message = config.responses.welcome.oldUser.replace('{username}', data.username);
-                    logger.info('[JOIN]', data.username + ' last seen ' + timeSince(dbUser.last_seen));
-                }
+                    if (data.username == config.superAdmin && config.responses.welcome.superAdmin != null) {
+                        message = config.responses.welcome.superAdmin.replace('{username}', data.username);
+                        logger.info('[JOIN]', data.username + ' last seen ' + timeSince(dbUser.last_seen));
+                    }
+                    else if (dbUser == null) {
+                        message = config.responses.welcome.newUser.replace('{username}', data.username);
+                        newUser = true;
+                        logger.info('[JOIN]', data.username + ' is a first-time visitor to the room!');
+                    }
+                    else {
+                        message = config.responses.welcome.oldUser.replace('{username}', data.username);
+                        logger.info('[JOIN]', data.username + ' last seen ' + timeSince(dbUser.last_seen));
+                    }
 
-                // Greet with the theme if it's not the default
-                RoomEvent.find({where: {starts_at: {lte: new Date()}, ends_at: {gte: new Date()}}}).then(function (row) {
-                    if (row !== null) {
-                        if (row.type == 'event') {
-                            message += ' :star: SPECIAL EVENT :star: ' + row.title + ' (.event for details)';
+                    // Greet with the theme if it's not the default
+                    RoomEvent.find({where: {starts_at: {lte: new Date()}, ends_at: {gte: new Date()}}}).then(function (row) {
+                        if (row !== null) {
+                            if (row.type == 'event') {
+                                message += ' :star: SPECIAL EVENT :star: ' + row.title + ' (.event for details)';
+                            }
+                            else if (row.type == 'theme') {
+                                message += ' Theme: ' + row.title + ' (.theme for details)';
+                            }
                         }
-                        else if (row.type == 'theme') {
-                            message += ' Theme: ' + row.title + ' (.theme for details)';
-                        }
+                    });
+
+                    if (!roomHasActiveMods) {
+                        message += ' Type .help if you need it!';
                     }
-                });
 
-                if (!roomHasActiveMods) {
-                    message += ' Type .help if you need it!';
-                }
-
-                if (message && (config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
-                    if (newUser) {
-                        setTimeout(function () {
-                            bot.sendChat(message)
-                        }, 5000);
-                    }
-                    else if (config.welcomeUsers == "ALL" && secondsSince(dbUser.last_active) >= 900 && secondsSince(dbUser.last_seen) >= 900) {
-                        setTimeout(function () {
-                            bot.sendChat(message)
-                        }, 5000);
-                    }
-                }
-
-                // Restore spot in line if user has been gone < 15 mins
-                var position = bot.getWaitListPosition(data.id);
-                if (!newUser && dbUser.waitlist_position > -1 && secondsSince(dbUser.last_seen) <= 900 && (position === -1 || (position > -1 && position > dbUser.waitlist_position))) {
-                    bot.moderateAddDJ(data.id, function () {
-                        if (dbUser.waitlist_position < bot.getWaitList().length && position !== dbUser.waitlist_position) {
-                            bot.moderateMoveDJ(data.id, dbUser.waitlist_position);
-                            var userData = {
-                                type: 'restored',
-                                details: 'Restored to position ' + dbUser.waitlist_position + ' (disconnected for ' + timeSince(dbUser.last_seen, true) + ')',
-                                user_id: data.id,
-                                mod_user_id: bot.getUser().id
-                            };
-                            Karma.create(userData);
-
+                    if (message && (config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
+                        if (newUser) {
                             setTimeout(function () {
-                                bot.sendChat('/me put @' + data.username + ' back in line :thumbsup:')
+                                bot.sendChat(message)
                             }, 5000);
                         }
+                        else if (config.welcomeUsers == "ALL" && secondsSince(dbUser.last_active) >= 900 && secondsSince(dbUser.last_seen) >= 900) {
+                            setTimeout(function () {
+                                bot.sendChat(message)
+                            }, 5000);
+                        }
+                    }
 
-                    });
-                }
+                    // Restore spot in line if user has been gone < 15 mins
+                    var position = bot.getWaitListPosition(data.id);
+                    if (!newUser && dbUser.waitlist_position > -1 && secondsSince(dbUser.last_seen) <= 900 && (position === -1 || (position > -1 && position > dbUser.waitlist_position))) {
+                        bot.moderateAddDJ(data.id, function () {
+                            if (dbUser.waitlist_position < bot.getWaitList().length && position !== dbUser.waitlist_position) {
+                                bot.moderateMoveDJ(data.id, dbUser.waitlist_position);
+                                var userData = {
+                                    type: 'restored',
+                                    details: 'Restored to position ' + dbUser.waitlist_position + ' (disconnected for ' + timeSince(dbUser.last_seen, true) + ')',
+                                    user_id: data.id,
+                                    mod_user_id: bot.getUser().id
+                                };
+                                Karma.create(userData);
 
-            });
-            updateDbUser(bot.getUser(data.id));
+                                setTimeout(function () {
+                                    bot.sendChat('/me put @' + data.username + ' back in line :thumbsup:')
+                                }, 5000);
+                            }
+
+                        });
+                    }
+
+                });
+                updateDbUser(bot.getUser(data.id));
+            }
         }
     })
 
