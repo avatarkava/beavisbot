@@ -201,11 +201,11 @@ function runBot(error, auth) {
 
         // Write previous play data to DB
         if (data.lastPlay.media !== null && data.lastPlay.dj !== null) {
-            Song.find({where: {format: data.media.format, cid: data.media.cid}}).then(function (song) {
+            Song.find({where: {format: data.lastPlay.media.format, cid: data.lastPlay.media.cid}}).then(function (song) {
                 if (song !== null) {
                     Play.create({
                         user_id: data.lastPlay.dj.id,
-                        song_id: song.id,
+                        song_id: song.plug_id,
                         positive: data.lastPlay.score.positive,
                         negative: data.lastPlay.score.negative,
                         grabs: data.lastPlay.score.grabs,
