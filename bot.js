@@ -205,7 +205,7 @@ function runBot(error, auth) {
                 if (song !== null) {
                     Play.create({
                         user_id: data.lastPlay.dj.id,
-                        song_id: data.lastPlay.media.id,
+                        song_id: song.id,
                         positive: data.lastPlay.score.positive,
                         negative: data.lastPlay.score.negative,
                         grabs: data.lastPlay.score.grabs,
