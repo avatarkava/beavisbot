@@ -1,6 +1,11 @@
-<?php 
+<?php
 
-$db = new PDO('mysql:host=localhost;dbname=beavisbot;charset=utf8', 'root', '9jekjv5H');
+$config = json_decode(file_get_contents(__DIR__ . '/../config.json'), true);
+$db_host = $config['db']['mysql']['host'];
+$db_name = $config['db']['mysql']['database'];
+$db_user = $config['db']['mysql']['username'];
+$db_pass = $config['db']['mysql']['password'];
+$db = new PDO('mysql:host=' . $db_host . ';dbname=' . $db_name . ';charset=utf8', $db_user, $db_pass);
 
 // Pseudo for user update
 $stmt = $db->query("SELECT * FROM zzz_old_users WHERE isImported = 0 AND dateJoined > NOW() - INTERVAL 24 HOUR ORDER BY dateJoined");
@@ -8,7 +13,7 @@ $numUsers = $stmt->rowCount();
 echo "\n$numUsers users were found...\n";
 $x = 0;
 
-while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
     $x++;
     echo "\n[" . $x . '/' . $numUsers . '] processing user ' . $row['username'] . '...';
@@ -18,7 +23,7 @@ while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $stmtUser->bindParam('username', $row['username']);
     $stmtUser->execute();
 
-    if($newUser = $stmtUser->fetch(PDO::FETCH_ASSOC)) {
+    if ($newUser = $stmtUser->fetch(PDO::FETCH_ASSOC)) {
 
         $y = 0;
         // If found, grab their new user_id and flag the isImported field in zzz_old_users = 1
@@ -44,7 +49,7 @@ while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $stmtUpdateOldPlay = $db->prepare("UPDATE zzz_old_plays SET isImported = 1 WHERE id = :id LIMIT 1");
         $stmtUpdateUser = $db->prepare("UPDATE zzz_old_users SET isImported = 1 WHERE userid = :olduserid LIMIT 1");
 
-        while($play = $stmtPlays->fetch(PDO::FETCH_ASSOC)) {
+        while ($play = $stmtPlays->fetch(PDO::FETCH_ASSOC)) {
             $y++;
 
             // Get the proper new SongId
@@ -77,8 +82,7 @@ while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $stmtUpdateUser->bindParam('olduserid', $row['userid']);
         $stmtUpdateUser->execute();
 
-    }
-    else {
+    } else {
         echo "\nNo match for " . $row['username'] . " found in current users table...";
     }
 }
