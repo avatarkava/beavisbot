@@ -1,4 +1,4 @@
-exports.names = ['.source'];
+exports.names = ['source'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;

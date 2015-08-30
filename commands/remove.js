@@ -1,4 +1,4 @@
-exports.names = ['.remove', '.rm', '.rmafk', '.rmidle'];
+exports.names = ['remove', 'rm', 'rmafk', 'rmidle'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
@@ -13,7 +13,7 @@ exports.handler = function (data) {
             var position = bot.getWaitListPosition(user.id)
             if (user && position !== -1) {
                 bot.moderateRemoveDJ(user.id);
-                if (input[0] === '.rmafk' || input[0] === '.rmidle') {
+                if (input[0] === 'rmafk' || input[0] === 'rmidle') {
                     bot.sendChat('@' + usernameFormatted + ' ' + config.responses.activeDJRemoveMessage);
                 }
             }

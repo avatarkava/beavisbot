@@ -1,4 +1,4 @@
-exports.names = ['.woot'];
+exports.names = ['woot'];
 exports.hidden = false;
 exports.enabled = false;
 exports.matchStart = true;

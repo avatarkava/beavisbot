@@ -1,4 +1,4 @@
-exports.names = ['.move', '.mv'];
+exports.names = ['move', 'mv'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;

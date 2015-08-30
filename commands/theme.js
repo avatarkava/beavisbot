@@ -1,4 +1,4 @@
-exports.names = ['.theme'];
+exports.names = ['theme'];
 exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = true;

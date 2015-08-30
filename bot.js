@@ -80,7 +80,12 @@ function runBot(error, auth) {
                     }
 
                     // Greet with the theme if it's not the default
-                    RoomEvent.find({where: {starts_at: {lte: new Date()}, ends_at: {gte: new Date()}}}).then(function (row) {
+                    RoomEvent.find({
+                        where: {
+                            starts_at: {lte: new Date()},
+                            ends_at: {gte: new Date()}
+                        }
+                    }).then(function (row) {
                         if (row !== null) {
                             if (row.type == 'event') {
                                 message += ' :star: SPECIAL EVENT :star: ' + row.title + ' (.event for details)';
@@ -201,7 +206,12 @@ function runBot(error, auth) {
 
         // Write previous play data to DB
         if (data.lastPlay.media !== null && data.lastPlay.dj !== null) {
-            Song.find({where: {format: data.lastPlay.media.format, cid: data.lastPlay.media.cid}}).then(function (song) {
+            Song.find({
+                where: {
+                    format: data.lastPlay.media.format,
+                    cid: data.lastPlay.media.cid
+                }
+            }).then(function (song) {
                 if (song !== null) {
                     Play.create({
                         user_id: data.lastPlay.dj.id,
@@ -247,7 +257,10 @@ function runBot(error, auth) {
                 duration: data.media.duration,
                 image: data.media.image
             };
-            Song.findOrCreate({where: {format: data.media.format, cid: data.media.cid}, defaults: songData}).spread(function (song) {
+            Song.findOrCreate({
+                where: {format: data.media.format, cid: data.media.cid},
+                defaults: songData
+            }).spread(function (song) {
                 song.updateAttributes(songData);
             });
 
@@ -334,7 +347,13 @@ function runBot(error, auth) {
                     bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
                 }
 
-                Song.find({where: {format: data.media.format, cid: data.media.cid, is_banned: true}}).then(function (row) {
+                Song.find({
+                    where: {
+                        format: data.media.format,
+                        cid: data.media.cid,
+                        is_banned: true
+                    }
+                }).then(function (row) {
                     if (row !== null) {
                         logger.warning('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (cid: ' + data.media.cid + ')');
                         bot.sendChat('Sorry @' + data.currentDJ.username + ', this video has been blacklisted in our song database.');
@@ -405,7 +424,7 @@ function runBot(error, auth) {
                 from: bot.getUser()
             };
 
-            if (data.message.indexOf('.') === 0) {
+            if (data.message.indexOf(commandLiteral) === 0) {
                 handleCommand(data);
             }
             else {
@@ -545,33 +564,39 @@ function runBot(error, auth) {
         data.message = data.message.replace(/&lt;/gi, '\<');
         data.message = data.message.replace(/&gt;/gi, '\>');
 
-        var command = commands.filter(function (cmd) {
-            var found = false;
-            for (i = 0; i < cmd.names.length; i++) {
-                if (!found) {
-                    found = (cmd.names[i] == data.message.toLowerCase() || (cmd.matchStart && data.message.toLowerCase().indexOf(cmd.names[i]) == 0));
+        if (data.message.charAt(0) === config.commandLiteral) {
+
+            // Chop off the command literal
+            data.message = data.message.substr(1);
+
+            var command = commands.filter(function (cmd) {
+                var found = false;
+                for (i = 0; i < cmd.names.length; i++) {
+                    if (!found) {
+                        found = (cmd.names[i] == data.message.toLowerCase() || (cmd.matchStart && data.message.toLowerCase().indexOf(cmd.names[i]) == 0));
+                    }
                 }
+                return found;
+            })[0];
+
+            if (command && command.enabled) {
+
+                if (config.verboseLogging) {
+                    logger.info('[COMMAND]', JSON.stringify(data, null, 2));
+                }
+
+                // Don't allow @mention to the bot - prevent loopback
+                data.message = data.message.replace('@' + bot.getUser().username, '');
+
+                command.handler(data);
             }
-            return found;
-        })[0];
-
-        if (command && command.enabled) {
-
-            if (config.verboseLogging) {
-                logger.info('[COMMAND]', JSON.stringify(data, null, 2));
+            else if (!config.quietMode) {
+                // @TODO - Build the list of possible commands on init() instead of querying every time
+                chatResponse(data);
             }
-
-            // Don't allow @mention to the bot - prevent loopback
-            data.message = data.message.replace('@' + bot.getUser().username, '');
-
-            command.handler(data);
         }
         else if (!config.quietMode && data.message.indexOf('@' + bot.getUser().username) > -1) {
             mentionResponse(data);
-        }
-        else if (!config.quietMode && data.message.indexOf('.') === 0) {
-            // @TODO - Build the list of possible commands on init() instead of querying every time
-            chatResponse(data);
         }
     }
 

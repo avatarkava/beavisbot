@@ -1,4 +1,4 @@
-exports.names = ['.uptime'];
+exports.names = ['uptime'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;

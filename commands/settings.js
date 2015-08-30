@@ -1,4 +1,4 @@
-exports.names = ['.settings', '.set'];
+exports.names = ['settings', 'set'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;

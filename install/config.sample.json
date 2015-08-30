@@ -60,6 +60,7 @@
     "activeDJTimeoutMins": 60,
     "autoSuggestCorrections": false,
     "chatRandomnessPercentage": 5,
+    "commandLiteral": ".",
     "maxSongLengthSecs": 420,
     "prohibitMehInLine": true,
     "quietMode": false,

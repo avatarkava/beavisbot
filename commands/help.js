@@ -1,4 +1,4 @@
-exports.names = ['.help', '.support'];
+exports.names = ['help', 'support'];
 exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = true;

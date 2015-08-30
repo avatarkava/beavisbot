@@ -1,4 +1,4 @@
-exports.names = ['.refresh'];
+exports.names = ['refresh'];
 exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = false;

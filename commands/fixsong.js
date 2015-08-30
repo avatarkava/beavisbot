@@ -1,4 +1,4 @@
-exports.names = ['.fixsong'];
+exports.names = ['fixsong'];
 exports.hidden = true;
 exports.enabled = false;
 exports.matchStart = true;

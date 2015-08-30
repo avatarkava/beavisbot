@@ -1,4 +1,4 @@
-exports.names = ['.lottery', '.roulette'];
+exports.names = ['lottery', 'roulette'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
@@ -21,7 +21,7 @@ exports.handler = function (data) {
             mins = 1;
         }
 
-        if (input[0] === '.roulette') {
+        if (input[0] === 'roulette') {
             bot.sendChat('Wait list roulette in ' + mins + ' minutes! Join the line and chat within ' + mins + ' minutes to enter.  Winner gets moved up a random number of spots! @djs');
         }
         else {
@@ -43,7 +43,7 @@ exports.handler = function (data) {
                     var user = _.findWhere(users, {id: winner});
                     if (user !== undefined) {
                         var currentPosition = bot.getWaitListPosition(user.id);
-                        if (input[0] === '.roulette') {
+                        if (input[0] === 'roulette') {
                             position = _.random(1, currentPosition - 1);
                         } else {
                             position = 1;

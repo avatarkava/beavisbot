@@ -1,4 +1,4 @@
-exports.names = ['.deli'];
+exports.names = ['deli'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;

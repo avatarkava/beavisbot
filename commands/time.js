@@ -1,4 +1,4 @@
-exports.names = ['.time', '.utc'];
+exports.names = ['time', 'utc'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;

@@ -1,4 +1,4 @@
-exports.names = ['.freespin'];
+exports.names = ['freespin'];
 exports.hidden = false;
 exports.enabled = false;
 exports.matchStart = false;

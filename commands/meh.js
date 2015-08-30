@@ -1,4 +1,4 @@
-exports.names = ['.meh'];
+exports.names = ['meh'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;

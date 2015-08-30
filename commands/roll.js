@@ -1,4 +1,4 @@
-exports.names = ['.roll'];
+exports.names = ['roll'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;

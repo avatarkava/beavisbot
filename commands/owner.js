@@ -1,4 +1,4 @@
-exports.names = ['.owner', '.feedback'];
+exports.names = ['owner', 'feedback'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;

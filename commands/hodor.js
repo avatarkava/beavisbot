@@ -1,4 +1,4 @@
-exports.names = ['.hodor', 'hodor', 'hodor?'];
+exports.names = ['hodor'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;

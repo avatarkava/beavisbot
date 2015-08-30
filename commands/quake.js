@@ -1,4 +1,4 @@
-exports.names = ['.quake'];
+exports.names = ['quake'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;

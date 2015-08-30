@@ -1,4 +1,4 @@
-exports.names = ['.afk', '.afkdjs'];
+exports.names = ['afk', 'afkdjs'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;

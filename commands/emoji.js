@@ -1,4 +1,4 @@
-exports.names = ['.emoji'];
+exports.names = ['emoji'];
 exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = false;

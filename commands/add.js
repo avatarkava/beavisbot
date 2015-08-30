@@ -1,4 +1,4 @@
-exports.names = ['.add'];
+exports.names = ['add'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;

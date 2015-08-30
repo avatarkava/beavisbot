@@ -1,4 +1,4 @@
-exports.names = ['.license'];
+exports.names = ['license'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;

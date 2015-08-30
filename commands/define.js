@@ -1,4 +1,4 @@
-exports.names = ['.define'];
+exports.names = ['define'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;

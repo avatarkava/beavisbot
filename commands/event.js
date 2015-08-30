@@ -1,4 +1,4 @@
-exports.names = ['.event', '.calendar'];
+exports.names = ['event', 'calendar'];
 exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = true;

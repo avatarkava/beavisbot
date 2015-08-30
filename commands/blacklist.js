@@ -1,4 +1,4 @@
-exports.names = ['.blacklist'];
+exports.names = ['blacklist'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;

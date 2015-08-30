@@ -1,4 +1,4 @@
-exports.names = ['.lastseen', '.seen'];
+exports.names = ['lastseen', 'seen'];
 exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = true;
