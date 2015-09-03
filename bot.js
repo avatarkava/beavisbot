@@ -691,7 +691,7 @@ function runBot(error, auth) {
 
     function chatResponse(data) {
         EventResponse.find({
-            where: Sequelize.and({event_type: 'chat', trigger: data.message.substring(1), is_active: true}),
+            where: Sequelize.and({event_type: 'chat', trigger: data.message, is_active: true}),
             order: 'RAND()'
         })
             .then(function (row) {
@@ -703,5 +703,9 @@ function runBot(error, auth) {
                 }
 
             });
+    }
+
+    function addCustomPoint(data) {
+
     }
 }
