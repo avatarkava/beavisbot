@@ -406,34 +406,6 @@ function runBot(error, auth) {
     bot.on('close', reconnect);
     bot.on('error', reconnect);
 
-
-    if (config.telnet.listenOnIp && config.telnet.listenOnPort) {
-        bot.tcpListen(config.telnet.listenOnPort, config.telnet.listenOnIp);
-    }
-
-    bot.on('tcpConnect', function (socket) {
-        logger.info('[TCP] Connected!');
-    });
-
-    bot.on('tcpMessage', function (socket, msg) {
-        if (typeof msg !== "undefined" && msg.length > 2) {
-            logger.info('[TCP] ' + msg);
-            // Convert into same format as incoming chat messages through the UI
-            var data = {
-                message: msg,
-                from: bot.getUser()
-            };
-
-            if (data.message.indexOf(commandLiteral) === 0) {
-                handleCommand(data);
-            }
-            else {
-                bot.sendChat(msg);
-            }
-        }
-    });
-
-
     function saveWaitList(wholeRoom) {
 
         if (wholeRoom) {

@@ -46,13 +46,15 @@ module.exports = function (options) {
     });
 
     // Build up the models and relations
-    var models = ['EventResponse', 'Karma', 'Play', 'RoomEvent', 'Song', 'SongResponse', 'User'];
+    var models = ['EventResponse', 'Game', 'Karma', 'Play', 'RoomEvent', 'Song', 'SongResponse', 'User'];
     models.forEach(function (model) {
         this[model] = sequelize.import(__dirname + '/models/' + model);
     });
 
     // @TODO - Is it better to declare these directly in the model?
     Song.hasMany(Play);
+    User.hasMany(Game, {as: 'User', foreignKey: 'user_id'});
+    User.hasMany(Game, {as: 'ModUser', foreignKey: 'mod_user_id'});
     User.hasMany(Karma);
     User.hasMany(Karma, {as: 'ModUser', foreignKey: 'mod_user_id'});
     User.hasMany(Play);
@@ -194,6 +196,5 @@ module.exports = function (options) {
             callback(activeUsers);
         });
     }
-
 
 };

@@ -30,7 +30,7 @@ exports.handler = function (data) {
         }
         else {
             var key = input[1];
-            var value = input[2];
+            var value = _.rest(input, 1);
 
             if (_.contains(supported, key)) {
                 config[key] = value;

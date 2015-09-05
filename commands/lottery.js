@@ -7,7 +7,7 @@ exports.handler = function (data) {
     var input = data.message.split(' ');
     var mins = 1;
 
-    if (data.from.role > 1 && config.activeDJTimeoutMins > 0) {
+    if (data.from.role > 1) {
 
         if (input.length >= 2) {
             mins = parseInt(_.last(input, 1));
@@ -17,8 +17,8 @@ exports.handler = function (data) {
         }
 
         // Sanity check!
-        if (mins < 1) {
-            mins = 1;
+        if (mins < 1 || mins > 120) {
+            mins = 5;
         }
 
         if (input[0] === 'roulette') {

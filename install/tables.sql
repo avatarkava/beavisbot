@@ -14,6 +14,24 @@ DEFAULT CHARACTER SET=latin1 COLLATE=latin1_swedish_ci
 
 ;
 
+DROP TABLE IF EXISTS `games`;
+CREATE TABLE `games` (
+`id`  int(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
+`type`  varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
+`user_id`  int(10) UNSIGNED NOT NULL ,
+`mod_user_id`  int(11) UNSIGNED NULL DEFAULT 0 ,
+`details`  text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL ,
+`result`  text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL ,
+`participants`  int(10) UNSIGNED NULL DEFAULT 0 ,
+`created_at`  datetime NOT NULL ,
+`updated_at`  datetime NOT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=latin1 COLLATE=latin1_swedish_ci
+
+;
+
 DROP TABLE IF EXISTS `karmas`;
 CREATE TABLE `karmas` (
 `id`  int(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
