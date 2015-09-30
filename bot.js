@@ -403,6 +403,14 @@ function runBot(error, auth) {
         setInterval(monitorDJList, 5000);
     }
 
+    // Handle when Plug.DJ warns about impending maintenance mode
+    bot.on(bot.MAINT_MODE_ALERT, function (data) {
+        // @TODO - Figure out how to handle this
+    });
+    bot.on(bot.MAINT_MODE, function (data) {
+        // @TODO - Figure out how to handle this
+    });
+
     bot.on('close', reconnect);
     bot.on('error', reconnect);
 
@@ -646,9 +654,9 @@ function runBot(error, auth) {
         }
         else {
             EventResponse.find({
-                where: Sequelize.and({event_type: 'mention', is_active: true}),
-                order: 'RAND()'
-            })
+                    where: Sequelize.and({event_type: 'mention', is_active: true}),
+                    order: 'RAND()'
+                })
                 .then(function (row) {
                     if (row === null) {
                         return;
@@ -663,9 +671,9 @@ function runBot(error, auth) {
 
     function chatResponse(data) {
         EventResponse.find({
-            where: Sequelize.and({event_type: 'chat', trigger: data.message, is_active: true}),
-            order: 'RAND()'
-        })
+                where: Sequelize.and({event_type: 'chat', trigger: data.message, is_active: true}),
+                order: 'RAND()'
+            })
             .then(function (row) {
                 if (row === null) {
                     return;
