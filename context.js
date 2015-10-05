@@ -1,20 +1,20 @@
 module.exports = function (options) {
-    var PlugAPI = require('plugapi');
+
+    var DubtrackAPI = require('dubtrackapi');
 
     Sequelize = require('sequelize');
     Promise = require('bluebird');
 
-    bot = new PlugAPI(options.auth);
+    bot = new DubtrackAPI(options.auth);
     config = options.config;
-    logger = PlugAPI.CreateLogger('Bot');
     fs = require('fs');
 
     var Cleverbot = require('cleverbot-node');
     cleverbot = new Cleverbot;
-    cleverbot.prepare();
+    Cleverbot.prepare();
 
     if (config.verboseLogging) {
-        logLevel = logger.info;
+        logLevel = console.log;
     }
     else {
         logLevel = false;
@@ -38,10 +38,10 @@ module.exports = function (options) {
 
     sequelize.authenticate().then(function (err) {
         if (err) {
-            logger.error('Unable to connect to the database:', err);
+            console.log('Unable to connect to the database:', err);
         }
         else {
-            logger.success('Connected to ' + config.db.dialect + ' database');
+            console.log('Connected to ' + config.db.dialect + ' database');
         }
     });
 

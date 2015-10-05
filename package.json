@@ -1,8 +1,8 @@
 {
     "name": "BeavisBot",
-    "description": "A customizable plug.dj room bot",
+    "description": "A customizable social music room bot",
     "version": "2.0.0",
-    "keywords": ["turntable.fm", "turntable", "plug.dj", "plug"],
+    "keywords": ["dubtrack", "dubtrack.fm"],
     "repository": {
         "type": "git",
         "url": "git://github.com/AvatarKava/BeavisBot.git"
@@ -17,11 +17,12 @@
     },
     "dependencies": {
         "bluebird": "*",
-        "cleverbot-node": "git://github.com/AvatarKava/cleverbot-node.git",
+        "cleverbot-node": "git://github.com/fojas/cleverbot-node.git",
+        "dubtrackapi": "git://github.com/atomjack/dubtrackapi.git",
         "moment": "*",
         "mysql": "*",
         "node-datatable": "git://github.com/jpravetz/node-datatable.git",
-        "plugapi": "git://github.com/plugCubed/plugAPI.git",
+        "phantomjs-node": "git://github.com/sgentle/phantomjs-node.git",
         "request": "*",
         "sequelize": "*",
         "sqlite3": "*",

@@ -3,7 +3,7 @@
     "superAdmin": "YourUsername",
     "roomStateFile": false,
     "auth": {
-        "email": "account-email-address@tld.com",
+        "username": "account-email-address@tld.com",
         "password": "account-password"
     },
     "db": {
