@@ -12,6 +12,6 @@ exports.handler = function (data) {
         }
 
         message += config.responses.mehReminder;
-        bot.sendChat(message);
+        bot.chat(message);
     }
 };

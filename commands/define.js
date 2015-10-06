@@ -14,9 +14,9 @@ exports.handler = function (data) {
             if (!error && response.statusCode == 200) {
                 var definition = JSON.parse(body);
                 if (definition.length == 0) {
-                    bot.sendChat('No definition for ' + input + ' found.');
+                    bot.chat('No definition for ' + input + ' found.');
                 } else {
-                    bot.sendChat("[ " + definition[0].word.toUpperCase() + " ] " + definition[0].partOfSpeech + " &mdash; " + definition[0].text);
+                    bot.chat("[ " + definition[0].word.toUpperCase() + " ] " + definition[0].partOfSpeech + " &mdash; " + definition[0].text);
                 }
             }
         });

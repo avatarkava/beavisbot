@@ -21,7 +21,7 @@ exports.handler = function (data) {
             var duration = 'PERMA';
         }
         else {
-            bot.sendChat('Usage: .[ban|unban|kick] username [PERMA|DAY|HOUR]');
+            bot.chat('Usage: .[ban|unban|kick] username [PERMA|DAY|HOUR]');
             return;
         }
 

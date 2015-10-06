@@ -12,23 +12,23 @@ exports.handler = function (data) {
         limit: 3
     }).then(function (rows) {
         if (rows.length === 0) {
-            bot.sendChat('/me No events currently scheduled.');
+            bot.chat('No events currently scheduled.');
         } else {
-            bot.sendChat('/me ' + rows.map(function (row) {
-                    var message = row.title;
-                    if (row.details !== null) {
-                        message += ' - ' + row.details;
-                    }
+            bot.chat(rows.map(function (row) {
+                var message = row.title;
+                if (row.details !== null) {
+                    message += ' - ' + row.details;
+                }
 
-                    if (row.starts_at > moment.utc().toDate()) {
-                        message += ' ' + timeUntil(row.starts_at, 'starting');
-                    }
-                    else if (row.starts_at <= moment.utc().toDate()) {
-                        message += ' ' + timeUntil(row.ends_at, 'ending');
-                    }
+                if (row.starts_at > moment.utc().toDate()) {
+                    message += ' ' + timeUntil(row.starts_at, 'starting');
+                }
+                else if (row.starts_at <= moment.utc().toDate()) {
+                    message += ' ' + timeUntil(row.ends_at, 'ending');
+                }
 
-                    return message;
-                }).join(' • '));
+                return message;
+            }).join(' • '));
         }
     });
 };

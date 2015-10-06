@@ -5,6 +5,6 @@ exports.enabled = true;
 exports.matchStart = false;
 exports.handler = function (data) {
     if (data.from.role > 1) {
-        bot.woot();
+        bot.dubup();
     }
 };

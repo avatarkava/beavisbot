@@ -3,5 +3,5 @@ exports.hidden = false;
 exports.enabled = false;
 exports.matchStart = false;
 exports.handler = function (data) {
-    bot.sendChat(config.responses.freeSpin);
+    bot.chat(config.responses.freeSpin);
 };

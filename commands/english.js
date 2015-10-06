@@ -8,7 +8,7 @@ exports.handler = function (data) {
         var params = _.rest(data.message.split(' '), 1);
 
         if (params.length < 1) {
-            bot.sendChat(config.responses.language);
+            bot.chat(config.responses.language);
         }
         else {
 
@@ -17,7 +17,7 @@ exports.handler = function (data) {
 
             // @TODO - Maybe provide language-specific messages to users
             user = _.findWhere(bot.getUsers(), {username: usernameFormatted});
-            bot.sendChat('@' + usernameFormatted + ': ' + config.responses.language);
+            bot.chat('@' + usernameFormatted + ': ' + config.responses.language);
         }
     }
 

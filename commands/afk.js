@@ -13,13 +13,13 @@ exports.handler = function (data) {
             var usernameFormatted = S(username).chompLeft('@').s;
 
             User.update({last_active: new Date(), last_seen: new Date()}, {where: {username: usernameFormatted}});
-            bot.sendChat("/me reset the idle timer for " + usernameFormatted);
+            bot.chat("reset the idle timer for " + usernameFormatted);
             logger.info('[IDLE]', data.from.username + ' reset the idle timer for ' + usernameFormatted);
 
 
         }
         else if (secondsSince(startupTimestamp) < config.activeDJTimeoutMins * 60) {
-            bot.sendChat("I've been connected less than " + config.activeDJTimeoutMins + " minutes");
+            bot.chat("I've been connected less than " + config.activeDJTimeoutMins + " minutes");
         }
         else {
             var maxIdleTime = config.activeDJTimeoutMins * 60;
@@ -42,10 +42,10 @@ exports.handler = function (data) {
             }).then(function () {
                 if (idleDJs.length > 0) {
                     var idleDJsList = idleDJs.join(' • ');
-                    bot.sendChat("Currently idle: " + idleDJsList);
+                    bot.chat("Currently idle: " + idleDJsList);
                 }
                 else {
-                    bot.sendChat("Everyone's currently active! :thumbsup:");
+                    bot.chat("Everyone's currently active! :thumbsup:");
                 }
             });
         }
