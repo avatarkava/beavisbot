@@ -17,12 +17,11 @@
     },
     "dependencies": {
         "bluebird": "*",
-        "cleverbot-node": "git://github.com/fojas/cleverbot-node.git",
+        "cleverbot-node": "git://github.com/avatarkava/cleverbot-node.git",
         "dubtrackapi": "git://github.com/atomjack/dubtrackapi.git",
         "moment": "*",
         "mysql": "*",
         "node-datatable": "git://github.com/jpravetz/node-datatable.git",
-        "phantomjs-node": "git://github.com/sgentle/phantomjs-node.git",
         "request": "*",
         "sequelize": "*",
         "sqlite3": "*",

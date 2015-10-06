@@ -11,5 +11,5 @@ exports.handler = function (data) {
     }
 
     message += config.responses.rules;
-    bot.sendChat(message);
+    bot.chat(message);
 };

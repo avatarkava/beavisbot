@@ -12,9 +12,9 @@ exports.handler = function (data) {
         limit: 3
     }).then(function (rows) {
         if (rows.length === 0) {
-            bot.sendChat('/me ' + config.responses.theme);
+            bot.chat('/me ' + config.responses.theme);
         } else {
-            bot.sendChat('/me ' + rows.map(function (row) {
+            bot.chat('/me ' + rows.map(function (row) {
                     var message = row.title;
                     if (row.details !== null) {
                         message += ' - ' + row.details;

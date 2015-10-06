@@ -10,20 +10,20 @@ exports.handler = function (data) {
     } else if (media != null) {
         songId = media.cid;
     } else {
-        bot.sendChat('No song playing.');
+        bot.chat('No song playing.');
         return;
     }
 
     //db.get('SELECT author, title FROM SONGS where id = ?', songId, function (err, row) {
     //    if (row != null) {
-    //        bot.sendChat('Song ' + songId + ' has this metadata in the DB: Artist: "'
+    //        bot.chat('Song ' + songId + ' has this metadata in the DB: Artist: "'
     //        + row['author'] + '". Title: "' + row['title'] + '". Use .updateauthor or .updatetitle to change.');
     //    } else if (songId == media.id) {
-    //        bot.sendChat('Song ' + songId + ' does not exist in the DB and will be added with'
+    //        bot.chat('Song ' + songId + ' does not exist in the DB and will be added with'
     //        + ' this metadata: Artist: "' + media.author + '". Title: "'
     //        + media.title + '".');
     //    } else {
-    //        bot.sendChat('Invalid song ID.');
+    //        bot.chat('Invalid song ID.');
     //    }
     //});
 };
