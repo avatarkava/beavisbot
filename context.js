@@ -1,11 +1,10 @@
 module.exports = function (options) {
 
-    var DubtrackAPI = require('dubtrackapi');
+    var DubAPI = require('dubapi');
 
     Sequelize = require('sequelize');
     Promise = require('bluebird');
 
-    bot = new DubtrackAPI(options.auth);
     config = options.config;
     fs = require('fs');
 
