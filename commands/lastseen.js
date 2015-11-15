@@ -17,7 +17,7 @@ exports.handler = function (data) {
         if (row === null) {
             bot.sendChat(usernameFormatted + ' was not found.');
         } else {
-            var user = _.findWhere(bot.getUsers(), {username: usernameFormatted});
+            var user = bot.getUserByName(usernameFormatted);
             if (user) {
                 bot.sendChat(usernameFormatted + ' is in the room and was last active ' + timeSince(row.last_active));
             }

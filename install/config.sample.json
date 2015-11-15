@@ -57,9 +57,8 @@
     "chatRandomnessPercentage": 5,
     "commandLiteral": ".",
     "maxSongLengthSecs": 420,
-    "prohibitMehInLine": true,
+    "prohibitDownvoteInQueue": false,
     "quietMode": false,
-    "requireWootInLine": false,
     "upvoteSongs": "ALL",
     "verboseLogging": false,
     "welcomeUsers": "ALL"

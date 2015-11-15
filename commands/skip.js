@@ -1,20 +1,21 @@
 exports.names = ['skip'];
 exports.hidden = true;
-exports.enabled = false;
+exports.enabled = true;
 exports.matchStart = false;
 exports.handler = function (data) {
-    if (data.from.role > 1 || data.from.id == bot.getDJ().id || (config.allowRDJSkip && data.from.role == 1)) {
 
-        media = bot.getMedia();
+    var dj = bot.getDJ();
 
-        logger.warning('[SKIP] ' + data.from.username + ' skipped ' + bot.getDJ().username);
+    if (data.user.id == dj.id || bot.hasPermission(bot.getUser(data.user.id), 'skip')) {
 
-        if (data.from.id !== bot.getDJ().id) {
+        var media = bot.getMedia();
+        console.log('[SKIP] ' + data.user.username + ' skipped ' + dj.username + ' - ' + media.name + ' (' + media.id + ')');
+        if (data.user.id !== dj.id) {
             var userData = {
                 type: 'skip',
-                details: 'Skipped by ' + data.from.username,
-                user_id: bot.getDJ().id,
-                mod_user_id: data.from.id
+                details: media.id + ': ' + media.name + ' (skipped by ' + data.user.username + ')',
+                user_id: dj.id,
+                mod_user_id: data.user.id
             };
             Karma.create(userData);
         }

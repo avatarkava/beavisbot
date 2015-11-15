@@ -10,7 +10,7 @@ exports.handler = function (data) {
         bot.sendChat('Need help? Ask a staff member!');
     }
     else if(message === '') {
-        bot.sendChat('Need help? Type '  + config.commandLiteral + 'callmod with the nature of your request - for example `' + config.commandLiteral + 'callmod Someone is spamming the chat!`');
+        bot.sendChat('Need help? Type '  + config.commandLiteral + 'callmod with the nature of your request - for example `' + config.commandLiteral + 'callmod Someone is spamming the chat!` (please don\'t abuse this function');
     }
     else {
 

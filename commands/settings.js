@@ -1,21 +1,20 @@
 exports.names = ['settings', 'set'];
 exports.hidden = true;
-exports.enabled = false;
+exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function (data) {
-    if (data.from.role > 1) {
+    if (bot.hasPermission(bot.getUser(data.user.id), 'skip')) {
 
         var input = data.message.split(' ');
         // Settings to support direct access to
         supported = ['activeDJTimeoutMins',
-            'allowRDJSkip',
             'maxSongLengthSecs',
             'prohibitMehInLine',
             'quietMode',
-            'requireWootInLine',
+            'upvoteSongs',
             'verboseLogging',
-            'welcomeUsers',
-            'wootSongs'];
+            'welcomeUsers'
+        ];
 
         var settings = [];
         var chatMessage = "";
@@ -34,10 +33,10 @@ exports.handler = function (data) {
 
             if (_.contains(supported, key)) {
                 config[key] = value;
-                bot.sendChat('/me @djs @staff @rdjs - set: ' + key + ' = ' + value);
+                bot.sendChat('/me @staff - set: ' + key + ' = ' + value);
             }
             else {
-                bot.sendChat('/me unknown setting: ' + key );
+                bot.sendChat('/me unknown setting: ' + key);
             }
         }
     }

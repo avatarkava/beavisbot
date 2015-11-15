@@ -22,7 +22,7 @@ new DubAPI(config.auth, function (err, bot) {
         }
 
         botUser = bot.getSelf();
-        console.log('[INIT] Data loaded for ' + JSON.stringify(botUser, null, 2));
+        console.log('[INIT] Data loaded for ' + botUser.username + '\n ' + JSON.stringify(botUser, null, 2));
 
         if (config.responses.botConnect !== "") {
             bot.sendChat(config.responses.botConnect);
@@ -49,12 +49,7 @@ new DubAPI(config.auth, function (err, bot) {
 
         if (data.user.username !== undefined && data.user.username !== null) {
             data.message = data.message.trim();
-            if (data.message == '.') {
-                bot.moderateDeleteChat(data.id);
-            }
-            else {
-                handleCommand(data);
-            }
+            handleCommand(data);
             User.update({last_active: new Date(), last_seen: new Date()}, {where: {id: data.user.id}});
         }
     });
@@ -74,11 +69,11 @@ new DubAPI(config.auth, function (err, bot) {
 
             var JSONstats = {}
 
-            //JSONstats.media = bot.getMedia();
-            //JSONstats.dj = bot.getDJ();
+            JSONstats.media = bot.getMedia();
+            JSONstats.dj = bot.getDJ();
             //JSONstats.waitlist = bot.getWaitList();
             JSONstats.users = bot.getUsers();
-            //JSONstats.staff = bot.getStaff();
+            JSONstats.staff = bot.getStaff();
 
             fs.writeFile(
                 config.roomStateFile,
@@ -115,26 +110,31 @@ new DubAPI(config.auth, function (err, bot) {
         //    });
         //}
         //
-        //if (data.media != null) {
-        //
-        //    if (data.currentDJ != null) {
-        //        console.log('********************************************************************');
-        //        console.log('[UPTIME]', 'Bot online ' + timeSince(startupTimestamp, true));
-        //        console.log('[SONG]', data.currentDJ.username + ' played: ' + data.media.author + ' - ' + data.media.title);
-        //    }
-        //
-        //    // Perform automatic song metadata correction
-        //    if (config.autoSuggestCorrections) {
-        //        correctMetadata();
-        //    }
-        //
-        //    // Auto skip for "stuck" songs
-        //    clearTimeout(skipTimer);
-        //    skipTimer = setTimeout(function () {
-        //        if (bot.getMedia() && bot.getMedia().cid == data.media.cid) {
-        //            bot.moderateForceSkip();
-        //        }
-        //    }, (data.media.duration + 5) * 1000);
+        if (data.media == null) {
+            return;
+        }
+
+        // songLength is passed in milliseconds so do some conversion here
+        data.media.songLengthSeconds = data.media.songLength / 1000;
+
+        console.log('********************************************************************');
+        console.log('[UPTIME]', 'Bot online ' + timeSince(startupTimestamp, true));
+        console.log('[SONG]', data.user.username + ' played: ' + data.media.name + ' (' + data.media.id + ')');
+
+        // Perform automatic song metadata correction
+        if (config.autoSuggestCorrections) {
+            correctMetadata();
+        }
+
+        // Auto skip for "stuck" songs
+        clearTimeout(skipTimer);
+        skipTimer = setTimeout(function () {
+            if (bot.getMedia() && bot.getMedia().id == data.media.id) {
+                bot.sendChat('Skipping ' + data.media.name + ' because it appears to be stuck...');
+                bot.moderateSkip();
+            }
+        }, (data.media.songLength + 10000));
+
         //
         //    // Write current song data to DB
         //    var songData = {
@@ -153,28 +153,30 @@ new DubAPI(config.auth, function (err, bot) {
         //        song.updateAttributes(songData);
         //    });
         //
-        if (config.wootSongs == 'ALL') {
+        if (config.upvoteSongs == 'ALL') {
             bot.updub();
         }
 
-        //SongResponse.find({
-        //    where: Sequelize.or(
-        //        Sequelize.and({media_type: 'author', trigger: {like: data.media.author}, is_active: true}),
-        //        Sequelize.and({media_type: 'title', trigger: {like: data.media.title}, is_active: true})
-        //    )
-        //}).then(function (row) {
-        //    if (row !== null) {
-        //        if (row.response != '') {
-        //            bot.sendChat(row.response);
-        //        }
-        //        if (row.rate === 1) {
-        //            bot.woot();
-        //        }
-        //        else if (row.rate === -1) {
-        //            bot.meh();
-        //        }
-        //    }
-        //});
+        SongResponse.find({
+            where: Sequelize.or(
+                // @TODO - No support in Dubtrack for author/title yet
+                Sequelize.and({media_type: 'author', trigger: {like: data.media.name}, is_active: true}),
+                Sequelize.and({media_type: 'title', trigger: {like: data.media.name}, is_active: true})
+            )
+        }).then(function (row) {
+            if (row !== null) {
+                if (row.response != '') {
+                    bot.sendChat(row.response);
+                }
+                if (row.rate === 1) {
+                    bot.updub();
+                }
+                else if (row.rate === -1) {
+                    bot.downdub();
+                }
+            }
+        });
+
         //
         //    var maxIdleTime = config.activeDJTimeoutMins * 60;
         //    var idleDJs = [];
@@ -206,7 +208,7 @@ new DubAPI(config.auth, function (err, bot) {
         //                            type: 'remove',
         //                            details: 'Removed from position ' + position + ': AFK for ' + timeSince(dbUser.last_active, true),
         //                            user_id: dj.id,
-        //                            mod_user_id: bot.getUser().id
+        //                            mod_user_id: botUser.id
         //                        };
         //                        Karma.create(userData);
         //                        User.update({waitlist_position: -1}, {where: {id: dj.id}});
@@ -216,7 +218,7 @@ new DubAPI(config.auth, function (err, bot) {
         //                            type: 'warn',
         //                            details: 'Warned in position ' + position + ': AFK for ' + timeSince(dbUser.last_active, true),
         //                            user_id: dj.id,
-        //                            mod_user_id: bot.getUser().id
+        //                            mod_user_id: botUser.id
         //                        };
         //                        Karma.create(userData);
         //                        idleDJs.push(dbUser.username);
@@ -244,54 +246,40 @@ new DubAPI(config.auth, function (err, bot) {
         //            }
         //        }).then(function (row) {
         //            if (row !== null) {
-        //                console.log('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (cid: ' + data.media.cid + ')');
-        //                bot.sendChat('Sorry @' + data.currentDJ.username + ', this video has been blacklisted in our song database.');
+        //                console.log('[SKIP] Skipped ' + data.user.username + ' spinning a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (cid: ' + data.media.cid + ')');
+        //                bot.sendChat('Sorry @' + data.user.username + ', this video has been blacklisted in our song database.');
         //                bot.moderateForceSkip();
         //                var userData = {
         //                    type: 'skip',
         //                    details: 'Skipped for playing a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (cid: ' + data.media.cid + ')',
-        //                    user_id: data.currentDJ.id,
-        //                    mod_user_id: bot.getUser().id
+        //                    user_id: data.user.id,
+        //                    mod_user_id: botUser.id
         //                };
         //                Karma.create(userData);
         //            }
-        //        });
+        //        });okay
         //
-        //        if (config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
-        //            console.log('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a song of ' + data.media.duration + ' seconds');
-        //            var maxLengthMins = Math.floor(config.maxSongLengthSecs / 60);
-        //            var maxLengthSecs = config.maxSongLengthSecs % 60;
-        //            if (maxLengthSecs < 10) {
-        //                maxLengthSecs = "0" + maxLengthSecs;
-        //            }
-        //            bot.sendChat('Sorry @' + data.currentDJ.username + ', this song is over our maximum room length of ' + maxLengthMins + ':' + maxLengthSecs + '.');
-        //            bot.moderateForceSkip();
-        //            var userData = {
-        //                type: 'skip',
-        //                details: 'Skipped for playing a song of ' + data.media.duration + ' (room configured for max of ' + config.maxSongLengthSecs + 's)',
-        //                user_id: data.currentDJ.id,
-        //                mod_user_id: bot.getUser().id
-        //            };
-        //            Karma.create(userData);
-        //
-        //        }
+
         //    });
-        //
-        //}
 
-    });
+        if (config.maxSongLengthSecs > 0 && data.media.songLengthSeconds > config.maxSongLengthSecs) {
+            console.log('[SKIP] Skipped ' + data.user.username + ' spinning a song of ' + data.media.songLengthSeconds + ' seconds');
+            var maxLengthMins = Math.floor(config.maxSongLengthSecs / 60);
+            var maxLengthSecs = config.maxSongLengthSecs % 60;
+            if (maxLengthSecs < 10) {
+                maxLengthSecs = "0" + maxLengthSecs;
+            }
+            bot.sendChat('Sorry @' + data.user.username + ', this song is over our maximum room length of ' + maxLengthMins + ':' + maxLengthSecs + '.');
+            bot.moderateSkip();
+            var userData = {
+                type: 'skip',
+                details: 'Skipped for playing a song of ' + data.media.songLengthSeconds + ' (room configured for max of ' + config.maxSongLengthSecs + 's)',
+                user_id: data.user.id,
+                mod_user_id: botUser.id
+            };
+            Karma.create(userData);
+        }
 
-    bot.on('error', function (msg, trace) {
-        console.log("Got an error from the virtual browser: ", msg, trace);
-    });
-    bot.on('room_playlist-queue-remove-user', function (data) {
-        console.log('[EVENT] room_playlist-queue-remove-user' + JSON.stringify(data, null, 2));
-    });
-    bot.on('room_playlist-queue-reorder', function (data) {
-        console.log('[EVENT] room_playlist-queue-reorder' + JSON.stringify(data, null, 2));
-    });
-    bot.on('disconnected', function (data) {
-        bot.reconnect();
     });
 
     bot.on('user-join', function (data) {
@@ -315,6 +303,9 @@ new DubAPI(config.auth, function (err, bot) {
                 }
                 else if (dbUser == null) {
                     message = config.responses.welcome.newUser.replace('{username}', data.user.username);
+                    if (!roomHasActiveMods) {
+                        message += ' Type .help if you need it!';
+                    }
                     newUser = true;
                     console.log('[JOIN]', data.user.username + ' is a first-time visitor to the room!');
                 }
@@ -340,10 +331,6 @@ new DubAPI(config.auth, function (err, bot) {
                     }
                 });
 
-                if (!roomHasActiveMods) {
-                    message += ' Type .help if you need it!';
-                }
-
                 if (message && (config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
                     if (newUser) {
                         setTimeout(function () {
@@ -367,7 +354,7 @@ new DubAPI(config.auth, function (err, bot) {
 //                                type: 'restored',
 //                                details: 'Restored to position ' + dbUser.waitlist_position + ' (disconnected for ' + timeSince(dbUser.last_seen, true) + ')',
 //                                user_id: data.id,
-//                                mod_user_id: bot.getUser().id
+//                                mod_user_id: botUser.id
 //                            };
 //                            Karma.create(userData);
 //
@@ -394,13 +381,11 @@ new DubAPI(config.auth, function (err, bot) {
         }
     });
 
-//bot.on('grab', function (data) {
-//    var user = _.findWhere(bot.getUsers(), {id: data});
-//    if (user) {
-//        console.log('[GRAB]', user.username + ' grabbed this song');
-//    }
-//});
-//
+    // @TODO - Support for grab/add to playlist event emission doesn't exist in dubtrack yet
+    //bot.on('grab', function (data) {
+    //  console.log('[GRAB]', data.user.username + ' grabbed this song');
+    //});
+    //
     bot.on('room_playlist-dub', function (data) {
 
         if (config.verboseLogging) {
@@ -409,27 +394,44 @@ new DubAPI(config.auth, function (err, bot) {
         else {
             console.log('[VOTE] ' + data.user.username + ' voted ' + data.dubtype);
         }
-        //var user = _.findWhere(bot.getUsers(), {id: data.i});
-        //
-        //if (config.prohibitMehInLine && data.v === -1 && bot.getWaitListPosition(data.i) > 0) {
-        //    bot.sendChat('@' + user.username + ', voting MEH while in line is prohibited. Please woot or leave the wait list.');
-        //    setTimeout(function () {
-        //        removeIfMehing(user.username);
-        //    }, 10 * 1000);
-        //}
+
+        if (config.prohibitDownvoteInQueue && data.dubtype === 'downdub' && data.user.songsInQueue > 0) {
+            bot.sendChat('@' + data.user.username + ', voting down while in queue is prohibited. Please vote up or leave the queue.');
+            setTimeout(function () {
+                removeIfDownvoting(data.user.id);
+            }, 10 * 1000);
+        }
+    });
+
+    bot.on('error', function (msg, trace) {
+        console.log("Got an error from the virtual browser: ", msg, trace);
+    });
+    bot.on('disconnected', function (data) {
+        bot.reconnect();
+    });
+
+    /**
+     * Unhandled events
+     */
+    bot.on('room_playlist-queue-remove-user', function (data) {
+        console.log('[EVENT] room_playlist-queue-remove-user' + JSON.stringify(data, null, 2));
+    });
+    bot.on('room_playlist-queue-reorder', function (data) {
+        console.log('[EVENT] room_playlist-queue-reorder' + JSON.stringify(data, null, 2));
     });
 
 
-//bot.on('djListUpdate', function (data) {
-//    if (config.verboseLogging) {
-//        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
-//    }
-//    saveWaitList(false);
-//});
-//
-//if (config.requireWootInLine || config.activeDJTimeoutMins > 0) {
-//    setInterval(monitorDJList, 5000);
-//}
+    // @TODO - Currently no support for monitoring changes to the queue built in
+    //bot.on('djListUpdate', function (data) {
+    //    if (config.verboseLogging) {
+    //        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+    //    }
+    //    saveWaitList(false);
+    //});
+    //
+    //if (config.activeDJTimeoutMins > 0) {
+    //    setInterval(monitorDJList, 5000);
+    //}
 
 });
 
@@ -505,23 +507,25 @@ function monitorDJList() {
 
 }
 
-function removeIfMehing(mehUsername) {
-    var mehWaitList = bot.getWaitList();
-    var mehUser = _.findWhere(mehWaitList, {username: mehUsername});
-    if (mehUser !== undefined && mehUser.vote === -1) {
-        console.log('[REMOVE] Removed ' + mehUser.username + ' from wait list for mehing');
-        var position = bot.getWaitListPosition(mehUser.id);
-        bot.moderateRemoveDJ(mehUser.id);
-        bot.sendChat('@' + mehUser.username + ', voting MEH/Chato/:thumbsdown: while in line is prohibited. Check .rules.');
-        var userData = {
-            type: 'remove',
-            details: 'Removed from position ' + position + ' for mehing',
-            user_id: mehUser.id,
-            mod_user_id: botUser.id
-        };
-        Karma.create(userData);
-        User.update({waitlist_position: -1}, {where: {id: mehUser.id}});
-    }
+function removeIfDownvoting(mehUsername) {
+    // @TODO fix this so it actually works
+
+    //var mehWaitList = bot.getWaitList();
+    //var mehUser = _.findWhere(mehWaitList, {username: mehUsername});
+    //if (mehUser !== undefined && mehUser.vote === -1) {
+    //    console.log('[REMOVE] Removed ' + mehUser.username + ' from wait list for mehing');
+    //    var position = bot.getWaitListPosition(mehUser.id);
+    //    bot.moderateRemoveDJ(mehUser.id);
+    //    bot.sendChat('@' + mehUser.username + ', voting MEH/Chato/:thumbsdown: while in line is prohibited. Check .rules.');
+    //    var userData = {
+    //        type: 'remove',
+    //        details: 'Removed from position ' + position + ' for mehing',
+    //        user_id: mehUser.id,
+    //        mod_user_id: botUser.id
+    //    };
+    //    Karma.create(userData);
+    //    User.update({waitlist_position: -1}, {where: {id: mehUser.id}});
+    //}
 }
 
 function initializeModules(auth, bot) {
@@ -547,6 +551,8 @@ function initializeModules(auth, bot) {
 }
 
 function handleCommand(data) {
+
+    if (data.user.username !== 'avatarkava') return;
 
     // unescape message
     data.message = S(data.message).unescapeHTML().s;
