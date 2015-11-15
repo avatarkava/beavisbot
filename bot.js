@@ -47,7 +47,7 @@ new DubAPI(config.auth, function (err, bot) {
             console.log('[CHAT]', data.user.username + ': ' + data.message);
         }
 
-        if (data.user.username !== undefined && data.user.username !== null && data.user.username == 'avatarkava') {
+        if (data.user.username !== undefined && data.user.username !== null) {
             data.message = data.message.trim();
             if (data.msg == '.') {
                 bot.moderateDeleteChat(data.id);
@@ -290,8 +290,8 @@ new DubAPI(config.auth, function (err, bot) {
     bot.on('room_playlist-queue-reorder', function (data) {
         console.log('[EVENT] room_playlist-queue-reorder' + JSON.stringify(data, null, 2));
     });
-    bot.on('disconnected', function(data) {
-       bot.reconnect();
+    bot.on('disconnected', function (data) {
+        bot.reconnect();
     });
 
     bot.on('user-join', function (data) {
