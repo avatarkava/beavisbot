@@ -12,9 +12,9 @@ exports.handler = function (data) {
         limit: 3
     }).then(function (rows) {
         if (rows.length === 0) {
-            bot.chat('No events currently scheduled.');
+            bot.sendChat('/me No events currently scheduled.');
         } else {
-            bot.chat(rows.map(function (row) {
+            bot.sendChat('/me ' + rows.map(function (row) {
                 var message = row.title;
                 if (row.details !== null) {
                     message += ' - ' + row.details;

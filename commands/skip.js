@@ -1,6 +1,6 @@
 exports.names = ['skip'];
 exports.hidden = true;
-exports.enabled = true;
+exports.enabled = false;
 exports.matchStart = false;
 exports.handler = function (data) {
     if (data.from.role > 1 || data.from.id == bot.getDJ().id || (config.allowRDJSkip && data.from.role == 1)) {
@@ -19,8 +19,7 @@ exports.handler = function (data) {
             Karma.create(userData);
         }
 
-        bot.moderateForceSkip();
-        //bot.moderateDeleteChat(data.id);
+        bot.moderateSkip();
     }
 };
 

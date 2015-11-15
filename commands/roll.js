@@ -14,10 +14,10 @@ exports.handler = function (data) {
 
     if (maxValue > 0 && maxValue < 99999) {
         var roll = _.random(1, maxValue);
-        bot.chat(data.from.username + ', you rolled a ' + roll + '!');
+        bot.sendChat('@' + data.user.username + ', you rolled a ' + roll + '!');
     }
     else {
-        bot.chat('http://www.clownshoes.net/clownshoes.gif');
+        bot.sendChat('http://www.clownshoes.net/clownshoes.gif');
     }
 
 };

@@ -50,10 +50,10 @@ exports.handler = function (data) {
         //db.run('INSERT OR REPLACE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)', [bot.getMedia().id, bot.getMedia().title, bot.getMedia().format, bot.getMedia().author, bot.getMedia().cid, bot.getMedia().duration],
         //    function (error) {
         //        if (error) {
-        //            bot.chat('An error occurred.');
+        //            bot.sendChat('An error occurred.');
         //            logger.error('Error while updating song ' + bot.getMedia().id, error);
         //        } else {
-        //            bot.chat('Author updated.')
+        //            bot.sendChat('Author updated.')
         //        }
         //    });
     } else if (input[1] == 'title') {
@@ -63,10 +63,10 @@ exports.handler = function (data) {
         //db.run('INSERT OR REPLACE INTO SONGS VALUES (?, ?, ?, ?, ?, ?)', [bot.getMedia().id, bot.getMedia().title, bot.getMedia().format, bot.getMedia().author, bot.getMedia().cid, bot.getMedia().duration],
         //    function (error) {
         //        if (error) {
-        //            bot.chat('An error occurred.');
+        //            bot.sendChat('An error occurred.');
         //            logger.error('Error while updating song ' + bot.getMedia().id, error);
         //        } else {
-        //            bot.chat('Title updated.')
+        //            bot.sendChat('Title updated.')
         //        }
         //    });
     } else if (input[1] == 'check') {
@@ -78,7 +78,7 @@ exports.handler = function (data) {
         //    function (error, row) {
         //        logger.info('db response: ', row);
         //        if (row != null) {
-        //            bot.chat('Database values: Artist: "' + row['author'] + '". Title: "' + row['title'] + '". Use .fixsong check if this looks wrong.');
+        //            bot.sendChat('Database values: Artist: "' + row['author'] + '". Title: "' + row['title'] + '". Use .fixsong check if this looks wrong.');
         //        } else {
         //            // check echonest
         //            logger.info('checking echonest');

@@ -1,6 +1,6 @@
 exports.names = ['remove', 'rm', 'rmafk', 'rmidle'];
 exports.hidden = true;
-exports.enabled = true;
+exports.enabled = false;
 exports.matchStart = true;
 exports.handler = function (data) {
     if (data.from.role > 1) {
@@ -9,7 +9,7 @@ exports.handler = function (data) {
         var username = _.rest(input, 1).join(' ').trim();
         var usernameFormatted = S(username).chompLeft('@').s;
         if (username) {
-            user = _.findWhere(bot.getUsers(), {username: usernameFormatted});
+            var user = _.findWhere(bot.getUsers(), {username: usernameFormatted});
             var position = bot.getWaitListPosition(user.id)
             if (user && position !== -1) {
                 bot.moderateRemoveDJ(user.id);

@@ -7,44 +7,32 @@ var roomHasActiveMods = false;
 var skipTimer;
 var botUser = {};
 
-initializeModules(config.auth);
-
 new DubAPI(config.auth, function (err, bot) {
+
+    initializeModules(config.auth, bot);
+
     bot.connect(config.roomName);
 
     bot.on('connected', function (data) {
         console.log('Connected: ', data);
-    });
-
-    bot.on('ready', function (data) {
 
         console.log('[EVENT] Ready - joined room: ' + config.roomName);
         if (config.verboseLogging) {
             console.log('[INIT] Room data: ' + JSON.stringify(data, null, 2));
         }
 
-        bot.getUser(null, function (user) {
-            botUser = user;
-            console.log('[INIT] Data loaded for ' + botUser.username);
-            // data contains the currentDJ (by name) and currentTrack (artist and track), and the list of users in the room (does not update on join/depart)
-        });
+        botUser = bot.getSelf();
+        console.log('[INIT] Data loaded for ' + JSON.stringify(botUser, null, 2));
 
         if (config.responses.botConnect !== "") {
-            bot.chat(config.responses.botConnect);
-        }
-
-        if (config.verboseLogging) {
-            bot.getEvents(function (events) {
-                console.log("These are the Dubtrack events I respond to: ", events);
-
-            });
+            bot.sendChat(config.responses.botConnect);
         }
 
         //    bot.getUsers().forEach(function (user) {
         //        updateDbUser(user);
         //    });
 
-        if (config.wootSongs == 'ALL') {
+        if (config.upvoteSongs == 'ALL') {
             bot.updub();
         }
 
@@ -59,15 +47,14 @@ new DubAPI(config.auth, function (err, bot) {
             console.log('[CHAT]', data.user.username + ': ' + data.message);
         }
 
-        if (data.user.username !== undefined && data.user.username !== null) {
+        if (data.user.username !== undefined && data.user.username !== null && data.user.username == 'avatarkava') {
             data.message = data.message.trim();
-            //if (data.msg == '.') {
-            //    bot.moderateDeleteChat(data.id);
-            //}
-            //else {
-            //    handleCommand(data);
-            //}
-            handleCommand(data);
+            if (data.msg == '.') {
+                bot.moderateDeleteChat(data.id);
+            }
+            else {
+                handleCommand(data);
+            }
             //User.update({last_active: new Date(), last_seen: new Date()}, {where: {id: data.from.id}});
         }
     });
@@ -131,9 +118,9 @@ new DubAPI(config.auth, function (err, bot) {
         //if (data.media != null) {
         //
         //    if (data.currentDJ != null) {
-        //        logger.success('********************************************************************');
-        //        logger.success('[UPTIME]', 'Bot online ' + timeSince(startupTimestamp, true));
-        //        logger.success('[SONG]', data.currentDJ.username + ' played: ' + data.media.author + ' - ' + data.media.title);
+        //        console.log('********************************************************************');
+        //        console.log('[UPTIME]', 'Bot online ' + timeSince(startupTimestamp, true));
+        //        console.log('[SONG]', data.currentDJ.username + ' played: ' + data.media.author + ' - ' + data.media.title);
         //    }
         //
         //    // Perform automatic song metadata correction
@@ -178,7 +165,7 @@ new DubAPI(config.auth, function (err, bot) {
         //}).then(function (row) {
         //    if (row !== null) {
         //        if (row.response != '') {
-        //            bot.chat(row.response);
+        //            bot.sendChat(row.response);
         //        }
         //        if (row.rate === 1) {
         //            bot.woot();
@@ -210,11 +197,11 @@ new DubAPI(config.auth, function (err, bot) {
         //            var position = bot.getWaitListPosition(dj.id);
         //            if (dbUser !== null) {
         //                if (secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
-        //                    logger.warning('[WL-IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
+        //                    console.log('[WL-IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
         //                    if (dbUser.Karmas.length > 0) {
-        //                        logger.warning('[WL-IDLE]', dbUser.username + ' was last warned ' + timeSince(dbUser.Karmas[0].created_at));
+        //                        console.log('[WL-IDLE]', dbUser.username + ' was last warned ' + timeSince(dbUser.Karmas[0].created_at));
         //                        bot.moderateRemoveDJ(dj.id);
-        //                        bot.chat('@' + dbUser.username + ' ' + config.responses.activeDJRemoveMessage);
+        //                        bot.sendChat('@' + dbUser.username + ' ' + config.responses.activeDJRemoveMessage);
         //                        var userData = {
         //                            type: 'remove',
         //                            details: 'Removed from position ' + position + ': AFK for ' + timeSince(dbUser.last_active, true),
@@ -239,14 +226,14 @@ new DubAPI(config.auth, function (err, bot) {
         //                    if (dj.role > 1) {
         //                        roomHasActiveMods = true;
         //                    }
-        //                    logger.info('[WL-ACTIVE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
+        //                    console.log('[WL-ACTIVE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
         //                }
         //            }
         //        });
         //    }).then(function () {
         //        if (idleDJs.length > 0) {
         //            var idleDJsList = idleDJs.join(' @');
-        //            bot.chat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
+        //            bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
         //        }
         //
         //        Song.find({
@@ -257,8 +244,8 @@ new DubAPI(config.auth, function (err, bot) {
         //            }
         //        }).then(function (row) {
         //            if (row !== null) {
-        //                logger.warning('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (cid: ' + data.media.cid + ')');
-        //                bot.chat('Sorry @' + data.currentDJ.username + ', this video has been blacklisted in our song database.');
+        //                console.log('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (cid: ' + data.media.cid + ')');
+        //                bot.sendChat('Sorry @' + data.currentDJ.username + ', this video has been blacklisted in our song database.');
         //                bot.moderateForceSkip();
         //                var userData = {
         //                    type: 'skip',
@@ -271,13 +258,13 @@ new DubAPI(config.auth, function (err, bot) {
         //        });
         //
         //        if (config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
-        //            logger.warning('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a song of ' + data.media.duration + ' seconds');
+        //            console.log('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a song of ' + data.media.duration + ' seconds');
         //            var maxLengthMins = Math.floor(config.maxSongLengthSecs / 60);
         //            var maxLengthSecs = config.maxSongLengthSecs % 60;
         //            if (maxLengthSecs < 10) {
         //                maxLengthSecs = "0" + maxLengthSecs;
         //            }
-        //            bot.chat('Sorry @' + data.currentDJ.username + ', this song is over our maximum room length of ' + maxLengthMins + ':' + maxLengthSecs + '.');
+        //            bot.sendChat('Sorry @' + data.currentDJ.username + ', this song is over our maximum room length of ' + maxLengthMins + ':' + maxLengthSecs + '.');
         //            bot.moderateForceSkip();
         //            var userData = {
         //                type: 'skip',
@@ -303,6 +290,9 @@ new DubAPI(config.auth, function (err, bot) {
     bot.on('room_playlist-queue-reorder', function (data) {
         console.log('[EVENT] room_playlist-queue-reorder' + JSON.stringify(data, null, 2));
     });
+    bot.on('disconnected', function(data) {
+       bot.reconnect();
+    });
 
     bot.on('user-join', function (data) {
 
@@ -317,55 +307,55 @@ new DubAPI(config.auth, function (err, bot) {
         var message = "";
 
         if (data.username !== botUser.username) {
-//            User.findById(data.id).then(function (dbUser) {
-//
-//                if (data.username == config.superAdmin && config.responses.welcome.superAdmin != null) {
-//                    message = config.responses.welcome.superAdmin.replace('{username}', data.username);
-//                    logger.info('[JOIN]', data.username + ' last seen ' + timeSince(dbUser.last_seen));
-//                }
-//                else if (dbUser == null) {
-//                    message = config.responses.welcome.newUser.replace('{username}', data.username);
-//                    newUser = true;
-//                    logger.info('[JOIN]', data.username + ' is a first-time visitor to the room!');
-//                }
-//                else {
-//                    message = config.responses.welcome.oldUser.replace('{username}', data.username);
-//                    logger.info('[JOIN]', data.username + ' last seen ' + timeSince(dbUser.last_seen));
-//                }
-//
-//                // Greet with the theme if it's not the default
-//                RoomEvent.find({
-//                    where: {
-//                        starts_at: {lte: new Date()},
-//                        ends_at: {gte: new Date()}
-//                    }
-//                }).then(function (row) {
-//                    if (row !== null) {
-//                        if (row.type == 'event') {
-//                            message += ' :star: SPECIAL EVENT :star: ' + row.title + ' (.event for details)';
-//                        }
-//                        else if (row.type == 'theme') {
-//                            message += ' Theme: ' + row.title + ' (.theme for details)';
-//                        }
-//                    }
-//                });
-//
-//                if (!roomHasActiveMods) {
-//                    message += ' Type .help if you need it!';
-//                }
+            User.findById(data.id).then(function (dbUser) {
 
-            if (message && (config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
-                if (newUser) {
-                    setTimeout(function () {
-                        bot.chat(message)
-                    }, 5000);
+                if (data.username == config.superAdmin && config.responses.welcome.superAdmin != null) {
+                    message = config.responses.welcome.superAdmin.replace('{username}', data.username);
+                    console.log('[JOIN]', data.username + ' last seen ' + timeSince(dbUser.last_seen));
                 }
-                else if (config.welcomeUsers == "ALL" && secondsSince(dbUser.last_active) >= 900 && secondsSince(dbUser.last_seen) >= 900) {
-                    setTimeout(function () {
-                        bot.chat(message)
-                    }, 5000);
+                else if (dbUser == null) {
+                    message = config.responses.welcome.newUser.replace('{username}', data.username);
+                    newUser = true;
+                    console.log('[JOIN]', data.username + ' is a first-time visitor to the room!');
                 }
-            }
+                else {
+                    message = config.responses.welcome.oldUser.replace('{username}', data.username);
+                    console.log('[JOIN]', data.username + ' last seen ' + timeSince(dbUser.last_seen));
+                }
+
+                // Greet with the theme if it's not the default
+                RoomEvent.find({
+                    where: {
+                        starts_at: {lte: new Date()},
+                        ends_at: {gte: new Date()}
+                    }
+                }).then(function (row) {
+                    if (row !== null) {
+                        if (row.type == 'event') {
+                            message += ' :star: SPECIAL EVENT :star: ' + row.title + ' (.event for details)';
+                        }
+                        else if (row.type == 'theme') {
+                            message += ' Theme: ' + row.title + ' (.theme for details)';
+                        }
+                    }
+                });
+
+                if (!roomHasActiveMods) {
+                    message += ' Type .help if you need it!';
+                }
+
+                if (message && (config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
+                    if (newUser) {
+                        setTimeout(function () {
+                            bot.sendChat(message)
+                        }, 5000);
+                    }
+                    else if (config.welcomeUsers == "ALL" && secondsSince(dbUser.last_active) >= 900 && secondsSince(dbUser.last_seen) >= 900) {
+                        setTimeout(function () {
+                            bot.sendChat(message)
+                        }, 5000);
+                    }
+                }
 
 //                // Restore spot in line if user has been gone < 15 mins
 //                var position = bot.getWaitListPosition(data.id);
@@ -382,7 +372,7 @@ new DubAPI(config.auth, function (err, bot) {
 //                            Karma.create(userData);
 //
 //                            setTimeout(function () {
-//                                bot.chat('/me put @' + data.username + ' back in line :thumbsup:')
+//                                bot.sendChat('/me put @' + data.username + ' back in line :thumbsup:')
 //                            }, 5000);
 //                        }
 //
@@ -392,6 +382,7 @@ new DubAPI(config.auth, function (err, bot) {
 //            });
 //            updateDbUser(bot.getUser(data.id));
 //        }
+            });
         }
     });
 
@@ -400,16 +391,16 @@ new DubAPI(config.auth, function (err, bot) {
         // User.update({last_seen: new Date()}, {where: {id: data.id}});
     });
 
-//bot.on('userUpdate', function (data) {
-//    if (config.verboseLogging) {
-//        logger.info('[EVENT] USER_UPDATE', data);
-//    }
-//});
+    bot.on('user-update', function (data) {
+        if (config.verboseLogging) {
+            console.log('[EVENT] USER_UPDATE', data);
+        }
+    });
 
 //bot.on('grab', function (data) {
 //    var user = _.findWhere(bot.getUsers(), {id: data});
 //    if (user) {
-//        logger.info('[GRAB]', user.username + ' grabbed this song');
+//        console.log('[GRAB]', user.username + ' grabbed this song');
 //    }
 //});
 //
@@ -424,7 +415,7 @@ new DubAPI(config.auth, function (err, bot) {
         //var user = _.findWhere(bot.getUsers(), {id: data.i});
         //
         //if (config.prohibitMehInLine && data.v === -1 && bot.getWaitListPosition(data.i) > 0) {
-        //    bot.chat('@' + user.username + ', voting MEH while in line is prohibited. Please woot or leave the wait list.');
+        //    bot.sendChat('@' + user.username + ', voting MEH while in line is prohibited. Please woot or leave the wait list.');
         //    setTimeout(function () {
         //        removeIfMehing(user.username);
         //    }, 10 * 1000);
@@ -434,7 +425,7 @@ new DubAPI(config.auth, function (err, bot) {
 
 //bot.on('djListUpdate', function (data) {
 //    if (config.verboseLogging) {
-//        logger.success('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+//        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
 //    }
 //    saveWaitList(false);
 //});
@@ -522,7 +513,7 @@ function removeIfMehing(mehUsername) {
         console.log('[REMOVE] Removed ' + mehUser.username + ' from wait list for mehing');
         var position = bot.getWaitListPosition(mehUser.id);
         bot.moderateRemoveDJ(mehUser.id);
-        bot.chat('@' + mehUser.username + ', voting MEH/Chato/:thumbsdown: while in line is prohibited. Check .rules.');
+        bot.sendChat('@' + mehUser.username + ', voting MEH/Chato/:thumbsdown: while in line is prohibited. Check .rules.');
         var userData = {
             type: 'remove',
             details: 'Removed from position ' + position + ' for mehing',
@@ -534,9 +525,9 @@ function removeIfMehing(mehUsername) {
     }
 }
 
-function initializeModules(auth) {
+function initializeModules(auth, bot) {
     // load context
-    require(path.resolve(__dirname, 'context.js'))({auth: auth, config: config});
+    require(path.resolve(__dirname, 'context.js'))({auth: auth, config: config, bot: bot});
 
     // Load commands
     try {
@@ -635,9 +626,9 @@ function suggestNewSongMetadata(valueToCorrect) {
     media = bot.getMedia();
     // @FIXME - don't use the room. construct.
     //request('http://developer.echonest.com/api/v4/song/search?api_key=' + config.apiKeys.echoNest + '&format=json&results=1&combined=' + S(valueToCorrect).escapeHTML().stripPunctuation().s, function (error, response, body) {
-    //    logger.info('echonest body', body);
+    //    console.log('echonest body', body);
     //    if (error) {
-    //        bot.chat('An error occurred while connecting to EchoNest.');
+    //        bot.sendChat('An error occurred while connecting to EchoNest.');
     //        bot.error('EchoNest error', error);
     //    } else {
     //        response = JSON.parse(body).response;
@@ -648,10 +639,10 @@ function suggestNewSongMetadata(valueToCorrect) {
     //        };
     //
     //        // log
-    //        logger.info('[EchoNest] Original: "' + media.author + '" - "' + media.title + '". Suggestion: "' + room.media.suggested.author + '" - "' + room.media.suggested.title);
+    //        console.log('[EchoNest] Original: "' + media.author + '" - "' + media.title + '". Suggestion: "' + room.media.suggested.author + '" - "' + room.media.suggested.title);
     //
     //        if (media.author != room.media.suggested.author || media.title != room.media.suggested.title) {
-    //            bot.chat('Hey, the metadata for this song looks wrong! Suggested Artist: "' + room.media.suggested.author + '". Title: "' + room.media.suggested.title + '". Type ".fixsong yes" to use the suggested tags.');
+    //            bot.sendChat('Hey, the metadata for this song looks wrong! Suggested Artist: "' + room.media.suggested.author + '". Title: "' + room.media.suggested.title + '". Type ".fixsong yes" to use the suggested tags.');
     //        }
     //    }
     //});
@@ -660,7 +651,7 @@ function suggestNewSongMetadata(valueToCorrect) {
 function mentionResponse(data) {
     // How much ADHD does the bot have?
     if (!config.chatRandomnessPercentage) {
-        chatRandomnessPercentage = 100;
+        chatRandomnessPercentage = 5;
     } else {
         chatRandomnessPercentage = config.chatRandomnessPercentage;
     }
@@ -669,9 +660,9 @@ function mentionResponse(data) {
         cleverMessage = data.message.replace('@' + botUser.username, '').trim();
         cleverbot.write(cleverMessage, function (response) {
             if (config.verboseLogging) {
-                logger.info('[CLEVERBOT]', JSON.stringify(response, null, 2));
+                console.log('[CLEVERBOT]', JSON.stringify(response, null, 2));
             }
-            bot.chat('@' + data.user.username + ': ' + response.message);
+            bot.sendChat(response.message + ' @' + data.user.username);
 
         });
     }
@@ -685,7 +676,7 @@ function mentionResponse(data) {
                     return;
                 }
                 else {
-                    bot.chat(row.response.replace('{sender}', data.user.username));
+                    bot.sendChat(row.response.replace('{sender}', data.user.username));
                 }
 
             });
@@ -702,7 +693,7 @@ function chatResponse(data) {
                 return;
             }
             else {
-                bot.chat(row.response.replace('{sender}', data.user.username));
+                bot.sendChat(row.response.replace('{sender}', data.user.username));
             }
 
         });

@@ -1,7 +1,7 @@
-exports.names = ['woot'];
-exports.hidden = false;
+exports.names = ['downvote'];
+exports.hidden = true;
 exports.enabled = false;
-exports.matchStart = true;
+exports.matchStart = false;
 exports.handler = function (data) {
     if (data.from.role > 1) {
 
@@ -11,7 +11,7 @@ exports.handler = function (data) {
             message = input + ' ';
         }
 
-        message += config.responses.wootReminder;
-        bot.chat(message);
+        message += config.responses.downvoteReminder;
+        bot.sendChat(message);
     }
 };

@@ -1,7 +1,7 @@
-// Instructs the bot to meh a song. Available to bouncers and higher.
-exports.names = ['m'];
+// Instructs the bot to downvote a song. Available to VIPs and higher.
+exports.names = ['down'];
 exports.hidden = true;
-exports.enabled = true;
+exports.enabled = false;
 exports.matchStart = false;
 exports.handler = function (data) {
     if (data.from.role > 1) {

@@ -1,6 +1,6 @@
 exports.names = ['blacklist'];
 exports.hidden = true;
-exports.enabled = true;
+exports.enabled = false;
 exports.matchStart = false;
 exports.handler = function (data) {
     if (data.from.role > 1) {
@@ -18,7 +18,7 @@ exports.handler = function (data) {
         Karma.create(userData);
 
         Song.update({is_banned: 1}, {where: {format: media.format, cid: media.cid}});
-        bot.chat("The song " + media.title + " has been blacklisted.");
+        bot.sendChat("The song " + media.title + " has been blacklisted.");
 
         bot.moderateForceSkip();
         //bot.moderateDeleteChat(data.id);

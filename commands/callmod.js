@@ -7,16 +7,16 @@ exports.handler = function (data) {
     var message = data.message.split(' ').slice(1).join(' ').trim();
 
     if (config.slack.webhookUrl === '') {
-        bot.chat('Need help? Ask a mod! No mods around? Contact a Brand Ambassador: http://plug.dj/support - Hours: http://blog.plug.dj/brand-ambassadors/');
+        bot.sendChat('Need help? Ask a staff member!');
     }
     else if(message === '') {
-        bot.chat('Need help? Type .callmod with the nature of your request - for example `.callmod Someone is spinning dubstep!`');
+        bot.sendChat('Need help? Type '  + config.commandLiteral + 'callmod with the nature of your request - for example `' + config.commandLiteral + 'callmod Someone is spamming the chat!`');
     }
     else {
 
         var formPayload = {
-            text: '@channel - ' + data.from.username + ' requested help in https://plug.dj/' + config.roomName + " \n`" + message + "`",
-            username: bot.getUser().username,
+            text: '@channel - ' + data.user.username + ' requested help in https://www.dubtrack.fm/join/' + config.roomName + " \n`" + message + "`",
+            username: bot.getSelf().username,
             link_names: 1,
             channel: config.slack.default.channel,
             icon_url: config.slack.default.icon_url
@@ -28,10 +28,10 @@ exports.handler = function (data) {
 
             if (!error && response.statusCode == 200) {
                 if (body == 'ok') {
-                    bot.chat('A mod has been contacted and will be on the way if available, @' + data.from.username + '. You can also contact a Brand Ambassador: http://plug.dj/support - Hours: http://blog.plug.dj/brand-ambassadors/');
+                    bot.sendChat('A mod has been contacted and will be on the way if available, @' + data.user.username);
                 }
                 else {
-                    bot.chat('There was an error sending your request.  In the meantime, please contact a Brand Ambassador: http://plug.dj/support');
+                    bot.sendChat('There was an error sending your request.');
                 }
             }
         });

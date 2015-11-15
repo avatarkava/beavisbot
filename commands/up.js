@@ -1,7 +1,7 @@
-// Instructs the bot to woot a song. Only available for bouncers and higher.
-exports.names = ['w'];
+// Instructs the bot to upvote a song. Only available for staff (not resident DJs).
+exports.names = ['up'];
 exports.hidden = true;
-exports.enabled = true;
+exports.enabled = false;
 exports.matchStart = false;
 exports.handler = function (data) {
     if (data.from.role > 1) {

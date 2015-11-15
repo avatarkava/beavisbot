@@ -8,7 +8,7 @@ exports.handler = function (data) {
     var message = '';
 
     if (params.length < 1) {
-        username = data.from.username;
+        username = data.user.username;
     }
     else {
         usernameRaw = params.join(' ').trim();
@@ -23,11 +23,11 @@ exports.handler = function (data) {
             birthday = row.birthday;
             level = row.level;
             slug = row.slug;
+            id = row.id
 
-            message = username + ' - Level ' + level + ' - Joined ' + joined;
-            if (level > 4) {
-                message += ' - https://plug.dj/@/' + slug;
-            }
+            // @TODO - display data we can get from dub like 'active', 'playedCount', 'songsInQueue', 'dubs'
+
+            message = username + ' (' + id + ') - Joined ' + joined + ' - https://www.dubtrack.fm/' + slug;
             bot.sendChat(message);
         }
     });

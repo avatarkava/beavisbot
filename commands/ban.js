@@ -21,7 +21,7 @@ exports.handler = function (data) {
             var duration = 'PERMA';
         }
         else {
-            bot.chat('Usage: .[ban|unban|kick] username [PERMA|DAY|HOUR]');
+            bot.sendChat('Usage: .[ban|unban|kick] username [PERMA|DAY|HOUR]');
             return;
         }
 
@@ -63,7 +63,7 @@ exports.handler = function (data) {
         //                break;
         //            case '.unban':
         //                bot.moderateUnbanUser(row.userid, function () {
-        //                    bot.chat('/me unbanning ' + username + '. This can take a few moments...');
+        //                    bot.sendChat('/me unbanning ' + username + '. This can take a few moments...');
         //                    logger.info('[UNBAN] ' + username + ' was unbanned by ' + data.from.username);
         //                    var userData = {
         //                        type: 'unban',
@@ -82,10 +82,10 @@ exports.handler = function (data) {
         //});
 
         //if (config.slack.webhookUrl === '') {
-        //    bot.chat('Need help? Ask a mod! No mods around? Contact a Brand Ambassador: http://plug.dj/support - Hours: http://blog.plug.dj/brand-ambassadors/');
+        //    bot.sendChat('Need help? Ask a mod! No mods around? Contact a Brand Ambassador: http://plug.dj/support - Hours: http://blog.plug.dj/brand-ambassadors/');
         //}
         //else if(message === '') {
-        //    bot.chat('Need help? Type .callmod with the nature of your request - for example `.callmod Someone is spinning dubstep!`');
+        //    bot.sendChat('Need help? Type .callmod with the nature of your request - for example `.callmod Someone is spinning dubstep!`');
         //}
         //else {
         //
@@ -103,10 +103,10 @@ exports.handler = function (data) {
         //
         //        if (!error && response.statusCode == 200) {
         //            if (body == 'ok') {
-        //                bot.chat('A mod has been contacted and will be on the way if available, @' + data.from.username + '. You can also contact a Brand Ambassador: http://plug.dj/support - Hours: http://blog.plug.dj/brand-ambassadors/');
+        //                bot.sendChat('A mod has been contacted and will be on the way if available, @' + data.from.username + '. You can also contact a Brand Ambassador: http://plug.dj/support - Hours: http://blog.plug.dj/brand-ambassadors/');
         //            }
         //            else {
-        //                bot.chat('There was an error sending your request.  In the meantime, please contact a Brand Ambassador: http://plug.dj/support');
+        //                bot.sendChat('There was an error sending your request.  In the meantime, please contact a Brand Ambassador: http://plug.dj/support');
         //            }
         //        }
         //    });

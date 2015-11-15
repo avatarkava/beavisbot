@@ -5,5 +5,5 @@ exports.matchStart = false;
 exports.handler = function (data) {
     users = bot.getUsers();
     var randomNumber = _.random(1, users.length);
-    bot.chat(":bell: Now serving customer #" + randomNumber + " - hey there, " + users[(randomNumber - 1)].username + "!");
+    bot.sendChat("/me :bell: Now serving customer #" + randomNumber + " - hey there, " + users[(randomNumber - 1)].username + "!");
 };

@@ -5,6 +5,7 @@ module.exports = function (options) {
     Sequelize = require('sequelize');
     Promise = require('bluebird');
 
+    bot = options.bot;
     config = options.config;
     fs = require('fs');
 

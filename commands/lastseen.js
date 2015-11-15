@@ -6,7 +6,7 @@ exports.handler = function (data) {
 
     var params = _.rest(data.message.split(' '), 1);
     if (params.length < 1) {
-        bot.sendChat('/me usage: .lastseen username');
+        bot.sendChat('/me usage: '  + config.commandLiteral + 'lastseen username');
         return;
     }
 
@@ -17,7 +17,7 @@ exports.handler = function (data) {
         if (row === null) {
             bot.sendChat(usernameFormatted + ' was not found.');
         } else {
-            user = _.findWhere(bot.getUsers(), {username: usernameFormatted});
+            var user = _.findWhere(bot.getUsers(), {username: usernameFormatted});
             if (user) {
                 bot.sendChat(usernameFormatted + ' is in the room and was last active ' + timeSince(row.last_active));
             }

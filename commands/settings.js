@@ -1,6 +1,6 @@
 exports.names = ['settings', 'set'];
 exports.hidden = true;
-exports.enabled = true;
+exports.enabled = false;
 exports.matchStart = true;
 exports.handler = function (data) {
     if (data.from.role > 1) {
@@ -26,7 +26,7 @@ exports.handler = function (data) {
                     chatMessage += key + ': ' + config[key] + ', ';
                 }
             }
-            bot.chat('/me Current settings: ' + chatMessage);
+            bot.sendChat('/me Current settings: ' + chatMessage);
         }
         else {
             var key = input[1];
@@ -34,10 +34,10 @@ exports.handler = function (data) {
 
             if (_.contains(supported, key)) {
                 config[key] = value;
-                bot.chat('/me @djs @staff @rdjs - set: ' + key + ' = ' + value);
+                bot.sendChat('/me @djs @staff @rdjs - set: ' + key + ' = ' + value);
             }
             else {
-                bot.chat('/me unknown setting: ' + key );
+                bot.sendChat('/me unknown setting: ' + key );
             }
         }
     }
