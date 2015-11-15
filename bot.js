@@ -28,9 +28,9 @@ new DubAPI(config.auth, function (err, bot) {
             bot.sendChat(config.responses.botConnect);
         }
 
-        //    bot.getUsers().forEach(function (user) {
-        //        updateDbUser(user);
-        //    });
+        bot.getUsers().forEach(function (user) {
+            updateDbUser(user);
+        });
 
         if (config.upvoteSongs == 'ALL') {
             bot.updub();
@@ -49,13 +49,13 @@ new DubAPI(config.auth, function (err, bot) {
 
         if (data.user.username !== undefined && data.user.username !== null) {
             data.message = data.message.trim();
-            if (data.msg == '.') {
+            if (data.message == '.') {
                 bot.moderateDeleteChat(data.id);
             }
             else {
                 handleCommand(data);
             }
-            //User.update({last_active: new Date(), last_seen: new Date()}, {where: {id: data.from.id}});
+            User.update({last_active: new Date(), last_seen: new Date()}, {where: {id: data.user.id}});
         }
     });
 
@@ -306,21 +306,21 @@ new DubAPI(config.auth, function (err, bot) {
         var newUser = false;
         var message = "";
 
-        if (data.username !== botUser.username) {
-            User.findById(data.id).then(function (dbUser) {
+        if (data.user.username !== botUser.username) {
+            User.findById(data.user.id).then(function (dbUser) {
 
-                if (data.username == config.superAdmin && config.responses.welcome.superAdmin != null) {
-                    message = config.responses.welcome.superAdmin.replace('{username}', data.username);
-                    console.log('[JOIN]', data.username + ' last seen ' + timeSince(dbUser.last_seen));
+                if (data.user.username == config.superAdmin && config.responses.welcome.superAdmin != null) {
+                    message = config.responses.welcome.superAdmin.replace('{username}', data.user.username);
+                    console.log('[JOIN]', data.user.username + ' last seen ' + timeSince(dbUser.last_seen));
                 }
                 else if (dbUser == null) {
-                    message = config.responses.welcome.newUser.replace('{username}', data.username);
+                    message = config.responses.welcome.newUser.replace('{username}', data.user.username);
                     newUser = true;
-                    console.log('[JOIN]', data.username + ' is a first-time visitor to the room!');
+                    console.log('[JOIN]', data.user.username + ' is a first-time visitor to the room!');
                 }
                 else {
-                    message = config.responses.welcome.oldUser.replace('{username}', data.username);
-                    console.log('[JOIN]', data.username + ' last seen ' + timeSince(dbUser.last_seen));
+                    message = config.responses.welcome.oldUser.replace('{username}', data.user.username);
+                    console.log('[JOIN]', data.user.username + ' last seen ' + timeSince(dbUser.last_seen));
                 }
 
                 // Greet with the theme if it's not the default
@@ -372,22 +372,19 @@ new DubAPI(config.auth, function (err, bot) {
 //                            Karma.create(userData);
 //
 //                            setTimeout(function () {
-//                                bot.sendChat('/me put @' + data.username + ' back in line :thumbsup:')
+//                                bot.sendChat('/me put @' + data.user.username + ' back in line :thumbsup:')
 //                            }, 5000);
 //                        }
 //
 //                    });
 //                }
-//
-//            });
-//            updateDbUser(bot.getUser(data.id));
-//        }
+                updateDbUser(data.user);
             });
         }
     });
 
     bot.on('user-leave', function (data) {
-        console.log('[LEAVE]', 'User left: ' + data.username);
+        console.log('[LEAVE]', 'User left: ' + data.user.username);
         // User.update({last_seen: new Date()}, {where: {id: data.id}});
     });
 
@@ -469,31 +466,33 @@ function saveWaitList(wholeRoom) {
 
 function updateDbUser(user) {
 
+    // @TODO - Must do migrations before this can actually write to the db (id is no longer an int, etc.)
+    return;
+
     var userData = {
         id: user.id,
         username: user.username,
-        language: user.language,
-        avatar_id: user.avatarID,
-        badge: user.badge,
-        blurb: user.blurb,
-        global_role: user.gRole,
-        role: user.role,
-        level: user.level,
-        joined: user.joined,
+        //language: user.language,
+        //avatar_id: user.avatarID,
+        //badge: user.badge,
+        //blurb: user.blurb,
+        //global_role: user.gRole,
+        //role: user.role,
+        //level: user.level,
         last_seen: new Date(),
     };
 
-    // This only gets passed some of the time
-    if (user.slug !== undefined) {
-        userData.slug = user.slug;
-    }
-
     User.findOrCreate({where: {id: user.id}, defaults: userData}).spread(function (dbUser) {
+
+        // Set join date to be the first time we see the user in our room
+        if (dbUser.joined === undefined) {
+            userData.joined = new Date();
+        }
 
         // Reset the user's AFK timer if they've been gone for long enough (so we don't reset on disconnects)
         if (secondsSince(dbUser.last_seen) >= 900) {
             userData.last_active = new Date();
-            userData.waitlist_position = bot.getWaitListPosition(user.id)
+            // userData.waitlist_position = bot.getWaitListPosition(user.id)
         }
         dbUser.updateAttributes(userData);
     }).catch(function (err) {
