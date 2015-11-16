@@ -12,9 +12,9 @@ exports.handler = function (data) {
             var username = _.rest(input, 1);
             var usernameFormatted = S(username).chompLeft('@').s;
 
-            User.update({last_active: new Date(), last_seen: new Date()}, {where: {username: usernameFormatted}});
+            models.User.update({last_active: new Date(), last_seen: new Date()}, {where: {username: usernameFormatted}});
             bot.sendChat("reset the idle timer for " + usernameFormatted);
-            logger.info('[IDLE]', data.from.username + ' reset the idle timer for ' + usernameFormatted);
+            console.log('[IDLE]', data.from.username + ' reset the idle timer for ' + usernameFormatted);
 
 
         }
@@ -26,17 +26,17 @@ exports.handler = function (data) {
             idleDJs = [];
 
             Promise.map(bot.getUsers(), function (dj) {
-                return User.find({where: {site_id: dj.id}}).then(function (dbUser) {
+                return models.User.find({where: {site_id: dj.id}}).then(function (dbUser) {
                     var position = -1;
                     //var position = bot.getWaitListPosition(dj.id);
                     if (dbUser !== null) {
                         if (secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
-                            logger.warning('[WL-IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
+                            console.log('[WL-IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                             idleDJs.push(dbUser.username);
 
                         }
                         else {
-                            logger.info('[WL-ACTIVE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
+                            console.log('[WL-ACTIVE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                         }
                     }
                 });
