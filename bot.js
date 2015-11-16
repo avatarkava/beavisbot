@@ -370,7 +370,7 @@ new DubAPI(config.auth, function (err, bot) {
 //
 //                    });
 //                }
-                updateDbUser(data.user);
+                updateDbUser(data);
             });
         }
     });
@@ -470,18 +470,18 @@ function saveWaitList(wholeRoom) {
 
 }
 
-function updateDbUser(user) {
+function updateDbUser(data) {
 
     var userData = {
-        site_id: user.id,
-        username: user.username,
-        locale: user.locale,
-        role: user.role,
-        site_points: user.dubs,
+        site_id: data.user.id,
+        username: data.user.username,
+        locale: data.raw.user.locale,
+        role: data.user.role,
+        site_points: data.user.dubs,
         last_seen: new Date(),
     };
 
-    models.User.findOrCreate({where: {site_id: user.id}, defaults: userData}).spread(function (dbUser) {
+    models.User.findOrCreate({where: {site_id: data.user.id}, defaults: userData}).spread(function (dbUser) {
 
         // Set join date to be the first time we see the user in our room
         if (dbUser.joined === undefined) {
