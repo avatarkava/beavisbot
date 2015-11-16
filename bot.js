@@ -31,7 +31,7 @@ new DubAPI(config.auth, function (err, bot) {
         }
 
         bot.getUsers().forEach(function (user) {
-            updateDbUser(user);
+            updateDbUser(data);
         });
 
         if (config.upvoteSongs == 'ALL') {
@@ -471,6 +471,14 @@ function saveWaitList(wholeRoom) {
 }
 
 function updateDbUser(data) {
+
+    // Handle cases where we're passed only the user portion
+    if (!data.user) {
+        var temp = data;
+        data = {};
+        data.user = temp;
+        data.raw.user = temp;
+    }
 
     var userData = {
         site_id: data.user.id,
