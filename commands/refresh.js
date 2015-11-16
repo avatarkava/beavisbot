@@ -1,6 +1,6 @@
 exports.names = ['refresh'];
 exports.hidden = false;
-exports.enabled = falsee;
+exports.enabled = false;
 exports.matchStart = false;
 exports.handler = function (data) {
     // @TODO - No functionality for this in plug
