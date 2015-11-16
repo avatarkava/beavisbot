@@ -1,17 +1,18 @@
 module.exports = function (options) {
 
     //var DubAPI = require('dubapi');
-    var Promise = require('bluebird');
+    Promise = require('bluebird');
 
     bot = options.bot;
     config = options.config;
     fs = require('fs');
 
-    var Cleverbot = require('cleverbot-node');
+    Cleverbot = require('cleverbot-node');
     cleverbot = new Cleverbot;
     cleverbot.prepare();
 
     // Sequelize database ORM
+    Sequelize = require('sequelize');
     models = require('./models');
     models.sequelize.sync({force: config.db.forceSequelizeSync}).then(function () {
         console.log('Connected to ' + config.db.dialect + ' database');

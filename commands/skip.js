@@ -5,15 +5,17 @@ exports.matchStart = false;
 exports.handler = function (data) {
 
     var dj = bot.getDJ();
+    var media = bot.getMedia();
 
     if (dj == null) {
         return;
     }
 
-    if (data.user.id == dj.id || bot.hasPermission(bot.getUser(data.user.id), 'skip')) {
+    if (media && (data.user.id == dj.id || bot.hasPermission(bot.getUser(data.user.id), 'skip'))) {
 
-        var media = bot.getMedia();
         console.log('[SKIP] ' + data.user.username + ' skipped ' + dj.username + ' - ' + media.name + ' (' + media.id + ')');
+        bot.moderateSkip();
+
         if (data.user.id !== dj.id) {
             getDbUserFromSiteUser(dj.id, function (row) {
                 var userData = {
@@ -25,8 +27,6 @@ exports.handler = function (data) {
                 models.Karma.create(userData);
             });
         }
-
-        bot.moderateSkip();
     }
 };
 

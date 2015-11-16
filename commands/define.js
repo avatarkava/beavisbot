@@ -1,6 +1,6 @@
 exports.names = ['define'];
-exports.hidden = true;
-exports.enabled = false;
+exports.hidden = false;
+exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function (data) {
 
@@ -16,7 +16,7 @@ exports.handler = function (data) {
                 if (definition.length == 0) {
                     bot.sendChat('No definition for ' + input + ' found.');
                 } else {
-                    bot.sendChat("[ " + definition[0].word.toUpperCase() + " ] " + definition[0].partOfSpeech + " &mdash; " + definition[0].text);
+                    bot.sendChat(definition[0].word + " [" + definition[0].partOfSpeech + "] - " + definition[0].text);
                 }
             }
         });
