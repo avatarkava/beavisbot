@@ -52,7 +52,7 @@ new DubAPI(config.auth, function (err, bot) {
         if (data.user.username !== undefined && data.user.username !== null) {
             data.message = data.message.trim();
             handleCommand(data);
-            models.User.update({last_active: new Date(), last_seen: new Date()}, {where: {site_id: data.user.id}});
+            models.User.update({last_active: new Date(), last_seen: new Date(), locale: data.raw.user.locale}, {where: {site_id: data.user.id}});
         }
     });
 
