@@ -31,7 +31,7 @@ new DubAPI(config.auth, function (err, bot) {
         }
 
         bot.getUsers().forEach(function (user) {
-            updateDbUser(data);
+            updateDbUser(user);
         });
 
         if (config.upvoteSongs == 'ALL') {
