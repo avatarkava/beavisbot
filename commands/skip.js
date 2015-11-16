@@ -15,13 +15,15 @@ exports.handler = function (data) {
         var media = bot.getMedia();
         console.log('[SKIP] ' + data.user.username + ' skipped ' + dj.username + ' - ' + media.name + ' (' + media.id + ')');
         if (data.user.id !== dj.id) {
-            var userData = {
-                type: 'skip',
-                details: media.id + ': ' + media.name + ' (skipped by ' + data.user.username + ')',
-                user_id: dj.id,
-                mod_user_id: data.user.id
-            };
-            models.Karma.create(userData);
+            getDbUserFromSiteUser(dj.id, function (row) {
+                var userData = {
+                    type: 'skip',
+                    details: media.id + ': ' + media.name + ' (skipped by ' + data.user.username + ')',
+                    user_id: row.id,
+                    mod_user_id: data.user.db.id
+                };
+                models.Karma.create(userData);
+            });
         }
 
         bot.moderateSkip();

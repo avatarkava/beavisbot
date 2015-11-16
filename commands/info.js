@@ -21,7 +21,6 @@ exports.handler = function (data) {
         } else {
             joined = timeSince(row.joined);
             birthday = row.birthday;
-            level = row.level;
             slug = row.slug;
             id = row.id
 

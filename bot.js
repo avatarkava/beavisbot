@@ -395,7 +395,7 @@ new DubAPI(config.auth, function (err, bot) {
         if (config.verboseLogging) {
             console.log('[VOTE] ' + JSON.stringify(data, null, 2));
         }
-        else {
+        else if (data.user) {
             console.log('[VOTE] ' + data.user.username + ' voted ' + data.dubtype);
         }
 
@@ -583,7 +583,16 @@ function handleCommand(data) {
             // Don't allow @mention to the bot - prevent loopback
             data.message = data.message.replace('@' + botUser.username, '');
 
-            command.handler(data);
+            // Grab the db entries for the user that sent this message
+            if (data.user.id !== null) {
+                getDbUserFromSiteUser(data.user.id, function (row) {
+                    data.user.db = row;
+                    command.handler(data);
+                });
+            }
+            else {
+                command.handler(data);
+            }
         }
         else if (!config.quietMode) {
             // @TODO - Build the list of possible commands on init() instead of querying every time

@@ -3,7 +3,7 @@ exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function (data) {
-    if (bot.hasPermission(bot.getUser(data.user.id), 'skip')) {
+    if (bot.hasPermission(bot.getUser(data.user.id), 'queue-order')) {
 
         var input = data.message.split(' ');
         // Settings to support direct access to
@@ -25,7 +25,7 @@ exports.handler = function (data) {
                     chatMessage += key + ': ' + config[key] + ', ';
                 }
             }
-            bot.sendChat('/me Current settings: ' + chatMessage);
+            bot.sendChat('Current settings: ' + chatMessage);
         }
         else {
             var key = input[1];

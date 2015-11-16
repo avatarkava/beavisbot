@@ -20,15 +20,17 @@ exports.handler = function (data) {
                 bot.sendChat('@' + usernameFormatted + ' ' + config.responses.activeDJRemoveMessage);
             }
 
-            var userData = {
-                type: 'remove',
-                details: 'Removed ' + user.songsInQueue + ' songs from queue by ' + data.user.username,
-                user_id: user.id,
-                mod_user_id: data.user.id
-            };
-            models.Karma.create(userData);
-            console.log('[REMOVE] ' + data.user.username + ' removed ' + usernameFormatted + ' from queue');
-            models.User.update({queue_position: -1}, {where: {site_id: user.id}});
+            getDbUserFromSiteUser(dj.id, function (row) {
+                var userData = {
+                    type: 'remove',
+                    details: 'Removed ' + user.songsInQueue + ' songs from queue by ' + data.user.username,
+                    user_id: row.id,
+                    mod_user_id: data.user.db.id
+                };
+                models.Karma.create(userData);
+                console.log('[REMOVE] ' + data.user.username + ' removed ' + usernameFormatted + ' from queue');
+                models.User.update({queue_position: -1}, {where: {site_id: user.id}});
+            });
 
         }
         else {
