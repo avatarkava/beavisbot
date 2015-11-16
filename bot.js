@@ -552,8 +552,6 @@ function initializeModules(auth, bot) {
 
 function handleCommand(data) {
 
-    if (data.user.username !== 'avatarkava') return;
-
     // unescape message
     data.message = S(data.message).unescapeHTML().s;
 
