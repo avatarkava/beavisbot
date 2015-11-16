@@ -476,6 +476,7 @@ function updateDbUser(data) {
     if (!data.user) {
         var temp = data;
         data = {};
+        data.raw = {};
         data.user = temp;
         data.raw.user = temp;
     }
