@@ -1,6 +1,6 @@
 exports.names = ['idle'];
 exports.hidden = true;
-exports.enabled = false;
+exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function (data) {
 
