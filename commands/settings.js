@@ -33,7 +33,7 @@ exports.handler = function (data) {
 
             if (_.contains(supported, key)) {
                 config[key] = value;
-                bot.sendChat('/me @staff - set: ' + key + ' = ' + value);
+                bot.sendChat('/me set: ' + key + ' = ' + value);
             }
             else {
                 bot.sendChat('/me unknown setting: ' + key);
