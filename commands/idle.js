@@ -1,4 +1,4 @@
-exports.names = ['afk', 'afkdjs'];
+exports.names = ['idle'];
 exports.hidden = true;
 exports.enabled = false;
 exports.matchStart = true;
@@ -6,7 +6,7 @@ exports.handler = function (data) {
 
     var input = data.message.split(' ');
 
-    if (data.from.role > 1 && config.activeDJTimeoutMins > 0) {
+    if (bot.hasPermission(bot.getUser(data.user.id), 'queue-order') && config.activeDJTimeoutMins > 0) {
 
         if (input.length >= 2) {
             var username = _.rest(input, 1);
@@ -25,9 +25,10 @@ exports.handler = function (data) {
             var maxIdleTime = config.activeDJTimeoutMins * 60;
             idleDJs = [];
 
-            Promise.map(bot.getWaitList(), function (dj) {
-                return User.find({where: {id: dj.id}}).then(function (dbUser) {
-                    var position = bot.getWaitListPosition(dj.id);
+            Promise.map(bot.getUsers(), function (dj) {
+                return User.find({where: {site_id: dj.id}}).then(function (dbUser) {
+                    var position = -1;
+                    //var position = bot.getWaitListPosition(dj.id);
                     if (dbUser !== null) {
                         if (secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
                             logger.warning('[WL-IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));

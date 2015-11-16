@@ -17,7 +17,7 @@ exports.handler = function (data) {
                 user_id: dj.id,
                 mod_user_id: data.user.id
             };
-            Karma.create(userData);
+            models.Karma.create(userData);
         }
 
         bot.moderateSkip();

@@ -26,9 +26,9 @@ exports.handler = function (data) {
                 user_id: user.id,
                 mod_user_id: data.user.id
             };
-            Karma.create(userData);
+            models.Karma.create(userData);
             console.log('[REMOVE] ' + data.user.username + ' removed ' + usernameFormatted + ' from queue');
-            User.update({waitlist_position: -1}, {where: {id: user.id}});
+            models.User.update({queue_position: -1}, {where: {site_id: user.id}});
 
         }
         else {

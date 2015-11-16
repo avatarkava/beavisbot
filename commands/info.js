@@ -15,7 +15,7 @@ exports.handler = function (data) {
         username = S(usernameRaw).chompLeft('@').s;
     }
 
-    User.find({where: {username: username}}).then(function (row) {
+    models.User.find({where: {username: username}}).then(function (row) {
         if (row === null) {
             bot.sendChat(username + ' was not found.');
         } else {

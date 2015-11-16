@@ -6,7 +6,7 @@ exports.handler = function (data) {
 
     //var input = data.message.split(' ');
 
-    RoomEvent.findAll({
+    models.RoomEvent.findAll({
         where: {type: 'theme', starts_at: {lte: moment.utc().add(1, 'day').toDate()}, ends_at: {gte: new Date()}},
         order: [['starts_at', 'ASC']],
         limit: 3

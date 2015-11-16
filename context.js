@@ -12,7 +12,7 @@ module.exports = function (options) {
     cleverbot.prepare();
 
     // Sequelize database ORM
-    var models = require('./models');
+    models = require('./models');
     models.sequelize.sync({force: config.db.forceSequelizeSync}).then(function () {
         console.log('Connected to ' + config.db.dialect + ' database');
     });
@@ -131,6 +131,14 @@ module.exports = function (options) {
         var now = moment.utc();
         timestamp = moment.utc(timestamp);
         return now.diff(timestamp, 'seconds');
+    };
+
+    getDbUserFromSiteUser = function (siteUser, callback) {
+        models.User.find({
+            where: {site_id: siteUser.id}
+        }).then(function (row) {
+            callback(row);
+        });
     };
 
     getActiveDJs = function (maxIdleMins, startPosition, callback) {

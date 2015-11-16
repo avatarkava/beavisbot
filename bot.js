@@ -98,9 +98,7 @@ new DubAPI(config.auth, function (err, bot) {
                 }
             }).then(function (song) {
                 if (song !== null) {
-                    models.User.find({
-                        where: {site_id: data.lastPlay.user.id}
-                    }).then(function (lastDJ) {
+                    getDbUserFromSiteUser(data.lastPlay.user, function (lastDJ) {
                         models.Play.create({
                             site_id: data.lastPlay.id,
                             user_id: lastDJ.id,
@@ -453,17 +451,17 @@ function saveWaitList(wholeRoom) {
         var position = bot.getWaitListPosition(user.id);
         // user last seen in 900 seconds
         if (position > 0) {
-            models.User.update({waitlist_position: position, last_seen: moment.utc().toDate()}, {where: {id: user.id}});
+            models.User.update({queue_position: position, last_seen: moment.utc().toDate()}, {where: {id: user.id}});
         }
         else {
-            models.User.update({waitlist_position: -1}, {where: {id: user.id}});
+            models.User.update({queue_position: -1}, {where: {id: user.id}});
         }
         if (config.verboseLogging) {
             console.log('Wait List Update', user.username + ' => ' + position);
         }
 
     });
-    models.User.update({waitlist_position: -1}, {
+    models.User.update({queue_position: -1}, {
         where: {
             last_seen: {lte: moment.utc().subtract(15, 'minutes').toDate()},
             last_active: {lte: moment.utc().subtract(15, 'minutes').toDate()}
