@@ -6,6 +6,10 @@ exports.handler = function (data) {
 
     var dj = bot.getDJ();
 
+    if (dj == null) {
+        return;
+    }
+
     if (data.user.id == dj.id || bot.hasPermission(bot.getUser(data.user.id), 'skip')) {
 
         var media = bot.getMedia();

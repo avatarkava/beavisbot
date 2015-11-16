@@ -145,7 +145,7 @@ new DubAPI(config.auth, function (err, bot) {
             //author: data.media.author,
             //title: data.media.title,
             name: data.media.name,
-            description: data.media.description,
+            //description: data.media.description,
             host: data.media.type,
             host_id: data.media.fkid,
             duration: data.media.songLengthSeconds,
@@ -169,15 +169,15 @@ new DubAPI(config.auth, function (err, bot) {
                 trigger: {$like: data.media.name},
                 is_active: true
             }
-        }).then(function (row) {
-            if (row !== null) {
-                if (row.response != '') {
-                    bot.sendChat(row.response);
+        }).then(function (songresponse) {
+            if (songresponse !== null) {
+                if (songresponse.response != '') {
+                    bot.sendChat(songresponse.response);
                 }
-                if (row.rate === 1) {
+                if (songresponse.rate === 1) {
                     bot.updub();
                 }
-                else if (row.rate === -1) {
+                else if (songresponse.rate === -1) {
                     bot.downdub();
                 }
             }
