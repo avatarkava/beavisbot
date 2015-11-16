@@ -21,7 +21,7 @@
   "dependencies": {
     "bluebird": "2.*",
     "cleverbot-node": "git://github.com/avatarkava/cleverbot-node.git",
-    "dubapi": "git://github.com/avatarkava/DubAPI.git",
+    "dubapi": "git://github.com/anjanms/DubAPI.git",
     "moment": "*",
     "mysql": "*",
     "node-datatable": "git://github.com/jpravetz/node-datatable.git",

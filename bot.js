@@ -1,7 +1,7 @@
 path = require('path');
 var fs = require('fs');
 
-var config = require(path.resolve(__dirname, 'config/bot.json'));
+var config = require(path.resolve(__dirname, 'config.json'));
 var models = require(path.resolve(__dirname, 'models'));
 var DubAPI = require('dubapi');
 
