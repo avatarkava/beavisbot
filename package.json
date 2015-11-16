@@ -1,35 +1,37 @@
 {
-    "name": "BeavisBot",
-    "description": "A customizable social music room bot",
-    "version": "2.0.0",
-    "keywords": ["dubtrack", "dubtrack.fm"],
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/AvatarKava/beavisbot-dubtrack-fm.git"
-    },
-    "author": "Mike Burke <mburke@phpmonkeys.com>",
-    "main": "bot.js",
-    "directories": {
-        "commands": "commands"
-    },
-    "engines": {
-        "node": ">= 0.6.0"
-    },
-    "dependencies": {
-        "bluebird": "*",
-        "cleverbot-node": "git://github.com/avatarkava/cleverbot-node.git",
-        "dubapi": "git://github.com/anjanms/DubAPI.git",
-        "moment": "*",
-        "mysql": "*",
-        "node-datatable": "git://github.com/jpravetz/node-datatable.git",
-        "request": "*",
-        "sequelize": "*",
-        "sqlite3": "*",
-        "string": "*",
-        "underscore": "*"
-    },
-    "devDependencies": {
-        "sequelize-fixtures": "*"
-    },
-    "optionalDependencies": {}
+  "name": "BeavisBot",
+  "description": "A customizable social music room bot",
+  "version": "2.0.0",
+  "keywords": [
+    "dubtrack",
+    "dubtrack.fm"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/AvatarKava/beavisbot-dubtrack-fm.git"
+  },
+  "author": "Mike Burke <mburke@phpmonkeys.com>",
+  "main": "bot.js",
+  "directories": {
+    "commands": "commands"
+  },
+  "engines": {
+    "node": ">= 0.6.0"
+  },
+  "dependencies": {
+    "bluebird": "2.*",
+    "cleverbot-node": "git://github.com/avatarkava/cleverbot-node.git",
+    "dubapi": "git://github.com/avatarkava/DubAPI.git",
+    "moment": "*",
+    "mysql": "*",
+    "node-datatable": "git://github.com/jpravetz/node-datatable.git",
+    "request": "*",
+    "sequelize": "*",
+    "sqlite3": "*",
+    "string": "*",
+    "underscore": "git://github.com/jashkenas/underscore.git"
+  },
+  "devDependencies": {
+  },
+  "optionalDependencies": {}
 }

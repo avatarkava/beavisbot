@@ -1,7 +1,9 @@
-var DubAPI = require('dubapi');
+path = require('path');
 var fs = require('fs');
-path = require('path')
-var config = require(path.resolve(__dirname, 'config.json'));
+
+var config = require(path.resolve(__dirname, 'config/bot.json'));
+var models = require(path.resolve(__dirname, 'models'));
+var DubAPI = require('dubapi');
 
 var roomHasActiveMods = false;
 var skipTimer;
@@ -50,7 +52,7 @@ new DubAPI(config.auth, function (err, bot) {
         if (data.user.username !== undefined && data.user.username !== null) {
             data.message = data.message.trim();
             handleCommand(data);
-            User.update({last_active: new Date(), last_seen: new Date()}, {where: {id: data.user.id}});
+            models.User.update({last_active: new Date(), last_seen: new Date()}, {where: {site_id: data.user.id}});
         }
     });
 
@@ -88,29 +90,33 @@ new DubAPI(config.auth, function (err, bot) {
 
         }
 
-        //// Write previous play data to DB
-        //if (data.lastPlay.media !== null && data.lastPlay.dj !== null) {
-        //    Song.find({
-        //        where: {
-        //            format: data.lastPlay.media.format,
-        //            cid: data.lastPlay.media.cid
-        //        }
-        //    }).then(function (song) {
-        //        if (song !== null) {
-        //            Play.create({
-        //                user_id: data.lastPlay.dj.id,
-        //                song_id: song.id,
-        //                positive: data.lastPlay.score.positive,
-        //                negative: data.lastPlay.score.negative,
-        //                grabs: data.lastPlay.score.grabs,
-        //                listeners: data.lastPlay.score.listeners,
-        //                skipped: data.lastPlay.score.skipped
-        //            });
-        //        }
-        //    });
-        //}
-        //
-        if (data.media == null) {
+        // Write previous play data to DB
+        if (data.lastPlay !== undefined) {
+            models.Song.find({
+                where: {
+                    site_id: data.lastPlay.media.id
+                }
+            }).then(function (song) {
+                if (song !== null) {
+                    models.User.find({
+                        where: {site_id: data.lastPlay.user.id}
+                    }).then(function (lastDJ) {
+                        models.Play.create({
+                            site_id: data.lastPlay.id,
+                            user_id: lastDJ.id,
+                            song_id: song.id,
+                            positive: data.lastPlay.score.updubs,
+                            negative: data.lastPlay.score.downdubs,
+                            //grabs: data.lastPlay.score.grabs,
+                            listeners: bot.getUsers().length,
+                            //skipped: data.lastPlay.score.skipped
+                        });
+                    });
+                }
+            });
+        }
+
+        if (data.media == undefined) {
             return;
         }
 
@@ -135,34 +141,36 @@ new DubAPI(config.auth, function (err, bot) {
             }
         }, (data.media.songLength + 10000));
 
-        //
-        //    // Write current song data to DB
-        //    var songData = {
-        //        plug_id: data.media.id,
-        //        author: data.media.author,
-        //        title: data.media.title,
-        //        format: data.media.format,
-        //        cid: data.media.cid,
-        //        duration: data.media.duration,
-        //        image: data.media.image
-        //    };
-        //    Song.findOrCreate({
-        //        where: {format: data.media.format, cid: data.media.cid},
-        //        defaults: songData
-        //    }).spread(function (song) {
-        //        song.updateAttributes(songData);
-        //    });
-        //
+        // Write current song data to DB
+        var songData = {
+            site_id: data.media.id,
+            //author: data.media.author,
+            //title: data.media.title,
+            name: data.media.name,
+            description: data.media.description,
+            host: data.media.type,
+            host_id: data.media.fkid,
+            duration: data.media.songLengthSeconds,
+            image: data.media.images.thumbnail
+        };
+        models.Song.findOrCreate({
+            where: {site_id: data.media.id},
+            defaults: songData
+        }).spread(function (song) {
+            song.updateAttributes(songData);
+        });
+
         if (config.upvoteSongs == 'ALL') {
             bot.updub();
         }
 
-        SongResponse.find({
-            where: Sequelize.or(
-                // @TODO - No support in Dubtrack for author/title yet
-                Sequelize.and({media_type: 'author', trigger: {like: data.media.name}, is_active: true}),
-                Sequelize.and({media_type: 'title', trigger: {like: data.media.name}, is_active: true})
-            )
+        models.SongResponse.find({
+            // @TODO - No support in Dubtrack for author/title yet
+            where: {
+                $or: [{media_type: ['author', 'title']}],
+                trigger: {$like: data.media.name},
+                is_active: true
+            }
         }).then(function (row) {
             if (row !== null) {
                 if (row.response != '') {
@@ -183,7 +191,7 @@ new DubAPI(config.auth, function (err, bot) {
         //    roomHasActiveMods = false;
         //
         //    Promise.map(bot.getWaitList(), function (dj) {
-        //        return User.find({
+        //        return models.User.find({
         //            where: {id: dj.id},
         //            include: {
         //                model: Karma,
@@ -210,8 +218,8 @@ new DubAPI(config.auth, function (err, bot) {
         //                            user_id: dj.id,
         //                            mod_user_id: botUser.id
         //                        };
-        //                        Karma.create(userData);
-        //                        User.update({waitlist_position: -1}, {where: {id: dj.id}});
+        //                        models.Karma.create(userData);
+        //                        models.User.update({waitlist_position: -1}, {where: {id: dj.id}});
         //                    }
         //                    else if (position > 1) {
         //                        var userData = {
@@ -220,7 +228,7 @@ new DubAPI(config.auth, function (err, bot) {
         //                            user_id: dj.id,
         //                            mod_user_id: botUser.id
         //                        };
-        //                        Karma.create(userData);
+        //                        models.Karma.create(userData);
         //                        idleDJs.push(dbUser.username);
         //                    }
         //                }
@@ -238,7 +246,7 @@ new DubAPI(config.auth, function (err, bot) {
         //            bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
         //        }
         //
-        //        Song.find({
+        //        models.Song.find({
         //            where: {
         //                format: data.media.format,
         //                cid: data.media.cid,
@@ -255,9 +263,9 @@ new DubAPI(config.auth, function (err, bot) {
         //                    user_id: data.user.id,
         //                    mod_user_id: botUser.id
         //                };
-        //                Karma.create(userData);
+        //                models.Karma.create(userData);
         //            }
-        //        });okay
+        //        });
         //
 
         //    });
@@ -277,7 +285,7 @@ new DubAPI(config.auth, function (err, bot) {
                 user_id: data.user.id,
                 mod_user_id: botUser.id
             };
-            Karma.create(userData);
+            models.Karma.create(userData);
         }
 
     });
@@ -295,8 +303,7 @@ new DubAPI(config.auth, function (err, bot) {
         var message = "";
 
         if (data.user.username !== botUser.username) {
-            User.findById(data.user.id).then(function (dbUser) {
-
+            models.User.find({where: {site_id: data.user.id}}).then(function (dbUser) {
                 if (data.user.username == config.superAdmin && config.responses.welcome.superAdmin != null) {
                     message = config.responses.welcome.superAdmin.replace('{username}', data.user.username);
                     console.log('[JOIN]', data.user.username + ' last seen ' + timeSince(dbUser.last_seen));
@@ -315,7 +322,7 @@ new DubAPI(config.auth, function (err, bot) {
                 }
 
                 // Greet with the theme if it's not the default
-                RoomEvent.find({
+                models.RoomEvent.find({
                     where: {
                         starts_at: {lte: new Date()},
                         ends_at: {gte: new Date()}
@@ -356,7 +363,7 @@ new DubAPI(config.auth, function (err, bot) {
 //                                user_id: data.id,
 //                                mod_user_id: botUser.id
 //                            };
-//                            Karma.create(userData);
+//                            models.Karma.create(userData);
 //
 //                            setTimeout(function () {
 //                                bot.sendChat('/me put @' + data.user.username + ' back in line :thumbsup:')
@@ -372,7 +379,7 @@ new DubAPI(config.auth, function (err, bot) {
 
     bot.on('user-leave', function (data) {
         console.log('[LEAVE]', 'User left: ' + data.user.username);
-        // User.update({last_seen: new Date()}, {where: {id: data.id}});
+        // models.User.update({last_seen: new Date()}, {where: {id: data.id}});
     });
 
     bot.on('user-update', function (data) {
@@ -385,9 +392,8 @@ new DubAPI(config.auth, function (err, bot) {
     //bot.on('grab', function (data) {
     //  console.log('[GRAB]', data.user.username + ' grabbed this song');
     //});
-    //
-    bot.on('room_playlist-dub', function (data) {
 
+    bot.on('room_playlist-dub', function (data) {
         if (config.verboseLogging) {
             console.log('[VOTE] ' + JSON.stringify(data, null, 2));
         }
@@ -447,17 +453,17 @@ function saveWaitList(wholeRoom) {
         var position = bot.getWaitListPosition(user.id);
         // user last seen in 900 seconds
         if (position > 0) {
-            User.update({waitlist_position: position, last_seen: moment.utc().toDate()}, {where: {id: user.id}});
+            models.User.update({waitlist_position: position, last_seen: moment.utc().toDate()}, {where: {id: user.id}});
         }
         else {
-            User.update({waitlist_position: -1}, {where: {id: user.id}});
+            models.User.update({waitlist_position: -1}, {where: {id: user.id}});
         }
         if (config.verboseLogging) {
             console.log('Wait List Update', user.username + ' => ' + position);
         }
 
     });
-    User.update({waitlist_position: -1}, {
+    models.User.update({waitlist_position: -1}, {
         where: {
             last_seen: {lte: moment.utc().subtract(15, 'minutes').toDate()},
             last_active: {lte: moment.utc().subtract(15, 'minutes').toDate()}
@@ -468,23 +474,16 @@ function saveWaitList(wholeRoom) {
 
 function updateDbUser(user) {
 
-    // @TODO - Must do migrations before this can actually write to the db (id is no longer an int, etc.)
-    return;
-
     var userData = {
-        id: user.id,
+        site_id: user.id,
         username: user.username,
-        //language: user.language,
-        //avatar_id: user.avatarID,
-        //badge: user.badge,
-        //blurb: user.blurb,
-        //global_role: user.gRole,
-        //role: user.role,
-        //level: user.level,
+        locale: user.locale,
+        role: user.role,
+        site_points: user.dubs,
         last_seen: new Date(),
     };
 
-    User.findOrCreate({where: {id: user.id}, defaults: userData}).spread(function (dbUser) {
+    models.User.findOrCreate({where: {site_id: user.id}, defaults: userData}).spread(function (dbUser) {
 
         // Set join date to be the first time we see the user in our room
         if (dbUser.joined === undefined) {
@@ -494,7 +493,8 @@ function updateDbUser(user) {
         // Reset the user's AFK timer if they've been gone for long enough (so we don't reset on disconnects)
         if (secondsSince(dbUser.last_seen) >= 900) {
             userData.last_active = new Date();
-            // userData.waitlist_position = bot.getWaitListPosition(user.id)
+            // @TODO - Get position in queue
+            // userData.queue_position = bot.getWaitListPosition(user.id)
         }
         dbUser.updateAttributes(userData);
     }).catch(function (err) {
@@ -523,8 +523,8 @@ function removeIfDownvoting(mehUsername) {
     //        user_id: mehUser.id,
     //        mod_user_id: botUser.id
     //    };
-    //    Karma.create(userData);
-    //    User.update({waitlist_position: -1}, {where: {id: mehUser.id}});
+    //    models.Karma.create(userData);
+    //    models.User.update({waitlist_position: -1}, {where: {id: mehUser.id}});
     //}
 }
 
@@ -655,9 +655,8 @@ function suggestNewSongMetadata(valueToCorrect) {
 
 function mentionResponse(data) {
     // How much ADHD does the bot have?
-    if (!config.chatRandomnessPercentage) {
-        chatRandomnessPercentage = 5;
-    } else {
+    chatRandomnessPercentage = 5;
+    if (config.chatRandomnessPercentage) {
         chatRandomnessPercentage = config.chatRandomnessPercentage;
     }
 
@@ -672,7 +671,7 @@ function mentionResponse(data) {
         });
     }
     else {
-        EventResponse.find({
+        models.EventResponse.find({
                 where: Sequelize.and({event_type: 'mention', is_active: true}),
                 order: 'RAND()'
             })
@@ -689,7 +688,7 @@ function mentionResponse(data) {
 }
 
 function chatResponse(data) {
-    EventResponse.find({
+    models.EventResponse.find({
             where: Sequelize.and({event_type: 'chat', trigger: data.message, is_active: true}),
             order: 'RAND()'
         })

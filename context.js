@@ -1,9 +1,7 @@
 module.exports = function (options) {
 
-    var DubAPI = require('dubapi');
-
-    Sequelize = require('sequelize');
-    Promise = require('bluebird');
+    //var DubAPI = require('dubapi');
+    var Promise = require('bluebird');
 
     bot = options.bot;
     config = options.config;
@@ -13,54 +11,11 @@ module.exports = function (options) {
     cleverbot = new Cleverbot;
     cleverbot.prepare();
 
-    if (config.verboseLogging) {
-        logLevel = console.log;
-    }
-    else {
-        logLevel = false;
-    }
-
-    if (config.db.dialect === 'sqlite') {
-        sequelize = new Sequelize(null, null, null, {
-            dialect: 'sqlite',
-            storage: config.db.sqlite.storage,
-            logging: logLevel
-        });
-    }
-    else if (config.db.dialect === 'mysql') {
-        sequelize = new Sequelize(config.db.mysql.database, config.db.mysql.username, config.db.mysql.password, {
-            dialect: 'mysql',
-            host: config.db.mysql.host,
-            port: config.db.mysql.port,
-            logging: logLevel
-        });
-    }
-
-    sequelize.authenticate().then(function (err) {
-        if (err) {
-            console.log('Unable to connect to the database:', err);
-        }
-        else {
-            console.log('Connected to ' + config.db.dialect + ' database');
-        }
+    // Sequelize database ORM
+    var models = require('./models');
+    models.sequelize.sync({force: config.db.forceSequelizeSync}).then(function () {
+        console.log('Connected to ' + config.db.dialect + ' database');
     });
-
-    // Build up the models and relations
-    var models = ['EventResponse', 'Game', 'Karma', 'Play', 'RoomEvent', 'Song', 'SongResponse', 'User'];
-    models.forEach(function (model) {
-        this[model] = sequelize.import(__dirname + '/models/' + model);
-    });
-
-    // @TODO - Is it better to declare these directly in the model?
-    Song.hasMany(Play);
-    User.hasMany(Game, {as: 'User', foreignKey: 'user_id'});
-    User.hasMany(Game, {as: 'ModUser', foreignKey: 'mod_user_id'});
-    User.hasMany(Karma);
-    User.hasMany(Karma, {as: 'ModUser', foreignKey: 'mod_user_id'});
-    User.hasMany(Play);
-    User.hasMany(RoomEvent, {as: 'ModUser', foreignKey: 'mod_user_id'});
-
-    sequelize.sync();
 
     package = require(path.resolve(__dirname, 'package.json'));
     request = require('request');
@@ -185,7 +140,7 @@ module.exports = function (options) {
         }
 
         Promise.map(_.rest(bot.getDJs(), startPosition), function (dj) {
-            return User.find({where: {id: dj.id}}).then(function (dbUser) {
+            return models.User.find({where: {id: dj.id}}).then(function (dbUser) {
                 if (dbUser !== null && dbUser.id !== bot.getUser().id) {
                     if (secondsSince(dbUser.last_active) <= (maxIdleMins * 60)) {
                         activeUsers.push(dbUser.id);

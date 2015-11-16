@@ -1,0 +1,63 @@
+{
+  "roomName": "i-80s-and-90s",
+  "roomStateFile": "/home/mburke/Projects/node/beavisbot-dubtrack-fm/roomState.json",
+  "superAdmin": "avatarkava",
+  "auth": {
+    "username": "testbot@phpmonkeys.com",
+    "password": "9jekjv5h"
+  },
+  "db": {
+    "dialect": "mysql",
+    "host": "localhost",
+    "port": "3306",
+    "username": "root",
+    "password": "9jekjv5H",
+    "database": "beavisbot",
+    "forceSequelizeSync": false
+  },
+  "apiKeys": {
+    "echoNest": "HNFF0PHDHPTJ7WLGY",
+    "lastFm": "091b0165fd23322b845fd27ba1c7f039",
+    "lastFm_secret": "03bdb3e1fa49e38587e4ca606f1dc08d"
+  },
+  "slack": {
+    "webhook_url": "https://80s90smods.slack.com/services/hooks/incoming-webhook?token=2qjMFltG2lNQ0beLaKdzwSKz",
+    "default": {
+      "channel": "#main",
+      "icon_url": ""
+    },
+    "pm2": {
+      "instance_name": "TestBot",
+      "token": "xxx",
+      "team_id": "xxx"
+    }
+  },
+  "responses": {
+    "botConnect": "",
+    "freeSpin": "",
+    "mention": "",
+    "welcome": {
+      "newUser": ":wave: Welcome, @{username}!",
+      "oldUser": ":wave: Welcome back, @{username}!",
+      "superAdmin": ":wave: Hello, Father."
+    },
+    "rules": "We ain't got no rules here, son.",
+    "theme": "No current theme.",
+    "language": "This is an English-speaking community.  Please keep room chat to English!",
+    "newDJReminder": "Hey @{username}, I noticed you just joined the line for the first time.  Please be sure to read the rules at ... or you might lose your spot in line!",
+    "activeDJReminder": "Are you still here?  I haven't seen you chat in more than an hour.  We require DJs in the wait list be active participants in chat. :smile:",
+    "activeDJRemoveMessage": "Everyone is welcome to listen to the music while AFK but we ask that if you wish to DJ you be able to respond to an @ mention in chat.",
+    "downvoteReminder": "We like to maintain a positive environment.  Repeated downvoting of songs probably means this is not the community for you and may result in a ban.",
+    "upvoteReminder": "Help us maintain an active, positive environment! We strongly encourage wooting. For auto-woot info, click the music note at the top left of the page."
+  },
+  "activeDJTimeoutMins": 60,
+  "autoSuggestCorrections": false,
+  "chatRandomnessPercentage": 5,
+  "commandLiteral": ".",
+  "maxSongLengthSecs": 420,
+  "prohibitDownvoteInQueue": false,
+  "quietMode": false,
+  "upvoteSongs": "ALL",
+  "verboseLogging": false,
+  "welcomeUsers": "ALL"
+}

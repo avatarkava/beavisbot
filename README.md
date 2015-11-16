@@ -5,8 +5,6 @@ BeavisBot is a heavily-adapted port of the turntable.fm SparkleBot that has migr
 
 This bot uses https://github.com/anjanms/DubAPI as its API dependency and is designed to be run using a node.JS instance.
 
-*Note*: This bot is NOT currently functional.  We're still working on porting it from plug.dj to work on dubtrack!
-
 Quick Installation
 -----------------------
 1. Run `npm install` in the root folder of the checkout
