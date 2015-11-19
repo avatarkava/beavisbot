@@ -8,7 +8,7 @@ exports.handler = function (data) {
         var params = _.rest(data.message.split(' '), 1);
         var username = params.join(' ').trim()
         var usernameFormatted = S(username).chompLeft('@').s;
-        var user = bot.getUserByName(usernameFormatted);
+        var user = bot.getUserByName(usernameFormatted.toLowerCase());
         if (user) {
             console.log(user);
             if (user.songsInQueue == 0) {
@@ -20,7 +20,7 @@ exports.handler = function (data) {
                 bot.sendChat('@' + usernameFormatted + ' ' + config.responses.activeDJRemoveMessage);
             }
 
-            getDbUserFromSiteUser(dj.id, function (row) {
+            getDbUserFromSiteUser(dj, function (row) {
                 var userData = {
                     type: 'remove',
                     details: 'Removed ' + user.songsInQueue + ' songs from queue by ' + data.user.username,

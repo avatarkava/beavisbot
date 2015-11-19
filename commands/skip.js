@@ -11,16 +11,22 @@ exports.handler = function (data) {
         return;
     }
 
-    if (media && (data.user.id == dj.id || bot.hasPermission(bot.getUser(data.user.id), 'skip'))) {
+    var params = _.rest(data.message.split(' '), 1);
+    var message = '';
 
-        console.log('[SKIP] ' + data.user.username + ' skipped ' + dj.username + ' - ' + media.name + ' (' + media.id + ')');
+    if (params.length > 0) {
+        message = params.join(' ').trim();
+    }
+
+    if (media && (data.user.id == dj.id || bot.hasPermission(bot.getUser(data.user.id), 'skip'))) {
+        console.log('[SKIP] ' + data.user.username + ' skipped ' + dj.username + ' - ' + media.name + ' (' + media.id + '): ' + message);
         bot.moderateSkip();
 
         if (data.user.id !== dj.id) {
-            getDbUserFromSiteUser(dj.id, function (row) {
+            getDbUserFromSiteUser(dj, function (row) {
                 var userData = {
                     type: 'skip',
-                    details: media.id + ': ' + media.name + ' (skipped by ' + data.user.username + ')',
+                    details: media.id + ': ' + media.name + ' (skipped by ' + data.user.username + '): ' + message,
                     user_id: row.id,
                     mod_user_id: data.user.db.id
                 };

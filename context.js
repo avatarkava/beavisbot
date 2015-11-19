@@ -106,9 +106,9 @@ module.exports = function (options) {
     /**
      * Custom functions accessible to commands
      */
-    timeSince = function (timestamp, ago) {
-        ago = typeof ago !== 'undefined' ? ago : false;
-        var message = moment.utc(timestamp).fromNow(ago);
+    timeSince = function (timestamp, suppressAgo) {
+        ago = typeof suppressAgo !== 'undefined' ? suppressAgo : false;
+        var message = moment.utc(timestamp).fromNow(suppressAgo);
 
         if (moment().isAfter(moment.utc(timestamp).add(24, 'hours'))) {
             message += ' (' + moment.utc(timestamp).calendar() + ')';

@@ -13,7 +13,8 @@ module.exports = function (sequelize, DataTypes) {
         tableName: 'plays',
         classMethods: {
             associate: function (models) {
-                // associations can be defined here
+                Play.belongsTo(models.Song);
+                Play.belongsTo(models.User);
             }
         }
     });

@@ -52,7 +52,11 @@ new DubAPI(config.auth, function (err, bot) {
         if (data.user.username !== undefined && data.user.username !== null) {
             data.message = data.message.trim();
             handleCommand(data);
-            models.User.update({last_active: new Date(), last_seen: new Date(), locale: data.raw.user.userInfo.locale}, {where: {site_id: data.user.id}});
+            models.User.update({
+                last_active: new Date(),
+                last_seen: new Date(),
+                locale: data.raw.user.userInfo.locale
+            }, {where: {site_id: data.user.id}});
         }
     });
 
@@ -244,30 +248,8 @@ new DubAPI(config.auth, function (err, bot) {
         //            bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
         //        }
         //
-        //        models.Song.find({
-        //            where: {
-        //                format: data.media.format,
-        //                cid: data.media.cid,
-        //                is_banned: true
-        //            }
-        //        }).then(function (row) {
-        //            if (row !== null) {
-        //                console.log('[SKIP] Skipped ' + data.user.username + ' spinning a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (cid: ' + data.media.cid + ')');
-        //                bot.sendChat('Sorry @' + data.user.username + ', this video has been blacklisted in our song database.');
-        //                bot.moderateForceSkip();
-        //                var userData = {
-        //                    type: 'skip',
-        //                    details: 'Skipped for playing a blacklisted song: ' + data.media.author + ' - ' + data.media.title + ' (cid: ' + data.media.cid + ')',
-        //                    user_id: data.user.id,
-        //                    mod_user_id: botUser.id
-        //                };
-        //                models.Karma.create(userData);
-        //            }
-        //        });
-        //
 
-        //    });
-
+        // Check if the song is too long for room settings.  Then check to see if it's blacklisted
         if (config.maxSongLengthSecs > 0 && data.media.songLengthSeconds > config.maxSongLengthSecs) {
             console.log('[SKIP] Skipped ' + data.user.username + ' spinning a song of ' + data.media.songLengthSeconds + ' seconds');
             var maxLengthMins = Math.floor(config.maxSongLengthSecs / 60);
@@ -277,13 +259,43 @@ new DubAPI(config.auth, function (err, bot) {
             }
             bot.sendChat('Sorry @' + data.user.username + ', this song is over our maximum room length of ' + maxLengthMins + ':' + maxLengthSecs + '.');
             bot.moderateSkip();
-            var userData = {
-                type: 'skip',
-                details: 'Skipped for playing a song of ' + data.media.songLengthSeconds + ' (room configured for max of ' + config.maxSongLengthSecs + 's)',
-                user_id: data.user.id,
-                mod_user_id: botUser.id
-            };
-            models.Karma.create(userData);
+            getDbUserFromSiteUser(data.user, function (dbuser) {
+                var userData = {
+                    type: 'skip',
+                    details: 'Skipped for playing a song of ' + data.media.songLengthSeconds + ' (room configured for max of ' + config.maxSongLengthSecs + 's)',
+                    user_id: dbuser.id,
+                    mod_user_id: botUser.id
+                };
+                models.Karma.create(userData);
+            });
+        }
+        else {
+            models.Song.find({
+                where: {
+                    site_id: data.media.id,
+                    is_banned: true
+                }
+            }).then(function (row) {
+                if (row !== null) {
+                    console.log('[SKIP] Skipped ' + data.user.username + ' spinning a blacklisted song: ' + data.media.name + ' (id: ' + data.media.id + ')');
+                    var message = 'Sorry @' + data.user.username + ', this video has been blacklisted in our song database.';
+                    if (row.message) {
+                        message += ' (' + row.message + ')';
+                    }
+                    bot.sendChat(message);
+                    bot.moderateSkip();
+                    getDbUserFromSiteUser(data.user, function (dbuser) {
+                        var userData = {
+                            type: 'skip',
+                            details: 'Skipped for playing a blacklisted song: ' + data.media.name + ' (id: ' + data.media.id + ')',
+                            user_id: dbuser.id,
+                            mod_user_id: botUser.id
+                        };
+                        models.Karma.create(userData);
+                    });
+
+                }
+            });
         }
 
     });
@@ -549,6 +561,11 @@ function initializeModules(auth, bot) {
 
 function handleCommand(data) {
 
+    // Only listen to the superAdmin when in development mode
+    if (config.developmentMode && data.user.username !== config.superAdmin) {
+        return;
+    }
+
     // unescape message
     data.message = S(data.message).unescapeHTML().s;
 
@@ -584,7 +601,7 @@ function handleCommand(data) {
 
             // Grab the db entries for the user that sent this message
             if (data.user.id !== null) {
-                getDbUserFromSiteUser(data.user.id, function (row) {
+                getDbUserFromSiteUser(data.user, function (row) {
                     data.user.db = row;
                     command.handler(data);
                 });

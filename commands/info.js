@@ -19,14 +19,9 @@ exports.handler = function (data) {
         if (row === null) {
             bot.sendChat(username + ' was not found.');
         } else {
-            joined = timeSince(row.joined);
-            birthday = row.birthday;
-            slug = row.slug;
-            id = row.id
-
-            // @TODO - display data we can get from dub like 'active', 'playedCount', 'songsInQueue', 'dubs'
-
-            message = username + ' (' + id + ') - Joined ' + joined + ' - https://www.dubtrack.fm/' + slug;
+            // @TODO - store & display data we can get from dub like 'active', 'playedCount', 'songsInQueue', 'dubs'
+            message = username + ' • ' + row.locale + ' • seen ' + timeSince(row.last_seen) + ' • '
+                + row.site_points.toLocaleString() + ' dubs • joined ' + moment.utc(row.joined).calendar() + ' • ID: ' + row.site_id;
             bot.sendChat(message);
         }
     });

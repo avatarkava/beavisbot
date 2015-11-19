@@ -1,13 +1,26 @@
 exports.names = ['lastplayed'];
 exports.hidden = false;
-exports.enabled = false;
-exports.matchStart = false;
+exports.enabled = true;
+exports.matchStart = true;
 exports.handler = function (data) {
-    //db.get('SELECT username, started, upvotes, downvotes, snags FROM (SELECT userid, started, upvotes, downvotes, snags FROM PLAYS WHERE songid = ? AND strftime("%s", datetime("now")) - strftime("%s", started) > 600 ORDER BY started DESC LIMIT 1) a INNER JOIN USERS ON a.userid = USERS.userid', [bot.getMedia().id], function (error, row) {
-    //    if (row != null) {
-    //        bot.sendChat('This song was last played ' + timeSince(row['started']) + ' by ' + row['username'] + ' (+' + row['upvotes'] + '/' + row['snags'] + '/-' + row['downvotes'] + ')');
-    //    } else {
-    //        bot.sendChat('This is the first time this song has been played in here.');
-    //    }
-    //});
+
+    var params = _.rest(data.message.split(' '), 1);
+    var message = '';
+    var songid = bot.getMedia().id;
+
+    if (params.length > 0) {
+        songid = params.join(' ').trim();
+    }
+
+    models.Play.find({
+        include: [{model: models.Song, where: {$or: [{site_id: songid}, {host_id: songid}]}}, models.User]
+    }).then(function (row) {
+        if (row === null) {
+            bot.sendChat('This is the first time I have seen this song played in this room!');
+        } else {
+            message = row.Song.name + ' • last played ' + timeSince(row.created_at) + ' by ' + row.User.username
+                + ' • ' + row.listeners + ' listeners • ' + (row.positive - row.negative) + ' dubs';
+            bot.sendChat(message);
+        }
+    });
 };

@@ -52,6 +52,7 @@
   "autoSuggestCorrections": false,
   "chatRandomnessPercentage": 5,
   "commandLiteral": ".",
+  "developmentMode": false,
   "maxSongLengthSecs": 420,
   "prohibitDownvoteInQueue": false,
   "quietMode": false,

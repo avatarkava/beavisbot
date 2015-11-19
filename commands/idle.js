@@ -32,7 +32,7 @@ exports.handler = function (data) {
                     if (dbUser !== null) {
                         if (secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
                             console.log('[WL-IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
-                            idleDJs.push(dbUser.username);
+                            idleDJs.push(dbUser.username + ' (' + timeSince(dbUser.last_active, true) + ')');
 
                         }
                         else {
