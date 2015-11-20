@@ -29,7 +29,7 @@ exports.handler = function (data) {
         }
         else {
             var key = input[1];
-            var value = _.rest(input, 1);
+            var value = _.rest(input, 2).join(' ');
 
             if (_.contains(supported, key)) {
                 config[key] = value;
