@@ -166,26 +166,27 @@ new DubAPI(config.auth, function (err, bot) {
             bot.updub();
         }
 
-        models.SongResponse.find({
-            // @TODO - No support in Dubtrack for author/title yet
-            where: {
-                $or: [{media_type: ['author', 'title']}],
-                trigger: {$like: data.media.name},
-                is_active: true
-            }
-        }).then(function (songresponse) {
-            if (songresponse !== null) {
-                if (songresponse.response != '') {
-                    bot.sendChat(songresponse.response);
-                }
-                if (songresponse.rate === 1) {
-                    bot.updub();
-                }
-                else if (songresponse.rate === -1) {
-                    bot.downdub();
-                }
-            }
-        });
+        // @TODO - No support in Dubtrack for author/title yet so we can't do matching
+        //models.SongResponse.find({
+        //
+        //    where: {
+        //        $or: [{media_type: ['author', 'title']}],
+        //        trigger: {$like: '%' + data.media.name + '%'},
+        //        is_active: true
+        //    }
+        //}).then(function (songresponse) {
+        //    if (songresponse !== null) {
+        //        if (songresponse.response != '') {
+        //            bot.sendChat(songresponse.response);
+        //        }
+        //        if (songresponse.rate === 1) {
+        //            bot.updub();
+        //        }
+        //        else if (songresponse.rate === -1) {
+        //            bot.downdub();
+        //        }
+        //    }
+        //});
 
         //
         //    var maxIdleTime = config.activeDJTimeoutMins * 60;
