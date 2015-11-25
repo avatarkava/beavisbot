@@ -12,8 +12,9 @@ exports.handler = function (data) {
         songid = params.join(' ').trim();
     }
 
-    models.Play.find({
-        include: [{model: models.Song, where: {$or: [{site_id: songid}, {host_id: songid}]}}, models.User]
+    models.Play.findOne({
+        include: [{model: models.Song, where: {$or: [{site_id: songid}, {host_id: songid}]}}, models.User],
+        order: [Play, 'created_at', 'DESC']
     }).then(function (row) {
         if (row === null) {
             bot.sendChat('This is the first time I have seen this song played in this room!');
