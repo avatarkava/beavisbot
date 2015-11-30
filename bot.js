@@ -24,6 +24,10 @@ new DubAPI(config.auth, function (err, bot) {
         }
 
         botUser = bot.getSelf();
+        getDbUserFromSiteUser(botUser, function (row) {
+            botUser.db = row;
+        });
+
         console.log('[INIT] Data loaded for ' + botUser.username + '\n ' + JSON.stringify(botUser, null, 2));
 
         if (config.responses.botConnect !== "") {
@@ -188,117 +192,121 @@ new DubAPI(config.auth, function (err, bot) {
         //    }
         //});
 
-        //
-        //    var maxIdleTime = config.activeDJTimeoutMins * 60;
-        //    var idleDJs = [];
-        //    roomHasActiveMods = false;
-        //
-        //    Promise.map(bot.getWaitList(), function (dj) {
-        //        return models.User.find({
-        //            where: {id: dj.id},
-        //            include: {
-        //                model: Karma,
-        //                required: false,
-        //                where: {
-        //                    type: 'warn',
-        //                    created_at: {gte: moment.utc().subtract(config.activeDJTimeoutMins, 'minutes').toDate()}
-        //                },
-        //                limit: 1,
-        //                order: [['created_at', 'DESC']]
-        //            }
-        //        }).then(function (dbUser) {
-        //            var position = bot.getWaitListPosition(dj.id);
-        //            if (dbUser !== null) {
-        //                if (secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
-        //                    console.log('[WL-IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
-        //                    if (dbUser.Karmas.length > 0) {
-        //                        console.log('[WL-IDLE]', dbUser.username + ' was last warned ' + timeSince(dbUser.Karmas[0].created_at));
-        //                        bot.moderateRemoveDJ(dj.id);
-        //                        bot.sendChat('@' + dbUser.username + ' ' + config.responses.activeDJRemoveMessage);
-        //                        var userData = {
-        //                            type: 'remove',
-        //                            details: 'Removed from position ' + position + ': AFK for ' + timeSince(dbUser.last_active, true),
-        //                            user_id: dj.id,
-        //                            mod_user_id: botUser.id
-        //                        };
-        //                        models.Karma.create(userData);
-        //                        models.User.update({waitlist_position: -1}, {where: {id: dj.id}});
-        //                    }
-        //                    else if (position > 1) {
-        //                        var userData = {
-        //                            type: 'warn',
-        //                            details: 'Warned in position ' + position + ': AFK for ' + timeSince(dbUser.last_active, true),
-        //                            user_id: dj.id,
-        //                            mod_user_id: botUser.id
-        //                        };
-        //                        models.Karma.create(userData);
-        //                        idleDJs.push(dbUser.username);
-        //                    }
-        //                }
-        //                else {
-        //                    if (dj.role > 1) {
-        //                        roomHasActiveMods = true;
-        //                    }
-        //                    console.log('[WL-ACTIVE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
-        //                }
-        //            }
-        //        });
-        //    }).then(function () {
-        //        if (idleDJs.length > 0) {
-        //            var idleDJsList = idleDJs.join(' @');
-        //            bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
-        //        }
-        //
 
-        // Check if the song is too long for room settings.  Then check to see if it's blacklisted
-        if (config.maxSongLengthSecs > 0 && data.media.songLengthSeconds > config.maxSongLengthSecs) {
-            console.log('[SKIP] Skipped ' + data.user.username + ' spinning a song of ' + data.media.songLengthSeconds + ' seconds');
-            var maxLengthMins = Math.floor(config.maxSongLengthSecs / 60);
-            var maxLengthSecs = config.maxSongLengthSecs % 60;
-            if (maxLengthSecs < 10) {
-                maxLengthSecs = "0" + maxLengthSecs;
-            }
-            bot.sendChat('Sorry @' + data.user.username + ', this song is over our maximum room length of ' + maxLengthMins + ':' + maxLengthSecs + '.');
-            bot.moderateSkip();
-            getDbUserFromSiteUser(data.user, function (dbuser) {
-                var userData = {
-                    type: 'skip',
-                    details: 'Skipped for playing a song of ' + data.media.songLengthSeconds + ' (room configured for max of ' + config.maxSongLengthSecs + 's)',
-                    user_id: dbuser.id,
-                    mod_user_id: botUser.id
-                };
-                models.Karma.create(userData);
-            });
-        }
-        else {
-            models.Song.find({
-                where: {
-                    site_id: data.media.id,
-                    is_banned: true
-                }
-            }).then(function (row) {
-                if (row !== null) {
-                    console.log('[SKIP] Skipped ' + data.user.username + ' spinning a blacklisted song: ' + data.media.name + ' (id: ' + data.media.id + ')');
-                    var message = 'Sorry @' + data.user.username + ', this video has been blacklisted in our song database.';
-                    if (row.message) {
-                        message += ' (' + row.message + ')';
+        var maxIdleTime = config.activeDJTimeoutMins * 60;
+        var idleDJs = [];
+        roomHasActiveMods = false;
+
+        // @FIXME - This should probably be recoded using Promise.all so it's in order
+        Promise.map(bot.getQueue(), function (queueItem) {
+            if (queueItem.user) {
+                return models.User.find({
+                    where: {site_id: queueItem.user.id},
+                    include: {
+                        model: models.Karma,
+                        required: false,
+                        where: {
+                            type: 'warn',
+                            created_at: {gte: moment.utc().subtract(config.activeDJTimeoutMins, 'minutes').toDate()}
+                        },
+                        limit: 1,
+                        order: [['created_at', 'DESC']]
                     }
-                    bot.sendChat(message);
-                    bot.moderateSkip();
-                    getDbUserFromSiteUser(data.user, function (dbuser) {
-                        var userData = {
-                            type: 'skip',
-                            details: 'Skipped for playing a blacklisted song: ' + data.media.name + ' (id: ' + data.media.id + ')',
-                            user_id: dbuser.id,
-                            mod_user_id: botUser.id
-                        };
-                        models.Karma.create(userData);
-                    });
+                }).then(function (dbUser) {
+                    var position = bot.getQueuePosition(dbUser.site_id);
+                    if (dbUser) {
+                        if (bot.getQueue().length >= config.minActiveDJQueueLength && secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
+                            console.log('[WL-IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
+                            if (dbUser.Karmas.length > 0) {
+                                console.log('[WL-IDLE]', dbUser.username + ' was last warned ' + timeSince(dbUser.Karmas[0].created_at));
+                                bot.moderateRemoveDJ(dbUser.site_id);
+                                bot.sendChat('@' + dbUser.username + ' ' + config.responses.activeDJRemoveMessage);
+                                var userData = {
+                                    type: 'remove',
+                                    details: 'Removed from position ' + position + ': AFK for ' + timeSince(dbUser.last_active, true),
+                                    user_id: dbUser.id,
+                                    mod_user_id: botUser.db.id
+                                };
+                                models.Karma.create(userData);
+                                models.User.update({waitlist_position: -1}, {where: {id: dj.id}});
+                            }
+                            else if (position > 1) {
+                                var userData = {
+                                    type: 'warn',
+                                    details: 'Warned in position ' + position + ': AFK for ' + timeSince(dbUser.last_active, true),
+                                    user_id: dbUser.id,
+                                    mod_user_id: botUser.db.id
+                                };
+                                models.Karma.create(userData);
+                                idleDJs.push(dbUser.username);
+                            }
+                        }
+                        else {
+                            if (bot.hasPermission(bot.getUser(dbUser.site_id), 'queue-order')) {
+                                roomHasActiveMods = true;
+                            }
+                            console.log('[WL-ACTIVE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
+                        }
+                    }
 
+                });
+            }
+        }).then(function () {
+            if (idleDJs.length > 0) {
+                var idleDJsList = idleDJs.join(' @');
+                bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
+            }
+
+            // Check if the song is too long for room settings.  Then check to see if it's blacklisted
+            if (config.maxSongLengthSecs > 0 && data.media.songLengthSeconds > config.maxSongLengthSecs) {
+                console.log('[SKIP] Skipped ' + data.user.username + ' spinning a song of ' + data.media.songLengthSeconds + ' seconds');
+                var maxLengthMins = Math.floor(config.maxSongLengthSecs / 60);
+                var maxLengthSecs = config.maxSongLengthSecs % 60;
+                if (maxLengthSecs < 10) {
+                    maxLengthSecs = "0" + maxLengthSecs;
                 }
-            });
-        }
+                bot.sendChat('Sorry @' + data.user.username + ', this song is over our maximum room length of ' + maxLengthMins + ':' + maxLengthSecs + '.');
+                bot.moderateSkip();
+                getDbUserFromSiteUser(data.user, function (dbuser) {
+                    var userData = {
+                        type: 'skip',
+                        details: 'Skipped for playing a song of ' + data.media.songLengthSeconds + ' (room configured for max of ' + config.maxSongLengthSecs + 's)',
+                        user_id: dbuser.id,
+                        mod_user_id: botUser.id
+                    };
+                    models.Karma.create(userData);
+                });
+            }
+            else {
+                models.Song.find({
+                    where: {
+                        site_id: data.media.id,
+                        is_banned: true
+                    }
+                }).then(function (row) {
+                    if (row !== null) {
+                        console.log('[SKIP] Skipped ' + data.user.username + ' spinning a blacklisted song: ' + data.media.name + ' (id: ' + data.media.id + ')');
+                        var message = 'Sorry @' + data.user.username + ', this video has been blacklisted in our song database.';
+                        if (row.message) {
+                            message += ' (' + row.message + ')';
+                        }
+                        bot.sendChat(message);
+                        bot.moderateSkip();
+                        getDbUserFromSiteUser(data.user, function (dbuser) {
+                            var userData = {
+                                type: 'skip',
+                                details: 'Skipped for playing a blacklisted song: ' + data.media.name + ' (id: ' + data.media.id + ')',
+                                user_id: dbuser.id,
+                                mod_user_id: botUser.id
+                            };
+                            models.Karma.create(userData);
+                        });
 
+                    }
+                });
+            }
+
+        });
     });
 
     bot.on('user-join', function (data) {
@@ -362,27 +370,27 @@ new DubAPI(config.auth, function (err, bot) {
                     }
                 }
 
-//                // Restore spot in line if user has been gone < 15 mins
-//                var position = bot.getWaitListPosition(data.id);
-//                if (!newUser && dbUser.waitlist_position > -1 && secondsSince(dbUser.last_seen) <= 900 && (position === -1 || (position > -1 && position > dbUser.waitlist_position))) {
-//                    bot.moderateAddDJ(data.id, function () {
-//                        if (dbUser.waitlist_position < bot.getWaitList().length && position !== dbUser.waitlist_position) {
-//                            bot.moderateMoveDJ(data.id, dbUser.waitlist_position);
-//                            var userData = {
-//                                type: 'restored',
-//                                details: 'Restored to position ' + dbUser.waitlist_position + ' (disconnected for ' + timeSince(dbUser.last_seen, true) + ')',
-//                                user_id: data.id,
-//                                mod_user_id: botUser.id
-//                            };
-//                            models.Karma.create(userData);
-//
-//                            setTimeout(function () {
-//                                bot.sendChat('/me put @' + data.user.username + ' back in line :thumbsup:')
-//                            }, 5000);
-//                        }
-//
-//                    });
-//                }
+                //// Restore spot in line if user has been gone < 15 mins
+                //var position = bot.getQueuePosition(data.user.id);
+                //if (!newUser && dbUser.waitlist_position > -1 && secondsSince(dbUser.last_seen) <= 900 && (position === -1 || (position > -1 && position > dbUser.waitlist_position))) {
+                //    bot.moderateAddDJ(data.id, function () {
+                //        if (dbUser.waitlist_position < bot.getWaitList().length && position !== dbUser.waitlist_position) {
+                //            bot.moderateMoveDJ(data.id, dbUser.waitlist_position);
+                //            var userData = {
+                //                type: 'restored',
+                //                details: 'Restored to position ' + dbUser.waitlist_position + ' (disconnected for ' + timeSince(dbUser.last_seen, true) + ')',
+                //                user_id: data.id,
+                //                mod_user_id: botUser.id
+                //            };
+                //            models.Karma.create(userData);
+                //
+                //            setTimeout(function () {
+                //                bot.sendChat('/me put @' + data.user.username + ' back in line :thumbsup:')
+                //            }, 5000);
+                //        }
+                //
+                //    });
+                //}
                 updateDbUser(data.user);
             });
         }
@@ -464,7 +472,10 @@ function saveWaitList(wholeRoom) {
         var position = bot.getWaitListPosition(user.id);
         // user last seen in 900 seconds
         if (position > 0) {
-            models.User.update({queue_position: position, last_seen: moment.utc().toDate()}, {where: {id: user.id}});
+            models.User.update({
+                queue_position: position,
+                last_seen: moment.utc().toDate()
+            }, {where: {id: user.id}});
         }
         else {
             models.User.update({queue_position: -1}, {where: {id: user.id}});

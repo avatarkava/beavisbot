@@ -148,11 +148,11 @@ module.exports = function (options) {
             startPosition = 0;
         }
 
-        Promise.map(_.rest(bot.getDJs(), startPosition), function (dj) {
-            return models.User.find({where: {id: dj.id}}).then(function (dbUser) {
-                if (dbUser !== null && dbUser.id !== bot.getUser().id) {
+        Promise.map(_.rest(bot.getQueue(), startPosition), function (queueItem) {
+            return models.User.find({where: {site_id: queueItem.user.id}}).then(function (dbUser) {
+                if (dbUser !== null && dbUser.site_id !== bot.getSelf().id) {
                     if (secondsSince(dbUser.last_active) <= (maxIdleMins * 60)) {
-                        activeUsers.push(dbUser.id);
+                        activeUsers.push(dbUser);
                     }
                 }
             });

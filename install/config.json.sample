@@ -49,6 +49,7 @@
     "upvoteReminder": "Help us maintain an active, positive environment! Wooting all songs while in line to DJ is required. For auto-woot info, click the music note at the top left of the page."
   },
   "activeDJTimeoutMins": 60,
+  "minActiveDJQueueLength": 5,
   "autoSuggestCorrections": false,
   "chatRandomnessPercentage": 5,
   "commandLiteral": ".",

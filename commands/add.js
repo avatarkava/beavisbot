@@ -3,6 +3,8 @@ exports.hidden = true;
 exports.enabled = false;
 exports.matchStart = true;
 exports.handler = function (data) {
+    // @TODO - No functionality for this in dubtrack
+    /*
     if (data.from.role > 1) {
         //bot.moderateDeleteChat(data.id);
         var input = data.message.split(' ');
@@ -17,4 +19,5 @@ exports.handler = function (data) {
             }
         }
     }
+    */
 };
