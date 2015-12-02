@@ -81,7 +81,7 @@ new DubAPI(config.auth, function (err, bot) {
 
             JSONstats.media = bot.getMedia();
             JSONstats.dj = bot.getDJ();
-            //JSONstats.waitlist = bot.getWaitList();
+            JSONstats.queue = bot.getQueue();
             JSONstats.users = bot.getUsers();
             JSONstats.staff = bot.getStaff();
 
@@ -228,7 +228,7 @@ new DubAPI(config.auth, function (err, bot) {
                                     mod_user_id: botUser.db.id
                                 };
                                 models.Karma.create(userData);
-                                models.User.update({waitlist_position: -1}, {where: {id: dj.id}});
+                                models.User.update({queue_position: -1}, {where: {id: dbUser.id}});
                             }
                             else if (position > 1) {
                                 var userData = {
@@ -460,16 +460,16 @@ new DubAPI(config.auth, function (err, bot) {
 
 });
 
-function saveWaitList(wholeRoom) {
+function saveQueue(wholeRoom) {
 
     if (wholeRoom) {
         var userList = bot.getUsers();
     }
     else {
-        var userList = bot.getWaitList();
+        var userList = bot.getQueue();
     }
     userList.forEach(function (user) {
-        var position = bot.getWaitListPosition(user.id);
+        var position = bot.getQueuePosition(user.id);
         // user last seen in 900 seconds
         if (position > 0) {
             models.User.update({
@@ -514,8 +514,7 @@ function updateDbUser(user) {
         // Reset the user's AFK timer if they've been gone for long enough (so we don't reset on disconnects)
         if (secondsSince(dbUser.last_seen) >= 900) {
             userData.last_active = new Date();
-            // @TODO - Get position in queue
-            // userData.queue_position = bot.getWaitListPosition(user.id)
+            userData.queue_position = bot.getQueuePosition(user.id)
         }
         dbUser.updateAttributes(userData);
     }).catch(function (err) {
@@ -531,7 +530,7 @@ function monitorDJList() {
 function removeIfDownvoting(mehUsername) {
     // @TODO fix this so it actually works
 
-    //var mehWaitList = bot.getWaitList();
+    //var mehWaitList = bot.getQueue();
     //var mehUser = _.findWhere(mehWaitList, {username: mehUsername});
     //if (mehUser !== undefined && mehUser.vote === -1) {
     //    console.log('[REMOVE] Removed ' + mehUser.username + ' from wait list for mehing');

@@ -12,7 +12,7 @@ exports.handler = function (data) {
         var usernameFormatted = S(username).chompLeft('@').s;
         if (usernameFormatted) {
             var user = bot.getUserByName(usernameFormatted.toLowerCase());
-            if (user && bot.getWaitListPosition(user.id) === -1) {
+            if (user && bot.getQueuePosition(user.id) === -1) {
                 bot.moderateAddDJ(user.id, function () {
                     logger.info('[ADD] ' + data.from.username + ' added ' + usernameFormatted + ' to waitlist.');
                 });
