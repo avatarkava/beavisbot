@@ -81,7 +81,7 @@ new DubAPI(config.auth, function (err, bot) {
 
             JSONstats.media = bot.getMedia();
             JSONstats.dj = bot.getDJ();
-            JSONstats.queue = bot.getQueue();
+            JSONstats.roomQueue = bot.getQueue();
             JSONstats.users = bot.getUsers();
             JSONstats.staff = bot.getStaff();
 
