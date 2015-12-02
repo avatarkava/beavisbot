@@ -87,7 +87,7 @@ new DubAPI(config.auth, function (err, bot) {
 
             fs.writeFile(
                 config.roomStateFile,
-                JSON.stringify(JSONstats, function (key, value) {
+                CircularJSON.stringify(JSONstats, function (key, value) {
                     if (key == 'parent') {
                         return value.id;
                     }

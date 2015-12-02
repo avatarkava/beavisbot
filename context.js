@@ -23,6 +23,7 @@ module.exports = function (options) {
     _ = require('underscore');
     S = require('string');
     moment = require('moment');
+    CircularJSON = require('circular-json');
     commands = [];
     uptime = new Date();
     lastRpcMessage = new Date();
