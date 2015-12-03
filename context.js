@@ -171,23 +171,26 @@ module.exports = function (options) {
             console.log('[GIFT] ' + fromUser.username + ' awarded ' + points + ' points to ' + toUser.username);
             bot.sendChat(':gift: ' + fromUser.username + ' awarded ' + points + ' ' + config.customPointName + ' to @' +
                 toUser.username + ' :gift:');
+
+            return;
         }
+        else {
+            getDbUserFromSiteUser(fromUser, function (row) {
+                if (!row || row.custom_points < points) {
+                    console.log('Gift failed');
+                    return false;
+                }
 
-        getDbUserFromSiteUser(fromUser, function (row) {
-            if (!row || row.custom_points < points) {
-                console.log('Gift failed');
-                return false;
-            }
+                // Deduct the points from the sender's balance and add to the recipient
+                models.User.update({custom_points: Sequelize.literal('(custom_points - ' + points + ')')}, {where: {site_id: fromUser.id}});
+                models.User.update({custom_points: Sequelize.literal('(custom_points + ' + points + ')')}, {where: {site_id: toUser.id}});
 
-            // Deduct the points from the sender's balance and add to the recipient
-            models.User.update({custom_points: Sequelize.literal('(custom_points - ' + points + ')')}, {where: {site_id: fromUser.id}});
-            models.User.update({custom_points: Sequelize.literal('(custom_points + ' + points + ')')}, {where: {site_id: toUser.id}});
+                console.log('[GIFT] ' + fromUser.username + ' gave ' + points + ' points to ' + toUser.username);
+                bot.sendChat(':gift: @' + fromUser.username + ' gave ' + points + ' ' + config.customPointName + ' to @' +
+                    toUser.username + ' :gift:');
 
-            console.log('[GIFT] ' + fromUser.username + ' gave ' + points + ' points to ' + toUser.username);
-            bot.sendChat(':gift: @' + fromUser.username + ' gave ' + points + ' ' + config.customPointName + ' to @' +
-                toUser.username + ' :gift:');
-
-        });
+            });
+        }
     }
 
 };
