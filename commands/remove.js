@@ -19,7 +19,7 @@ exports.handler = function (data) {
                 bot.sendChat('@' + usernameFormatted + ' ' + config.responses.activeDJRemoveMessage);
             }
 
-            getDbUserFromSiteUser(dj, function (row) {
+            getDbUserFromSiteUser(user, function (row) {
                 var userData = {
                     type: 'remove',
                     details: 'Removed ' + user.songsInQueue + ' songs from queue by ' + data.user.username,

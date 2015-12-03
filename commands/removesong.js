@@ -17,7 +17,7 @@ exports.handler = function (data) {
             }
             bot.moderateRemoveSong(user.id);
 
-            getDbUserFromSiteUser(dj, function (row) {
+            getDbUserFromSiteUser(user, function (row) {
                 var userData = {
                     type: 'remove',
                     details: 'Removed queued song by ' + data.user.username,

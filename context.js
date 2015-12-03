@@ -126,7 +126,6 @@ module.exports = function (options) {
         else {
             return '(' + message + ')';
         }
-
     };
 
     secondsSince = function (timestamp) {
@@ -159,6 +158,25 @@ module.exports = function (options) {
             });
         }).then(function () {
             callback(activeUsers);
+        });
+    }
+
+    transferCustomPoints = function(fromUser, toUser, points) {
+
+        getDbUserFromSiteUser(fromUser, function (row) {
+            if (!row || row.custom_points < points) {
+                console.log('Gift failed');
+                return false;
+            }
+
+            // Deduct the points from the sender's balance and add to the recipient
+            models.User.update({custom_points: Sequelize.literal('(custom_points - ' + points + ')')}, {where: {site_id: fromUser.id}});
+            models.User.update({custom_points: Sequelize.literal('(custom_points + ' + points + ')')}, {where: {site_id: toUser.id}});
+
+            console.log('[GIFT] ' + fromUser.username + ' gave ' + points + ' points to ' + toUser.username);
+            bot.sendChat(':gift: @' + fromUser.username + ' gave ' + config.customPointName + ' ' + points + ' to @' +
+                toUser.username + ' :gift:');
+
         });
     }
 

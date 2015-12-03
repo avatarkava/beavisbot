@@ -22,6 +22,10 @@ exports.handler = function (data) {
             // @TODO - store & display data we can get from dub like 'active', 'playedCount', 'songsInQueue', 'dubs'
             message = username + ' • ' + row.locale + ' • seen ' + timeSince(row.last_seen) + ' • '
                 + row.site_points.toLocaleString() + ' dubs • joined ' + moment.utc(row.joined).calendar() + ' • ID: ' + row.site_id;
+
+            if(config.customPointName) {
+                message = message + ' • ' + config.customPointName + row.custom_points;
+            }
             bot.sendChat(message);
         }
     });
