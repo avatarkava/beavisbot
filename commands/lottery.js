@@ -39,6 +39,7 @@ exports.handler = function (data) {
                     var randomNumber = _.random(1, activeDJs.length);
                     var winner = activeDJs[(randomNumber - 1)];
                     bot.sendChat(":tada: @" + winner.username + " emerges victorious!");
+                    transferCustomPoints(null, winner, 1);
                     var currentPosition = bot.getQueuePosition(winner.site_id);
                     if (input[0] === 'roulette') {
                         position = _.random(0, currentPosition - 1);

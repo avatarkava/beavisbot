@@ -161,7 +161,17 @@ module.exports = function (options) {
         });
     }
 
-    transferCustomPoints = function(fromUser, toUser, points) {
+    transferCustomPoints = function (fromUser, toUser, points) {
+
+        // Create them out of thin air!
+        if (fromUser === null) {
+            fromUser = bot.getUser();
+
+            models.User.update({custom_points: Sequelize.literal('(custom_points + ' + points + ')')}, {where: {site_id: toUser.id}});
+            console.log('[GIFT] ' + fromUser.username + ' awarded ' + points + ' points to ' + toUser.username);
+            bot.sendChat(':gift: @' + fromUser.username + ' awarded ' + config.customPointName + ' ' + points + ' to @' +
+                toUser.username + ' :gift:');
+        }
 
         getDbUserFromSiteUser(fromUser, function (row) {
             if (!row || row.custom_points < points) {
