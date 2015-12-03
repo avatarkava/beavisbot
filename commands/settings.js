@@ -8,8 +8,9 @@ exports.handler = function (data) {
         var input = data.message.split(' ');
         // Settings to support direct access to
         supported = ['activeDJTimeoutMins',
+            'minActiveDJQueueLength',
             'maxSongLengthSecs',
-            'prohibitMehInLine',
+            'chatRandomnessPercentage',
             'quietMode',
             'upvoteSongs',
             'verboseLogging',
