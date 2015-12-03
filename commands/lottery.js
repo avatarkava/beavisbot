@@ -38,7 +38,7 @@ exports.handler = function (data) {
                 if (activeDJs.length > 0) {
                     var randomNumber = _.random(1, activeDJs.length);
                     var winner = activeDJs[(randomNumber - 1)];
-                    bot.sendChat(":tada: @" + winner.username + " emerges victorious!");
+                    var message = ":tada: @" + winner.username + " emerges victorious!";
                     transferCustomPoints(null, winner, 1);
                     var currentPosition = bot.getQueuePosition(winner.site_id);
                     if (input[0] === 'roulette') {
@@ -49,8 +49,9 @@ exports.handler = function (data) {
                     if (currentPosition > 0 && currentPosition > position) {
                         bot.moderateMoveDJ(winner.site_id, position);
                         console.log('[LOTTO] Moving ' + winner.username + ' to position: ' + position);
+                        message += ' Moving to position: ' + position;
                     }
-
+                    bot.sendChat(message);
                 }
                 else {
                     bot.sendChat(":thumbsdown: No one is eligible to win the contest.");

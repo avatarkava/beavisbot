@@ -165,11 +165,11 @@ module.exports = function (options) {
 
         // Create them out of thin air!
         if (fromUser === null) {
-            fromUser = bot.getUser();
+            fromUser = bot.getSelf();
 
             models.User.update({custom_points: Sequelize.literal('(custom_points + ' + points + ')')}, {where: {site_id: toUser.id}});
             console.log('[GIFT] ' + fromUser.username + ' awarded ' + points + ' points to ' + toUser.username);
-            bot.sendChat(':gift: @' + fromUser.username + ' awarded ' + config.customPointName + ' ' + points + ' to @' +
+            bot.sendChat(':gift: ' + fromUser.username + ' awarded ' + points + ' ' + config.customPointName + ' to @' +
                 toUser.username + ' :gift:');
         }
 
@@ -184,7 +184,7 @@ module.exports = function (options) {
             models.User.update({custom_points: Sequelize.literal('(custom_points + ' + points + ')')}, {where: {site_id: toUser.id}});
 
             console.log('[GIFT] ' + fromUser.username + ' gave ' + points + ' points to ' + toUser.username);
-            bot.sendChat(':gift: @' + fromUser.username + ' gave ' + config.customPointName + ' ' + points + ' to @' +
+            bot.sendChat(':gift: @' + fromUser.username + ' gave ' + points + ' ' + config.customPointName + ' to @' +
                 toUser.username + ' :gift:');
 
         });
