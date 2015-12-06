@@ -10,7 +10,6 @@ exports.handler = function (data) {
     var amount = parseInt(input[2]);
     var user = bot.getUserByName(usernameFormatted.toLowerCase());
 
-    console.log('THE AMOUNT' + amount);
     if (!amount || isNaN(amount) || amount < 1) {
         amount = 1;
     }
@@ -28,7 +27,7 @@ exports.handler = function (data) {
             bot.sendChat('You do not have any ' + config.customPointName + ' to give, @' + data.user.username + '.');
             return;
         } else if (row.custom_points < amount) {
-            bot.sendChat('You only have ' + config.customPointName + ' ' + row.custom_points + ' to give, @' +
+            bot.sendChat('You only have ' + row.custom_points + ' ' +  config.customPointName + ' to give, @' +
                 data.user.username + '.');
             return;
         }
