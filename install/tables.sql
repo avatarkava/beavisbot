@@ -8,7 +8,7 @@ CREATE TABLE `event_responses` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `games`;
 CREATE TABLE `games` (
@@ -23,10 +23,8 @@ CREATE TABLE `games` (
   `mod_user_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
-  KEY `mod_user_id` (`mod_user_id`),
-  CONSTRAINT `games_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `games_ibfk_2` FOREIGN KEY (`mod_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `mod_user_id` (`mod_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `karmas`;
 CREATE TABLE `karmas` (
@@ -39,10 +37,8 @@ CREATE TABLE `karmas` (
   `mod_user_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
-  KEY `mod_user_id` (`mod_user_id`),
-  CONSTRAINT `karmas_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `karmas_ibfk_2` FOREIGN KEY (`mod_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+  KEY `mod_user_id` (`mod_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `plays`;
 CREATE TABLE `plays` (
@@ -59,10 +55,8 @@ CREATE TABLE `plays` (
   `user_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `song_id` (`song_id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `plays_ibfk_1` FOREIGN KEY (`song_id`) REFERENCES `songs` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `plays_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=201 DEFAULT CHARSET=latin1;
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `room_events`;
 CREATE TABLE `room_events` (
@@ -77,9 +71,8 @@ CREATE TABLE `room_events` (
   `updated_at` datetime NOT NULL,
   `mod_user_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `mod_user_id` (`mod_user_id`),
-  CONSTRAINT `room_events_ibfk_1` FOREIGN KEY (`mod_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `mod_user_id` (`mod_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `song_responses`;
 CREATE TABLE `song_responses` (
@@ -92,7 +85,7 @@ CREATE TABLE `song_responses` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `songs`;
 CREATE TABLE `songs` (
@@ -115,7 +108,7 @@ CREATE TABLE `songs` (
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `site_id` (`site_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=228 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
@@ -138,4 +131,14 @@ CREATE TABLE `users` (
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `site_id` (`site_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE `games` ADD CONSTRAINT `games_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `games` ADD CONSTRAINT `games_ibfk_2` FOREIGN KEY (`mod_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `karmas` ADD CONSTRAINT `karmas_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `karmas` ADD CONSTRAINT `karmas_ibfk_2` FOREIGN KEY (`mod_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `plays` ADD CONSTRAINT `plays_ibfk_1` FOREIGN KEY (`song_id`) REFERENCES `songs` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `plays` ADD CONSTRAINT `plays_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `room_events` ADD CONSTRAINT `room_events_ibfk_1` FOREIGN KEY (`mod_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+
