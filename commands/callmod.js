@@ -34,6 +34,9 @@ exports.handler = function (data) {
                     bot.sendChat('There was an error sending your request.');
                 }
             }
+            else {
+                console.log(error);
+            }
         });
     }
 }

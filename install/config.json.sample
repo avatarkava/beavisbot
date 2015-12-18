@@ -22,7 +22,7 @@
     "wordnik": "wordnikApiKey"
   },
   "slack": {
-    "webhookUrl": "https://xxxxxx.slack.com/services/hooks/incoming-webhook?token=xxxxxxxxxxx",
+    "webhook_url": "https://xxxxxx.slack.com/services/hooks/incoming-webhook?token=xxxxxxxxxxx",
     "default": {
       "channel": "#general",
       "iconUrl": ""
