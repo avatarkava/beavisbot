@@ -22,14 +22,14 @@ exports.handler = function (data) {
         }
 
         if (input[0] === 'roulette') {
-            bot.sendChat('Queue roulette in ' + mins + ' minutes! Have a queued song and chat within ' + mins + ' minutes to enter.  Winner gets moved up a random number of spots!');
+            bot.sendChat('Queue roulette in ' + mins + ' minutes! Have a queued song and chat within ' + mins + ' minutes to enter.  Winner gets moved up a random number of spots! @djs');
         }
         else {
-            bot.sendChat('Queue lottery in ' + mins + ' minutes! Have a queued song and chat within ' + mins + ' minutes to enter.  Winner gets the #1 spot!');
+            bot.sendChat('Queue lottery in ' + mins + ' minutes! Have a queued song and chat within ' + mins + ' minutes to enter.  Winner gets the #1 spot! @djs');
         }
 
         setTimeout(function () {
-            bot.sendChat("Contest ending in ONE MINUTE - have a queued song and chat to enter!");
+            bot.sendChat("Contest ending in ONE MINUTE - have a queued song and chat to enter! @djs");
         }, (mins - 1) * 60 * 1000);
 
         setTimeout(function () {

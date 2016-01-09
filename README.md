@@ -22,7 +22,7 @@ Full details are here: https://github.com/Unitech/pm2
 
 Start the process in pm2 with custom log locations:
 ```
-pm2 start /srv/web/apps/plug.dj/BeavisBot/bot.js --name beavisbot -o /var/log/node/beavisbot.log -e /var/log/node/beavisbot.err --run-as-user=www-data
+pm2 start /srv/web/apps/plug.dj/BeavisBot/bot.js --name beavisbot -o /var/log/node/beavisbot.log -e /var/log/node/beavisbot.err --log-date-format 'YYYY-MM-DD HH:mm:ss'
 ```
 Set pm2 to automatically run on startup
 ```
