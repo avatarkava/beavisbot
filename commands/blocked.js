@@ -36,7 +36,7 @@ exports.handler = function (data) {
                                     country.splice(0,1);
                                 }
                                 country = country.join('-').trim();
-                                if(country !== undefined && country != '')
+                                if(country != '')
                                     blocked.push(country);
                             }
                         }
