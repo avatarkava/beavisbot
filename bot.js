@@ -148,12 +148,14 @@ new DubAPI(config.auth, function (err, bot) {
 
         // Auto skip for "stuck" songs
         clearTimeout(skipTimer);
-        skipTimer = setTimeout(function () {
-            if (bot.getMedia() && bot.getMedia().id == data.media.id) {
-                bot.sendChat('Skipping ' + data.media.name + ' because it appears to be stuck...');
-                bot.moderateSkip();
-            }
-        }, (data.media.songLength + 10000));
+        if(config.skipStuckSongs ) {
+            skipTimer = setTimeout(function () {
+                if (bot.getMedia() && bot.getMedia().id == data.media.id) {
+                    bot.sendChat('Skipping ' + data.media.name + ' because it appears to be stuck...');
+                    bot.moderateSkip();
+                }
+            }, (data.media.songLength + 10000));
+        }
 
         // Write current song data to DB
         var songData = {
