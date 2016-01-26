@@ -60,5 +60,6 @@
   "quietMode": false,
   "upvoteSongs": "ALL",
   "verboseLogging": false,
-  "welcomeUsers": "ALL"
+  "welcomeUsers": "ALL",
+  "skipStuckSongs": true
 }
