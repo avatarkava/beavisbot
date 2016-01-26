@@ -8,7 +8,7 @@ exports.handler = function (data) {
     var username = input[1];
     var usernameFormatted = S(username).chompLeft('@').s;
     var amount = parseInt(input[2]);
-    var user = bot.getUserByName(usernameFormatted.toLowerCase());
+    var user = bot.getUserByName(usernameFormatted);
 
     if (!amount || isNaN(amount) || amount < 1) {
         amount = 1;
