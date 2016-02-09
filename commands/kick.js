@@ -19,7 +19,7 @@ exports.handler = function (data) {
         }
 
         var usernameFormatted = S(username).chompLeft('@').s;
-        var user = bot.getUserByName(usernameFormatted);
+        var user = bot.getUserByName(usernameFormatted, true);
 
         if (user) {
             bot.moderateKickUser(user.id, message);

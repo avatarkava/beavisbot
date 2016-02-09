@@ -8,13 +8,13 @@ exports.handler = function (data) {
         var params = _.rest(data.message.split(' '), 1);
         var username = params.join(' ').trim()
         var usernameFormatted = S(username).chompLeft('@').s;
-        var user = bot.getUserByName(usernameFormatted);
+        var user = bot.getUserByName(usernameFormatted, true);
         if (user) {
             if (user.songsInQueue == 0) {
                 bot.sendChat('/me ' + usernameFormatted + ' does not have any songs queued');
                 return;
             }
-            bot.moderateRemoveDJ(user.id);
+            bot.moderatePauseDJ(user.id);
             if (command === 'rmafk' || command === 'rmidle') {
                 bot.sendChat('@' + usernameFormatted + ' ' + config.responses.activeDJRemoveMessage);
             }
@@ -22,12 +22,12 @@ exports.handler = function (data) {
             getDbUserFromSiteUser(user, function (row) {
                 var userData = {
                     type: 'remove',
-                    details: 'Removed ' + user.songsInQueue + ' songs from queue by ' + data.user.username,
+                    details: 'Paused queue for ' + data.user.username,
                     user_id: row.id,
                     mod_user_id: data.user.db.id
                 };
                 models.Karma.create(userData);
-                console.log('[REMOVE] ' + data.user.username + ' removed ' + usernameFormatted + ' from queue');
+                console.log('[REMOVE] ' + data.user.username + ' paused the queue for ' + usernameFormatted);
                 models.User.update({queue_position: -1}, {where: {site_id: user.id}});
             });
 

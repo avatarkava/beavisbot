@@ -411,7 +411,7 @@ new DubAPI(config.auth, function (err, bot) {
         // models.User.update({last_seen: new Date()}, {where: {id: data.id}});
     });
 
-    bot.on('user-update', function (data) {
+    bot.on('user_update', function (data) {
         if (config.verboseLogging) {
             console.log('[EVENT] USER_UPDATE', data);
         }

@@ -13,7 +13,7 @@ exports.handler = function (data) {
             usernameFormatted = S(username).chompLeft('@').s;
 
             // @TODO - Maybe provide language-specific messages to users
-            // var user = bot.getUserByName(usernameFormatted);
+            // var user = bot.getUserByName(usernameFormatted, true);
             bot.sendChat('@' + usernameFormatted + ': ' + config.responses.language);
         }
     }
