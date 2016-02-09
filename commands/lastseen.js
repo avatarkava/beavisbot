@@ -19,7 +19,7 @@ exports.handler = function (data) {
         } else {
             var user = bot.getUserByName(usernameFormatted, true);
             if (user) {
-                bot.sendChat(usernameFormatted + ' is in the room and was last active ' + timeSince(row.last_active));
+                bot.sendChat(user.username + ' is in the room and was last active ' + timeSince(row.last_active));
             }
             else {
                 bot.sendChat(row.username + ' was last seen ' + timeSince(row.last_seen));

@@ -12,7 +12,7 @@ exports.handler = function (data) {
         if (user) {
             console.log(user);
             if (user.songsInQueue == 0) {
-                bot.sendChat('/me ' + usernameFormatted + ' does not have any songs queued');
+                bot.sendChat('/me ' + user.username + ' does not have any songs queued');
                 return;
             }
             bot.moderateRemoveSong(user.id);
@@ -25,7 +25,7 @@ exports.handler = function (data) {
                     mod_user_id: data.user.db.id
                 };
                 models.Karma.create(userData);
-                console.log('[REMOVE] ' + data.user.username + ' removed a song queued by  ' + usernameFormatted);
+                console.log('[REMOVE] ' + data.user.username + ' removed a song queued by  ' + user.username);
             });
 
         }

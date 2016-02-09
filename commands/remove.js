@@ -11,12 +11,12 @@ exports.handler = function (data) {
         var user = bot.getUserByName(usernameFormatted, true);
         if (user) {
             if (user.songsInQueue == 0) {
-                bot.sendChat('/me ' + usernameFormatted + ' does not have any songs queued');
+                bot.sendChat('/me ' + user.username + ' does not have any songs queued');
                 return;
             }
             bot.moderatePauseDJ(user.id);
             if (command === 'rmafk' || command === 'rmidle') {
-                bot.sendChat('@' + usernameFormatted + ' ' + config.responses.activeDJRemoveMessage);
+                bot.sendChat('@' + user.username + ' ' + config.responses.activeDJRemoveMessage);
             }
 
             getDbUserFromSiteUser(user, function (row) {
@@ -27,7 +27,7 @@ exports.handler = function (data) {
                     mod_user_id: data.user.db.id
                 };
                 models.Karma.create(userData);
-                console.log('[REMOVE] ' + data.user.username + ' paused the queue for ' + usernameFormatted);
+                console.log('[REMOVE] ' + data.user.username + ' paused the queue for ' + user.username);
                 models.User.update({queue_position: -1}, {where: {site_id: user.id}});
             });
 

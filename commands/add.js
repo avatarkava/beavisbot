@@ -14,7 +14,7 @@ exports.handler = function (data) {
             var user = bot.getUserByName(usernameFormatted, true);
             if (user && bot.getQueuePosition(user.id) === -1) {
                 bot.moderateAddDJ(user.id, function () {
-                    logger.info('[ADD] ' + data.from.username + ' added ' + usernameFormatted + ' to waitlist.');
+                    logger.info('[ADD] ' + data.from.username + ' added ' + user.username + ' to waitlist.');
                 });
             }
         }
