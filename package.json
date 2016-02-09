@@ -19,7 +19,7 @@
     "node": ">= 0.6.0"
   },
   "dependencies": {
-    "bluebird": "2.*",
+    "bluebird": "*",
     "circular-json": "*",
     "cleverbot-node": "git://github.com/avatarkava/cleverbot-node.git",
     "dubapi": "git://github.com/anjanms/DubAPI.git",
