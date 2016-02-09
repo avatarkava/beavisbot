@@ -1,4 +1,4 @@
-exports.names = ['gif'];
+exports.names = ['giphy'];
 exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = true;
