@@ -704,12 +704,13 @@ function mentionResponse(data) {
 
     if (_.random(1, 100) > chatRandomnessPercentage) {
         cleverMessage = data.message.replace('@' + botUser.username, '').trim();
-        cleverbot.write(cleverMessage, function (response) {
-            if (config.verboseLogging) {
-                console.log('[CLEVERBOT]', JSON.stringify(response, null, 2));
-            }
-            bot.sendChat(response.message + ' @' + data.user.username);
-
+	    Cleverbot.prepare(function() {
+            cleverbot.write(cleverMessage, function (response) {
+                if (config.verboseLogging) {
+                    console.log('[CLEVERBOT]', JSON.stringify(response, null, 2));
+                }
+                bot.sendChat(response.message + ' @' + data.user.username);
+            });
         });
     }
     else {

@@ -9,7 +9,6 @@ module.exports = function (options) {
 
     Cleverbot = require('cleverbot-node');
     cleverbot = new Cleverbot;
-    cleverbot.prepare();
 
     // Sequelize database ORM
     Sequelize = require('sequelize');
