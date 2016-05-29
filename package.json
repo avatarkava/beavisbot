@@ -21,7 +21,7 @@
   "dependencies": {
     "bluebird": "*",
     "circular-json": "*",
-    "cleverbot-node": "git://github.com/avatarkava/cleverbot-node.git",
+    "cleverbot-node": "git://github.com/fojas/cleverbot-node.git",
     "dubapi": "git://github.com/anjanms/DubAPI.git",
     "moment": "*",
     "mysql": "*",
