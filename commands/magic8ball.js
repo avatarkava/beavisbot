@@ -51,5 +51,5 @@ exports.handler = function (data) {
         "YAAAAASSS"
     ];
     var randomNumber = _.random(1, responses.length);
-    bot.sendChat("/me :8ball: " + responses[(randomNumber - 1)] + " @" + data.user.username);
+    bot.sendChat("/me :8ball: " + responses[(randomNumber - 1)] + " @" + data.from.username);
 };

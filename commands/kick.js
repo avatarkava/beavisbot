@@ -27,12 +27,12 @@ exports.handler = function (data) {
             getDbUserFromSiteUser(user.id, function (row) {
                 var userData = {
                     type: 'kick',
-                    details: 'Kicked ' + data.user.username,
+                    details: 'Kicked ' + data.username,
                     user_id: row.id,
-                    mod_user_id: data.user.db.id
+                    mod_user_id: data.from.db.id
                 };
                 models.Karma.create(userData);
-                console.log('[KICK] ' + data.user.username + ' kicked from room');
+                console.log('[KICK] ' + data.username + ' kicked from room');
                 models.User.update({queue_position: -1}, {where: {site_id: user.id}});
             });
 

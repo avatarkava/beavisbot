@@ -8,7 +8,7 @@ exports.handler = function (data) {
     var message = '';
 
     if (params.length < 1) {
-        username = data.user.username;
+        username = data.username;
     }
     else {
         usernameRaw = params.join(' ').trim();

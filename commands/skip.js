@@ -18,17 +18,17 @@ exports.handler = function (data) {
         message = params.join(' ').trim();
     }
 
-    if (media && (data.user.id == dj.id || bot.hasPermission(bot.getUser(data.user.id), 'skip'))) {
-        console.log('[SKIP] ' + data.user.username + ' skipped ' + dj.username + ' - ' + media.name + ' (' + media.id + '): ' + message);
-        bot.moderateSkip();
+    if (media && (data.from.id == dj.id || bot.hasPermission(bot.getUser(data.from.id), 'skip'))) {
+        console.log('[SKIP] ' + data.from.username + ' skipped ' + dj.username + ' - ' + media.name + ' (' + media.id + '): ' + message);
+        bot.moderateForceSkip();
 
-        if (data.user.id !== dj.id) {
+        if (data.from.id !== dj.id) {
             getDbUserFromSiteUser(dj, function (row) {
                 var userData = {
                     type: 'skip',
-                    details: media.id + ': ' + media.name + ' (skipped by ' + data.user.username + '): ' + message,
+                    details: media.id + ': ' + media.name + ' (skipped by ' + data.from.username + '): ' + message,
                     user_id: row.id,
-                    mod_user_id: data.user.db.id
+                    mod_user_id: data.from.db.id
                 };
                 models.Karma.create(userData);
             });

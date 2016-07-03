@@ -22,7 +22,7 @@
     "bluebird": "*",
     "circular-json": "*",
     "cleverbot-node": "git://github.com/fojas/cleverbot-node.git",
-    "dubapi": "git://github.com/anjanms/DubAPI.git",
+    "plugapi": "git://github.com/plugCubed/plugAPI.git",
     "moment": "*",
     "mysql": "*",
     "node-datatable": "git://github.com/jpravetz/node-datatable.git",
