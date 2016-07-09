@@ -76,7 +76,7 @@ bot.on('chat', function (data) {
 bot.on('advance', function (data) {
 
     if (config.verboseLogging) {
-        console.log('[EVENT] advance ', JSON.stringify(data, null, 2));
+        console.log('[EVENT] advance', JSON.stringify(data, null, 2));
     } else {
         console.log('[EVENT] advance');
     }
@@ -125,7 +125,7 @@ bot.on('advance', function (data) {
             if (song !== null) {
                 getDbUserFromSiteUser(data.lastPlay.dj, function (lastDJ) {
                     models.Play.create({
-                        site_id: data.lastPlay.id.toString(),
+                        site_id: data.lastPlay.media.id.toString(),
                         user_id: lastDJ.id,
                         song_id: song.id,
                         positive: data.lastPlay.score.positive,
@@ -450,7 +450,7 @@ bot.on('userUpdate', function (data) {
     }
 });
 
-bot.on('curateUpdate', function (data) {
+bot.on('grab', function (data) {
 
     user = bot.getUser(data.id);
 
