@@ -6,20 +6,22 @@ exports.handler = function (data) {
 
     var input = data.message.split(' ');
     var username = input[1];
-    var usernameFormatted = S(username).chompLeft('@').s;
-    var amount = parseInt(input[2]);
-    var user = _.findWhere(bot.getUsers(), {username: usernameFormatted});
-
-    if (!amount || isNaN(amount) || amount < 1) {
-        amount = 1;
-    }
 
     if (!username) {
         bot.sendChat('/me usage: .gift @username 50 (gifts 50 points)');
         return;
     }
-    else if (!user) {
+
+    var usernameFormatted = S(username).chompLeft('@').s;
+    var amount = parseInt(input[2]);
+    var user = _.findWhere(bot.getUsers(), {username: usernameFormatted});
+
+    if (!user) {
         bot.sendChat('/me user ' + username + ' was not found.');
+    }
+
+    if (!amount || isNaN(amount) || amount < 1) {
+        amount = 1;
     }
 
     getDbUserFromSiteUser(data.from, function (row) {
@@ -28,7 +30,7 @@ exports.handler = function (data) {
             return;
         } else if (row.custom_points < amount) {
             bot.sendChat('You only have ' + row.custom_points + ' ' +  config.customPointName + ' to give, @' +
-                data.user.username + '.');
+                data.from.username + '.');
             return;
         }
 

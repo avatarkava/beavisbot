@@ -109,7 +109,7 @@ bot.on('advance', function (data) {
                 console.log('[SKIP]', 'Skipping ' + data.media.name + ' because it appears to be stuck...');
                 //bot.sendChat('Skipping ' + data.media.name + ' because it appears to be stuck...');
                 // @TODO fix crazy skip
-                //               bot.moderateForceSkip();
+                // bot.moderateForceSkip();
             }
         }, (data.media.duration + 10));
     }
@@ -137,27 +137,28 @@ bot.on('advance', function (data) {
         bot.woot();
     }
 
-    // @TODO - No support in Dubtrack for author/title yet so we can't do matching
-    //models.SongResponse.find({
-    //
-    //    where: {
-    //        $or: [{media_type: ['author', 'title']}],
-    //        trigger: {$like: '%' + data.media.name + '%'},
-    //        is_active: true
-    //    }
-    //}).then(function (songresponse) {
-    //    if (songresponse !== null) {
-    //        if (songresponse.response != '') {
-    //            bot.sendChat(songresponse.response);
-    //        }
-    //        if (songresponse.rate === 1) {
-    //            bot.updub();
-    //        }
-    //        else if (songresponse.rate === -1) {
-    //            bot.downdub();
-    //        }
-    //    }
-    //});
+
+    models.SongResponse.find({
+        where: {
+            $or: [{
+                $and: [{media_type: 'author'}, {trigger: {$like: '%' + data.media.author + '%'}}],
+                $and: [{media_type: 'title'}, {trigger: {$like: '%' + data.media.title + '%'}}],
+            }],
+            is_active: true
+        }
+    }).then(function (songresponse) {
+        if (songresponse !== null) {
+            if (songresponse.response != '') {
+                bot.sendChat(songresponse.response);
+            }
+            if (songresponse.rate === 1) {
+                bot.woot();
+            }
+            else if (songresponse.rate === -1) {
+                bot.meh();
+            }
+        }
+    });
 
 
     var maxIdleTime = config.activeDJTimeoutMins * 60;
@@ -294,8 +295,8 @@ bot.on('chat', function (data) {
         }, {where: {site_id: data.from.id.toString()}});
     }
 });
-bot.on('connected', function (data) {
-    console.log('Connected: ', data);
+bot.on('connected', function () {
+    console.log('Connected!');
 });
 bot.on('grab', function (data) {
 
@@ -347,7 +348,7 @@ bot.on('userJoin', function (data) {
     var message = "";
 
     if (data.username !== botUser.username) {
-        models.User.find({where: {site_id: data.id.toString()}}).then(function (dbUser) {
+        getDbUserFromSiteUser(data.id, function (dbUser) {
             if (dbUser == null) {
                 message = config.responses.welcome.newUser.replace('{username}', data.username);
                 if (!roomHasActiveMods) {
@@ -368,6 +369,7 @@ bot.on('userJoin', function (data) {
                         else {
                             message = row.response.replace('{username}', data.username);
                         }
+                        console.log('[JOIN]', message);
                     });
                 console.log('[JOIN]', data.username + ' last seen ' + timeSince(dbUser.last_seen));
             }

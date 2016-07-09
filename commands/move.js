@@ -25,7 +25,7 @@ exports.handler = function (data) {
                 else if (currentPosition > 0 && currentPosition !== position) {
                     bot.moderateMoveDJ(user.id, position);
                 }
-                logger.info('Moving ' + usernameFormatted + ' to position: ' + position);
+                console.log('Moving ' + usernameFormatted + ' to position: ' + position);
             }
         }
     }
