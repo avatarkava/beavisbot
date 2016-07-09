@@ -348,7 +348,7 @@ bot.on('userJoin', function (data) {
     var message = "";
 
     if (data.username !== botUser.username) {
-        getDbUserFromSiteUser(data.id, function (dbUser) {
+        getDbUserFromSiteUser(data, function (dbUser) {
             if (dbUser == null) {
                 message = config.responses.welcome.newUser.replace('{username}', data.username);
                 if (!roomHasActiveMods) {
