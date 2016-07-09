@@ -354,8 +354,12 @@ bot.on('userJoin', function (data) {
                 if (!roomHasActiveMods) {
                     message += ' Type .help if you need it!';
                 }
-                newUser = true;
                 console.log('[JOIN]', data.username + ' is a first-time visitor to the room!');
+                if ((config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
+                    setTimeout(function () {
+                        bot.sendChat(message)
+                    }, 5000);
+                }
             }
             else {
                 models.EventResponse.find({
@@ -384,17 +388,10 @@ bot.on('userJoin', function (data) {
                             }
                         }
 
-                        if (message && (config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
-                            if (newUser) {
-                                setTimeout(function () {
-                                    bot.sendChat(message)
-                                }, 5000);
-                            }
-                            else if (config.welcomeUsers == "ALL" && secondsSince(dbUser.last_active) >= 900 && secondsSince(dbUser.last_seen) >= 900) {
-                                setTimeout(function () {
-                                    bot.sendChat(message)
-                                }, 5000);
-                            }
+                        if (message && config.welcomeUsers == "ALL" && secondsSince(dbUser.last_active) >= 900 && secondsSince(dbUser.last_seen) >= 900) {
+                            setTimeout(function () {
+                                bot.sendChat(message)
+                            }, 5000);
                         }
 
                         console.log('[JOIN]', data.username + ' last seen ' + timeSince(dbUser.last_seen));
