@@ -20,59 +20,6 @@ var botUser = {};
 
 bot.connect(config.roomName); // The part after https://plug.dj
 
-
-bot.on('connected', function (data) {
-    console.log('Connected: ', data);
-});
-
-bot.on('roomJoin', function (data) {
-    console.log('[EVENT] Ready - joined room: ' + config.roomName);
-    if (config.verboseLogging) {
-        console.log('[INIT] Room data: ' + JSON.stringify(data, null, 2));
-    }
-
-    botUser = bot.getSelf();
-
-    getDbUserFromSiteUser(botUser, function (row) {
-        botUser.db = row;
-    });
-
-    console.log('[INIT] Data loaded for ' + botUser.username + '\n ' + JSON.stringify(botUser, null, 2));
-
-    if (config.responses.botConnect !== "") {
-        bot.sendChat(config.responses.botConnect);
-    }
-
-    bot.getUsers().forEach(function (user) {
-        updateDbUser(user);
-    });
-
-    if (config.upvoteSongs == 'ALL') {
-        bot.woot();
-    }
-
-});
-
-bot.on('chat', function (data) {
-
-    if (config.verboseLogging) {
-        console.log('[CHAT]', JSON.stringify(data, null, 2));
-    }
-    else if (data.from.username !== undefined && data.from.username !== null) {
-        console.log('[CHAT]', data.from.username + ': ' + data.message);
-    }
-
-    if (data.from.username !== undefined && data.from.username !== null) {
-        data.message = data.message.trim();
-        handleCommand(data);
-        models.User.update({
-            last_active: new Date(),
-            last_seen: new Date(),
-            locale: data.from.language
-        }, {where: {site_id: data.from.id.toString()}});
-    }
-});
-
 bot.on('advance', function (data) {
 
     if (config.verboseLogging) {
@@ -189,29 +136,6 @@ bot.on('advance', function (data) {
     if (config.upvoteSongs == 'ALL') {
         bot.woot();
     }
-
-    /**
-     * boothCycle
-     boothLocked
-     chat
-     chatDelete
-     curateUpdate
-     advance
-     djUpdate
-     emote
-     followJoin
-     modAddDj
-     modBan
-     modMoveDJ
-     modRemoveDJ
-     modSkip
-     roomMinChatLevelUpdate
-     roomJoin
-     userJoin
-     userLeave
-     userUpdate
-     vote
-     s     */
 
     // @TODO - No support in Dubtrack for author/title yet so we can't do matching
     //models.SongResponse.find({
@@ -351,7 +275,65 @@ bot.on('advance', function (data) {
 
     });
 });
+bot.on('chat', function (data) {
 
+    if (config.verboseLogging) {
+        console.log('[CHAT]', JSON.stringify(data, null, 2));
+    }
+    else if (data.from.username !== undefined && data.from.username !== null) {
+        console.log('[CHAT]', data.from.username + ': ' + data.message);
+    }
+
+    if (data.from.username !== undefined && data.from.username !== null) {
+        data.message = data.message.trim();
+        handleCommand(data);
+        models.User.update({
+            last_active: new Date(),
+            last_seen: new Date(),
+            locale: data.from.language
+        }, {where: {site_id: data.from.id.toString()}});
+    }
+});
+bot.on('connected', function (data) {
+    console.log('Connected: ', data);
+});
+bot.on('grab', function (data) {
+
+    user = bot.getUser(data);
+
+    if (config.verboseLogging) {
+        console.log('[VOTE] ' + JSON.stringify(data, null, 2));
+    } else if (user) {
+        console.log('[GRAB]', user.username + ' grabbed this song');
+    }
+});
+bot.on('roomJoin', function (data) {
+    console.log('[EVENT] Ready - joined room: ' + config.roomName);
+    if (config.verboseLogging) {
+        console.log('[INIT] Room data: ' + JSON.stringify(data, null, 2));
+    }
+
+    botUser = bot.getSelf();
+
+    getDbUserFromSiteUser(botUser, function (row) {
+        botUser.db = row;
+    });
+
+    console.log('[INIT] Data loaded for ' + botUser.username + '\n ' + JSON.stringify(botUser, null, 2));
+
+    if (config.responses.botConnect !== "") {
+        bot.sendChat(config.responses.botConnect);
+    }
+
+    bot.getUsers().forEach(function (user) {
+        updateDbUser(user);
+    });
+
+    if (config.upvoteSongs == 'ALL') {
+        bot.woot();
+    }
+
+});
 bot.on('userJoin', function (data) {
 
     if (config.verboseLogging) {
@@ -366,11 +348,7 @@ bot.on('userJoin', function (data) {
 
     if (data.username !== botUser.username) {
         models.User.find({where: {site_id: data.id.toString()}}).then(function (dbUser) {
-            if (data.username == config.superAdmin && config.responses.welcome.superAdmin != null) {
-                message = config.responses.welcome.superAdmin.replace('{username}', data.username);
-                console.log('[JOIN]', data.username + ' last seen ' + timeSince(dbUser.last_seen));
-            }
-            else if (dbUser == null) {
+            if (dbUser == null) {
                 message = config.responses.welcome.newUser.replace('{username}', data.username);
                 if (!roomHasActiveMods) {
                     message += ' Type .help if you need it!';
@@ -379,7 +357,18 @@ bot.on('userJoin', function (data) {
                 console.log('[JOIN]', data.username + ' is a first-time visitor to the room!');
             }
             else {
-                message = config.responses.welcome.oldUser.replace('{username}', data.username);
+                models.EventResponse.find({
+                        where: {event_type: 'userJoin', trigger: data.username, is_active: true},
+                        order: 'RAND()'
+                    })
+                    .then(function (row) {
+                        if (row === null) {
+                            message = config.responses.welcome.oldUser.replace('{username}', data.username);
+                        }
+                        else {
+                            message = row.response.replace('{username}', data.username);
+                        }
+                    });
                 console.log('[JOIN]', data.username + ' last seen ' + timeSince(dbUser.last_seen));
             }
 
@@ -438,29 +427,15 @@ bot.on('userJoin', function (data) {
         });
     }
 });
-
 bot.on('userLeave', function (data) {
     console.log('[LEAVE]', 'User left: ' + data.username);
     // models.User.update({last_seen: new Date()}, {where: {id: data.id}});
 });
-
 bot.on('userUpdate', function (data) {
     if (config.verboseLogging) {
         console.log('[EVENT] USER_UPDATE', data);
     }
 });
-
-bot.on('grab', function (data) {
-
-    user = bot.getUser(data);
-
-    if (config.verboseLogging) {
-        console.log('[VOTE] ' + JSON.stringify(data, null, 2));
-    } else if (user) {
-        console.log('[GRAB]', user.username + ' grabbed this song');
-    }
-});
-
 bot.on('vote', function (data) {
 
     user = bot.getUser(data.i);
@@ -480,6 +455,7 @@ bot.on('vote', function (data) {
     }
 });
 
+
 bot.on('error', function (msg, trace) {
     console.log("Got an error from the virtual browser: ", msg, trace);
 });
@@ -494,10 +470,73 @@ bot.on('djListUpdate', function (data) {
     //saveWaitList(false);
 });
 
+/**
+ * @TODO - No current handling
+ */
+bot.on('boothLocked', function (data) {
+});
+bot.on('chatDelete', function (data) {
+});
+bot.on('djUpdate', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+    }
+    //saveWaitList(false);
+});
+bot.on('emote', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+    }
+    //saveWaitList(false);
+});
+bot.on('followJoin', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+    }
+    //saveWaitList(false);
+});
+
+bot.on('modAddDj', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+    }
+    //saveWaitList(false);
+});
+bot.on('modBan', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+    }
+    //saveWaitList(false);
+});
+bot.on('modMoveDJ', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+    }
+    //saveWaitList(false);
+});
+bot.on('modRemoveDJ', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+    }
+    //saveWaitList(false);
+});
+bot.on('modSkip', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+    }
+    //saveWaitList(false);
+});
+
+bot.on('roomMinChatLevelUpdate', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+    }
+    //saveWaitList(false);
+});
+
 if (config.activeDJTimeoutMins > 0) {
     setInterval(monitorDJList, 5000);
 }
-
 
 function saveQueue(wholeRoom) {
 
