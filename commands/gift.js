@@ -22,9 +22,9 @@ exports.handler = function (data) {
         bot.sendChat('/me user ' + username + ' was not found.');
     }
 
-    getDbUserFromSiteUser(data.user, function (row) {
+    getDbUserFromSiteUser(data.from, function (row) {
         if (!row || row.custom_points == 0) {
-            bot.sendChat('You do not have any ' + config.customPointName + ' to give, @' + data.user.username + '.');
+            bot.sendChat('You do not have any ' + config.customPointName + ' to give, @' + data.from.username + '.');
             return;
         } else if (row.custom_points < amount) {
             bot.sendChat('You only have ' + row.custom_points + ' ' +  config.customPointName + ' to give, @' +
@@ -32,7 +32,7 @@ exports.handler = function (data) {
             return;
         }
 
-        transferCustomPoints(data.user, user, amount);
+        transferCustomPoints(data.from, user, amount);
 
     });
 };
