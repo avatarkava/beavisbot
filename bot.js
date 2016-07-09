@@ -125,7 +125,7 @@ bot.on('advance', function (data) {
             if (song !== null) {
                 getDbUserFromSiteUser(data.lastPlay.dj, function (lastDJ) {
                     models.Play.create({
-                        site_id: data.lastPlay.id,
+                        site_id: data.lastPlay.id.toString(),
                         user_id: lastDJ.id,
                         song_id: song.id,
                         positive: data.lastPlay.score.positive,
