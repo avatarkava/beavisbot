@@ -9,6 +9,8 @@ var bot = new PlugAPI({
     email: config.auth.username,
     password: config.auth.password
 });
+bot.multiLine = true;
+bot.multiLineLimit = 5;
 
 initializeModules(config.auth, bot);
 
@@ -307,7 +309,7 @@ bot.on('advance', function (data) {
                 maxLengthSecs = "0" + maxLengthSecs;
             }
             bot.sendChat('Sorry @' + data.username + ', this song is over our maximum room length of ' + maxLengthMins + ':' + maxLengthSecs + '.');
-            bot.moderateSkip();
+            bot.moderateForceSkip();
             getDbUserFromSiteUser(data.user, function (dbuser) {
                 var userData = {
                     type: 'skip',

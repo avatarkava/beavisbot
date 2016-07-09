@@ -35,7 +35,7 @@ exports.handler = function (data) {
         models.Song.update({is_banned: 1, banned_reason: message}, {where: {site_id: media.id}});
         bot.sendChat("The song \"" + media.name + "\" has been blacklisted.");
 
-        bot.moderateSkip();
+        bot.moderateForceSkip();
     }
 };
 
