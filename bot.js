@@ -359,49 +359,48 @@ bot.on('userJoin', function (data) {
             }
             else {
                 models.EventResponse.find({
-                        where: {event_type: 'userJoin', trigger: data.username, is_active: true},
-                        order: 'RAND()'
-                    })
-                    .then(function (row) {
-                        if (row === null) {
-                            message = config.responses.welcome.oldUser.replace('{username}', data.username);
+                    where: {event_type: 'userJoin', trigger: data.username, is_active: true},
+                    order: 'RAND()'
+                }).then(function (eventResponse) {
+                    if (eventResponse == null) {
+                        message = config.responses.welcome.oldUser.replace('{username}', data.username);
+                    }
+                    else {
+                        message = eventResponse.response.replace('{username}', data.username);
+                    }
+                }).then(function () {
+                    models.RoomEvent.find({
+                        where: {
+                            starts_at: {lte: new Date()},
+                            ends_at: {gte: new Date()}
                         }
-                        else {
-                            message = row.response.replace('{username}', data.username);
+                    }).then(function (event) {
+                        if (event !== null) {
+                            if (event.type == 'event') {
+                                message += ' :star: SPECIAL EVENT :star: ' + event.title + ' (.event for details)';
+                            }
+                            else if (event.type == 'theme') {
+                                message += ' Theme: ' + event.title + ' (.theme for details)';
+                            }
                         }
-                        console.log('[JOIN]', message);
+
+                        if (message && (config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
+                            if (newUser) {
+                                setTimeout(function () {
+                                    bot.sendChat(message)
+                                }, 5000);
+                            }
+                            else if (config.welcomeUsers == "ALL" && secondsSince(dbUser.last_active) >= 900 && secondsSince(dbUser.last_seen) >= 900) {
+                                setTimeout(function () {
+                                    bot.sendChat(message)
+                                }, 5000);
+                            }
+                        }
+
+                        console.log('[JOIN]', data.username + ' last seen ' + timeSince(dbUser.last_seen));
+                        updateDbUser(data);
                     });
-                console.log('[JOIN]', data.username + ' last seen ' + timeSince(dbUser.last_seen));
-            }
-
-            // Greet with the theme if it's not the default
-            models.RoomEvent.find({
-                where: {
-                    starts_at: {lte: new Date()},
-                    ends_at: {gte: new Date()}
-                }
-            }).then(function (row) {
-                if (row !== null) {
-                    if (row.type == 'event') {
-                        message += ' :star: SPECIAL EVENT :star: ' + row.title + ' (.event for details)';
-                    }
-                    else if (row.type == 'theme') {
-                        message += ' Theme: ' + row.title + ' (.theme for details)';
-                    }
-                }
-            });
-
-            if (message && (config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
-                if (newUser) {
-                    setTimeout(function () {
-                        bot.sendChat(message)
-                    }, 5000);
-                }
-                else if (config.welcomeUsers == "ALL" && secondsSince(dbUser.last_active) >= 900 && secondsSince(dbUser.last_seen) >= 900) {
-                    setTimeout(function () {
-                        bot.sendChat(message)
-                    }, 5000);
-                }
+                });
             }
 
             // Restore spot in line if user has been gone < 15 mins
@@ -425,10 +424,10 @@ bot.on('userJoin', function (data) {
 
                 });
             }
-            updateDbUser(data);
         });
     }
 });
+
 bot.on('userLeave', function (data) {
     console.log('[LEAVE]', 'User left: ' + data.username);
     // models.User.update({last_seen: new Date()}, {where: {id: data.id}});
@@ -607,7 +606,6 @@ function updateDbUser(user) {
 function monitorDJList() {
 
 }
-
 function removeIfDownvoting(mehUsername) {
 
     var mehWaitList = bot.getWaitList();

@@ -41,10 +41,9 @@ exports.handler = function (data) {
                     var message = ":tada: @" + winner.username + " emerges victorious!";
                     transferCustomPoints(null, bot.getUser(winner.site_id), 1);
                     var currentPosition = bot.getWaitListPosition(winner.site_id);
+                    var position = 0;
                     if (input[0] === 'roulette') {
                         position = _.random(0, currentPosition - 1);
-                    } else {
-                        position = 0;
                     }
                     if (currentPosition > 0 && currentPosition > position) {
                         bot.moderateMoveDJ(winner.site_id, position);
