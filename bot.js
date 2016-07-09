@@ -116,7 +116,7 @@ bot.on('advance', function (data) {
     }
 
     // Write previous play data to DB
-    if (data.lastPlay !== undefined && data.lastPlay !== null && data.lastPlay.media !== null) {
+    if (data.lastPlay !== undefined && data.lastPlay !== null && data.lastPlay.media !== undefined && data.lastPlay.media !== null) {
         models.Song.find({
             where: {
                 site_id: data.lastPlay.media.id.toString()
@@ -452,10 +452,9 @@ bot.on('userUpdate', function (data) {
 
 bot.on('grab', function (data) {
 
-    user = bot.getUser(data.id);
+    user = bot.getUser(data);
 
     if (config.verboseLogging) {
-        data.user = user;
         console.log('[VOTE] ' + JSON.stringify(data, null, 2));
     } else if (user) {
         console.log('[GRAB]', user.username + ' grabbed this song');

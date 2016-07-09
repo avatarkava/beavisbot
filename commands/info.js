@@ -19,12 +19,11 @@ exports.handler = function (data) {
         if (row === null) {
             bot.sendChat(username + ' was not found.');
         } else {
-            // @TODO - store & display data we can get from dub like 'active', 'playedCount', 'songsInQueue', 'dubs'
-            message = username + ' • ' + row.locale + ' • seen ' + timeSince(row.last_seen) + ' • '
-                + row.site_points.toLocaleString() + ' dubs • joined ' + moment.utc(row.joined).calendar() + ' • ID: ' + row.site_id;
+            // @TODO - store & display data we can get from the site like 'active', 'playedCount', 'songsInQueue', 'dubs'
+            message = username + ' • ' + row.locale + ' • seen ' + timeSince(row.last_seen) + ' • joined ' + moment.utc(row.joined).calendar() + ' • ID: ' + row.site_id;
 
-            if(config.customPointName) {
-                message = message + ' • ' + config.customPointName + row.custom_points;
+            if (config.customPointName) {
+                message = message + ' • ' + config.customPointName + row.custom_points.toLocaleString();
             }
             bot.sendChat(message);
         }

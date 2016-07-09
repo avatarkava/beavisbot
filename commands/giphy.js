@@ -36,7 +36,7 @@ exports.handler = function (data) {
     var tag = null;
 
     if (params.length > 0) {
-        tag = params.join(' ').trim().replace(/ /g, ", ");
+        tag = params.join('+').trim().replace(/ /g, ", ");
     }
 
     getGifURL(api_key, function(imageurl) {

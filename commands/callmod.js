@@ -15,7 +15,7 @@ exports.handler = function (data) {
     else {
 
         var formPayload = {
-            text: '@channel - ' + data.user.username + ' requested help in https://www.dubtrack.fm/join/' + config.roomName + " \n`" + message + "`",
+            text: '@channel - ' + data.from.username + ' requested help in https://www.dubtrack.fm/join/' + config.roomName + " \n`" + message + "`",
             username: bot.getSelf().username,
             link_names: 1,
             channel: config.slack.default.channel,
@@ -28,7 +28,7 @@ exports.handler = function (data) {
 
             if (!error && response.statusCode == 200) {
                 if (body == 'ok') {
-                    bot.sendChat('A mod has been contacted and will be on the way if available, @' + data.user.username);
+                    bot.sendChat('A mod has been contacted and will be on the way if available, @' + data.from.username);
                 }
                 else {
                     bot.sendChat('There was an error sending your request.');

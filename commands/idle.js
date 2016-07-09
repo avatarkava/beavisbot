@@ -25,9 +25,9 @@ exports.handler = function (data) {
             var maxIdleTime = config.activeDJTimeoutMins * 60;
             idleDJs = [];
 
-            Promise.map(bot.getQueue(), function (queueItem) {
-                return models.User.find({where: {site_id: queueItem.user.id}}).then(function (dbUser) {
-                    var position = bot.getQueuePosition(queueItem.user.id);
+            Promise.map(bot.getWaitList(), function (dj) {
+                return models.User.find({where: {site_id: dj.user.id}}).then(function (dbUser) {
+                    var position = bot.getWaitListPosition(dj.user.id);
                     if (dbUser !== null) {
                         if (secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
                             console.log('[WL-IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));

@@ -3,7 +3,7 @@ exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function (data) {
-    if (bot.hasPermission(bot.getUser(data.from.id), 'queue-order')) {
+    if (data.from.role > 2) {
 
         var input = data.message.split(' ');
         // Settings to support direct access to
