@@ -117,7 +117,7 @@ bot.on('advance', function (data) {
     if (data.lastPlay !== undefined && data.lastPlay !== null && data.lastPlay.media !== null) {
         models.Song.find({
             where: {
-                site_id: data.lastPlay.media.id
+                site_id: data.lastPlay.media.id.toString()
             }
         }).then(function (song) {
             if (song !== null) {
@@ -126,11 +126,11 @@ bot.on('advance', function (data) {
                         site_id: data.lastPlay.id,
                         user_id: lastDJ.id,
                         song_id: song.id,
-                        positive: data.lastPlay.score.updubs,
-                        negative: data.lastPlay.score.downdubs,
-                        //grabs: data.lastPlay.score.grabs,
+                        positive: data.lastPlay.score.positive,
+                        negative: data.lastPlay.score.negative,
+                        grabs: data.lastPlay.score.grabs,
                         listeners: bot.getUsers().length,
-                        //skipped: data.lastPlay.score.skipped
+                        skipped: data.lastPlay.score.skipped
                     });
                 });
             }
@@ -167,7 +167,7 @@ bot.on('advance', function (data) {
 
     // Write current song data to DB
     var songData = {
-        site_id: data.media.id,
+        site_id: data.media.id.toString(),
         author: data.media.author,
         title: data.media.title,
         name: data.media.name,
@@ -178,7 +178,7 @@ bot.on('advance', function (data) {
         image: data.media.image
     };
     models.Song.findOrCreate({
-        where: {site_id: data.media.id},
+        where: {site_id: data.media.id.toString()},
         defaults: songData
     }).spread(function (song) {
         song.updateAttributes(songData);
@@ -411,27 +411,27 @@ bot.on('userJoin', function (data) {
                 }
             }
 
-            //// Restore spot in line if user has been gone < 15 mins
-            //var position = bot.getWaitListPosition(data.user.id);
-            //if (!newUser && dbUser.waitlist_position > -1 && secondsSince(dbUser.last_seen) <= 900 && (position === -1 || (position > -1 && position > dbUser.waitlist_position))) {
-            //    bot.moderateAddDJ(data.id, function () {
-            //        if (dbUser.waitlist_position < bot.getWaitList().length && position !== dbUser.waitlist_position) {
-            //            bot.moderateMoveDJ(data.id, dbUser.waitlist_position);
-            //            var userData = {
-            //                type: 'restored',
-            //                details: 'Restored to position ' + dbUser.waitlist_position + ' (disconnected for ' + timeSince(dbUser.last_seen, true) + ')',
-            //                user_id: data.id,
-            //                mod_user_id: botUser.id
-            //            };
-            //            models.Karma.create(userData);
-            //
-            //            setTimeout(function () {
-            //                bot.sendChat('/me put @' + data.username + ' back in line :thumbsup:')
-            //            }, 5000);
-            //        }
-            //
-            //    });
-            //}
+            // Restore spot in line if user has been gone < 15 mins
+            var position = bot.getWaitListPosition(data.id);
+            if (!newUser && dbUser.waitlist_position > -1 && secondsSince(dbUser.last_seen) <= 900 && (position === -1 || (position > -1 && position > dbUser.waitlist_position))) {
+                bot.moderateAddDJ(data.id, function () {
+                    if (dbUser.waitlist_position < bot.getWaitList().length && position !== dbUser.waitlist_position) {
+                        bot.moderateMoveDJ(data.id, dbUser.waitlist_position);
+                        var userData = {
+                            type: 'restored',
+                            details: 'Restored to position ' + dbUser.waitlist_position + ' (disconnected for ' + timeSince(dbUser.last_seen, true) + ')',
+                            user_id: data.id,
+                            mod_user_id: botUser.id
+                        };
+                        models.Karma.create(userData);
+
+                        setTimeout(function () {
+                            bot.sendChat('/me put @' + data.username + ' back in line :thumbsup:')
+                        }, 5000);
+                    }
+
+                });
+            }
             updateDbUser(data);
         });
     }
@@ -448,10 +448,17 @@ bot.on('userUpdate', function (data) {
     }
 });
 
-// @TODO - Support for grab/add to playlist event emission doesn't exist in dubtrack yet
-//bot.on('grab', function (data) {
-//  console.log('[GRAB]', data.username + ' grabbed this song');
-//});
+bot.on('curateUpdate', function (data) {
+
+    user = bot.getUser(data.id);
+
+    if (config.verboseLogging) {
+        data.user = user;
+        console.log('[VOTE] ' + JSON.stringify(data, null, 2));
+    } else if (user) {
+        console.log('[GRAB]', user.username + ' grabbed this song');
+    }
+});
 
 bot.on('vote', function (data) {
 
@@ -479,28 +486,16 @@ bot.on('disconnected', function (data) {
     bot.reconnect();
 });
 
-/**
- * Unhandled events
- */
-bot.on('room_playlist-queue-remove-user', function (data) {
-    console.log('[EVENT] room_playlist-queue-remove-user' + JSON.stringify(data, null, 2));
-});
-bot.on('room_playlist-queue-reorder', function (data) {
-    console.log('[EVENT] room_playlist-queue-reorder' + JSON.stringify(data, null, 2));
+bot.on('djListUpdate', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+    }
+    //saveWaitList(false);
 });
 
-
-// @TODO - Currently no support for monitoring changes to the queue built in
-//bot.on('djListUpdate', function (data) {
-//    if (config.verboseLogging) {
-//        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
-//    }
-//    saveWaitList(false);
-//});
-//
-//if (config.activeDJTimeoutMins > 0) {
-//    setInterval(monitorDJList, 5000);
-//}
+if (config.activeDJTimeoutMins > 0) {
+    setInterval(monitorDJList, 5000);
+}
 
 
 function saveQueue(wholeRoom) {

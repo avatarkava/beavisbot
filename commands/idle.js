@@ -6,7 +6,7 @@ exports.handler = function (data) {
 
     var input = data.message.split(' ');
 
-    if (bot.hasPermission(bot.getUser(data.user.id), 'queue-order') && config.activeDJTimeoutMins > 0) {
+    if (data.from.role > 1 && config.activeDJTimeoutMins > 0) {
 
         if (input.length >= 2) {
             var username = _.rest(input, 1);

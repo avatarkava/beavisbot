@@ -7,7 +7,7 @@ exports.handler = function (data) {
     var input = data.message.split(' ');
     var mins = 1;
 
-    if (bot.hasPermission(bot.getUser(data.user.id), 'queue-order')) {
+    if (data.from.role > 1) {
 
         if (input.length >= 2) {
             mins = parseInt(_.last(input, 1));
@@ -40,7 +40,7 @@ exports.handler = function (data) {
                     var winner = activeDJs[(randomNumber - 1)];
                     var message = ":tada: @" + winner.username + " emerges victorious!";
                     transferCustomPoints(null, bot.getUser(winner.site_id), 1);
-                    var currentPosition = bot.getQueuePosition(winner.site_id);
+                    var currentPosition = bot.getWaitListPosition(winner.site_id);
                     if (input[0] === 'roulette') {
                         position = _.random(0, currentPosition - 1);
                     } else {

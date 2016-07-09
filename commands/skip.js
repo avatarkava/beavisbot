@@ -18,7 +18,7 @@ exports.handler = function (data) {
         message = params.join(' ').trim();
     }
 
-    if (media && (data.from.id == dj.id || bot.hasPermission(bot.getUser(data.from.id), 'skip'))) {
+    if (media && (data.from.id == dj.id || data.from.role > 1)) {
         console.log('[SKIP] ' + data.from.username + ' skipped ' + dj.username + ' - ' + media.name + ' (' + media.id + '): ' + message);
         bot.moderateForceSkip();
 

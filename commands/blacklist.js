@@ -18,7 +18,7 @@ exports.handler = function (data) {
         return;
     }
 
-    if (bot.hasPermission(bot.getUser(data.user.id), 'queue-order')) {
+    if (data.from.role > 1) {
 
         console.log('[BLACKLIST] ' + data.user.username + ' blacklisted ' + media.title + ': ' + message);
 

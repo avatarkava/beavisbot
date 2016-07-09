@@ -9,10 +9,10 @@ exports.handler = function (data) {
         var username = _.rest(input, 1).join(' ').trim();
         var usernameFormatted = S(username).chompLeft('@').s;
         if (usernameFormatted) {
-            var user = bot.getUserByName(usernameFormatted, true);
+            var user = _.findWhere(bot.getUsers(), {username: usernameFormatted});
             if (user && bot.getWaitListPosition(user.id) === -1) {
                 bot.moderateAddDJ(user.id, function () {
-                    logger.info('[ADD] ' + data.from.username + ' added ' + user.username + ' to waitlist.');
+                    console.log('[ADD] ' + data.from.username + ' added ' + user.username + ' to waitlist.');
                 });
             }
         }

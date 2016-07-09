@@ -4,7 +4,7 @@ exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;
 exports.handler = function (data) {
-    if (bot.hasPermission(bot.getUser(data.user.id), 'skip')) {
+    if (data.from.role > 1) {
         bot.woot();
     }
 };
