@@ -25,12 +25,14 @@ exports.handler = function (data) {
             bot.sendChat('Wait list roulette in ' + mins + ' minutes! Chat and be in line within ' + mins + ' minutes to enter.  Winner gets moved up a random number of spots! @djs');
         }
         else {
-            bot.sendChat('Wait list lottery in ' + mins + ' minutes! Chat and be in line within ' + mins + ' minutes to enter.  Winner gets the #1 spot! @djs');
+            bot.sendChat('Wait list lottery in ' + mins + ' minutes! Chat and be in line within ' + mins + ' minutes to enter.  Winner gets the #2 spot! @djs');
         }
 
-        setTimeout(function () {
-            bot.sendChat("Contest ending in ONE MINUTE - be in line and chat to enter! @djs");
-        }, (mins - 1) * 60 * 1000);
+        if (mins > 1) {
+            setTimeout(function () {
+                bot.sendChat("Contest ending in ONE MINUTE - be in line and chat to enter! @djs");
+            }, (mins - 1) * 60 * 1000);
+        }
 
         setTimeout(function () {
             // Only select from users active during the lottery
@@ -41,11 +43,11 @@ exports.handler = function (data) {
                     var message = ":tada: @" + winner.username + " emerges victorious!";
                     transferCustomPoints(null, bot.getUser(winner.site_id), 1);
                     var currentPosition = bot.getWaitListPosition(winner.site_id);
-                    var position = 0;
+                    var position = 1;
                     if (input[0] === 'roulette') {
-                        position = _.random(0, currentPosition - 1);
+                        position = _.random(1, currentPosition - 1);
                     }
-                    if (currentPosition > 0 && currentPosition > position) {
+                    if (currentPosition > 1 && currentPosition > position) {
                         bot.moderateMoveDJ(winner.site_id, position);
                         console.log('[LOTTO] Moving ' + winner.username + ' to position: ' + position);
                         message += ' Moving to position ' + (position + 1);
