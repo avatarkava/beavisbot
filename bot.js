@@ -181,8 +181,8 @@ bot.on('advance', function (data) {
                     order: [['created_at', 'DESC']]
                 }
             }).then(function (dbUser) {
-                var position = bot.getWaitListPosition(dbUser.site_id);
                 if (dbUser) {
+                    var position = bot.getWaitListPosition(dbUser.site_id);
                     if (bot.getWaitList().length >= config.minActiveDJQueueLength && secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
                         console.log('[WL-IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                         if (dbUser.Karmas.length > 0) {
@@ -210,7 +210,7 @@ bot.on('advance', function (data) {
                         }
                     }
                     else {
-                        if (bot.hasPermission(bot.getUser(dbUser.site_id), 'queue-order')) {
+                        if (dbUser.role > 1) {
                             roomHasActiveMods = true;
                         }
                         console.log('[WL-ACTIVE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));

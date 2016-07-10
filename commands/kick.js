@@ -3,7 +3,7 @@ exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
 exports.handler = function (data) {
-    if (bot.hasPermission(bot.getUser(data.user.id), 'queue-order')) {
+    if (data.from.role > 1) {
 
         var params = _.rest(data.message.split(' '), 1);
         var username;
@@ -27,12 +27,12 @@ exports.handler = function (data) {
             getDbUserFromSiteUser(user.id, function (row) {
                 var userData = {
                     type: 'kick',
-                    details: 'Kicked ' + data.username,
+                    details: 'Kicked ' + username,
                     user_id: row.id,
                     mod_user_id: data.from.db.id
                 };
                 models.Karma.create(userData);
-                console.log('[KICK] ' + data.username + ' kicked from room');
+                console.log('[KICK] ' + username + ' kicked from room');
                 models.User.update({queue_position: -1}, {where: {site_id: user.id}});
             });
 
