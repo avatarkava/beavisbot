@@ -20,7 +20,7 @@ exports.handler = function (data) {
             bot.sendChat(username + ' was not found.');
         } else {
             // @TODO - store & display data we can get from the site like 'active', 'playedCount', 'songsInQueue', 'dubs'
-            message = username + ' • ' + row.locale + ' • seen ' + timeSince(row.last_seen) + ' • joined ' + moment.utc(row.joined).calendar()
+            message = row.username + ' • ' + row.locale + ' • seen ' + timeSince(row.last_seen) + ' • joined ' + moment.utc(row.joined).calendar()
                 + ' • ID: ' + row.site_id + ' • Lvl: ' + row.site_points;
 
             if (config.customPointName) {

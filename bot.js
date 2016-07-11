@@ -234,15 +234,15 @@ bot.on('advance', function (data) {
 
         // Check if the song is too long for room settings.  Then check to see if it's blacklisted
         if (config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
-            console.log('[SKIP] Skipped ' + data.username + ' spinning a song of ' + data.media.duration + ' seconds');
+            console.log('[SKIP] Skipped ' + data.dj.username + ' spinning a song of ' + data.media.duration + ' seconds');
             var maxLengthMins = Math.floor(config.maxSongLengthSecs / 60);
             var maxLengthSecs = config.maxSongLengthSecs % 60;
             if (maxLengthSecs < 10) {
                 maxLengthSecs = "0" + maxLengthSecs;
             }
-            bot.sendChat('Sorry @' + data.username + ', this song is over our maximum room length of ' + maxLengthMins + ':' + maxLengthSecs + '.');
+            bot.sendChat('Sorry @' + data.dj.username + ', this song is over our maximum room length of ' + maxLengthMins + ':' + maxLengthSecs + '.');
             bot.moderateForceSkip();
-            getDbUserFromSiteUser(data.user, function (dbuser) {
+            getDbUserFromSiteUser(data.dj, function (dbuser) {
                 var userData = {
                     type: 'skip',
                     details: 'Skipped for playing a song of ' + data.media.duration + ' (room configured for max of ' + config.maxSongLengthSecs + 's)',
@@ -262,14 +262,14 @@ bot.on('advance', function (data) {
                 }
             }).then(function (row) {
                 if (row !== null) {
-                    console.log('[SKIP] Skipped ' + data.username + ' spinning a blacklisted song: ' + data.media.name + ' (id: ' + data.media.id + ')');
-                    var message = 'Sorry @' + data.username + ', this video has been blacklisted in our song database.';
+                    console.log('[SKIP] Skipped ' + data.dj.username + ' spinning a blacklisted song: ' + data.media.name + ' (id: ' + data.media.id + ')');
+                    var message = 'Sorry @' + data.dj.username + ', this video has been blacklisted in our song database.';
                     if (row.message) {
                         message += ' (' + row.message + ')';
                     }
                     bot.sendChat(message);
                     bot.moderateForceSkip();
-                    getDbUserFromSiteUser(data.user, function (dbuser) {
+                    getDbUserFromSiteUser(data.dj, function (dbuser) {
                         var userData = {
                             type: 'skip',
                             details: 'Skipped for playing a blacklisted song: ' + data.media.name + ' (id: ' + data.media.id + ')',
