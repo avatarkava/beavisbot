@@ -359,6 +359,7 @@ bot.on('userJoin', function (data) {
     if (data.username !== botUser.username) {
         getDbUserFromSiteUser(data, function (dbUser) {
             if (dbUser == null) {
+                newUser = true;
                 message = config.responses.welcome.newUser.replace('{username}', data.username);
                 if (!roomHasActiveMods) {
                     message += ' Type .help if you need it!';
