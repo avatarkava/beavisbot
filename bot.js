@@ -67,8 +67,8 @@ bot.on('advance', function (data) {
         models.Song.find({
             where: {
                 site: config.site,
-                host: data.media.format,
-                host_id: data.media.cid,
+                host: data.lastPlay.media.format,
+                host_id: data.lastPlay.media.cid,
             }
         }).then(function (song) {
             if (song !== null) {
@@ -545,7 +545,7 @@ if (config.activeDJTimeoutMins > 0) {
     setInterval(monitorDJList, 5000);
 }
 
-function saveQueue(wholeRoom) {
+function saveWaitList(wholeRoom) {
 
     if (wholeRoom) {
         var userList = bot.getUsers();

@@ -135,7 +135,7 @@ module.exports = function (options) {
 
     getDbUserFromSiteUser = function (siteUser, callback) {
         models.User.find({
-            where: {site_id: siteUser.id.toString()}
+            where: {site_id: siteUser.id.toString(), site: config.site}
         }).then(function (row) {
             callback(row);
         });
