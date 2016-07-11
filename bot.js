@@ -583,6 +583,7 @@ function saveWaitList(wholeRoom) {
 function updateDbUser(user) {
 
     var userData = {
+        site: config.site,
         site_id: user.id,
         username: user.username,
         language: user.language,
@@ -591,7 +592,10 @@ function updateDbUser(user) {
         last_seen: new Date(),
     };
 
-    models.User.findOrCreate({where: {site_id: user.id}, defaults: userData}).spread(function (dbUser) {
+    models.User.findOrCreate({
+        where: {site_id: user.id, site: config.site},
+        defaults: userData
+    }).spread(function (dbUser) {
 
         // Set join date to be the first time we see the user in our room
         if (dbUser.joined === undefined) {
