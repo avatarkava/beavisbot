@@ -1,4 +1,5 @@
 {
+  "site": "plug",
   "roomName": "room-name-slug-from-url",
   "superAdmin": "YourUsername",
   "roomStateFile": false,

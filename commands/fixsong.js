@@ -31,7 +31,7 @@ exports.handler = function (data) {
     if (data.from.role > 1 || (data.from.id == bot.getMedia().currentDJ && input[1] != 'yes')) {
         bot.sendChat('This command is only available to bouncers, managers, and hosts.');
         return;
-    }
+    }   
 
     if (input[1] == 'yes') {
         // commit suggested song value to DB and room.media

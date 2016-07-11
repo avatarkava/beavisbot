@@ -6,14 +6,14 @@ exports.handler = function (data) {
 
     var params = _.rest(data.message.split(' '), 1);
     if (params.length < 1) {
-        bot.sendChat('/me usage: '  + config.commandLiteral + 'lastseen username');
+        bot.sendChat('/me usage: ' + config.commandLiteral + 'lastseen username');
         return;
     }
 
     username = params.join(' ').trim()
     usernameFormatted = S(username).chompLeft('@').s;
 
-    models.User.find({where: {username: usernameFormatted}}).then(function (row) {
+    models.User.find({where: {username: usernameFormatted, site: config.site}}).then(function (row) {
         if (row === null) {
             bot.sendChat(usernameFormatted + ' was not found.');
         } else {

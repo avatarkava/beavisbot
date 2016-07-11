@@ -9,7 +9,7 @@ exports.handler = function (data) {
 
     models.User.findAll({
         attributes: ['locale', [Sequelize.fn('count', Sequelize.col('locale')), 'user_count']],
-        where: {site_id: {$in: userList}},
+        where: {site_id: {$in: userList}, site: config.site},
         group: ['locale'],
         raw: true
     }).then(function (rows) {

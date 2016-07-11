@@ -2,6 +2,7 @@
 module.exports = function (sequelize, DataTypes) {
     var Song = sequelize.define('Song', {
         id: {type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true},
+        site: {type: DataTypes.STRING, allowNull: false, defaultValue: 'dubtrack', unique: 'site_host_id'},
         site_id: {type: DataTypes.STRING, allowNull: false, unique: true},
         name: {type: DataTypes.STRING, allowNull: false},
         slug: {type: DataTypes.STRING, allowNull: false},
@@ -10,8 +11,8 @@ module.exports = function (sequelize, DataTypes) {
         description: {type: DataTypes.TEXT},
         release_date: {type: DataTypes.DATEONLY},
         tags: {type: DataTypes.STRING},
-        host: {type: DataTypes.STRING, allowNull: false, defaultValue: 'youtube'},
-        host_id: {type: DataTypes.STRING, allowNull: false},
+        host: {type: DataTypes.STRING, allowNull: false, defaultValue: 'youtube', unique: 'site_host_id'},
+        host_id: {type: DataTypes.STRING, allowNull: false, unique: 'site_host_id'},
         duration: {type: DataTypes.INTEGER.UNSIGNED},
         image: {type: DataTypes.STRING},
         is_banned: {type: DataTypes.BOOLEAN, defaultValue: 0},

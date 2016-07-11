@@ -66,7 +66,9 @@ bot.on('advance', function (data) {
     if (data.lastPlay !== undefined && data.lastPlay !== null && data.lastPlay.media !== undefined && data.lastPlay.media !== null) {
         models.Song.find({
             where: {
-                site_id: data.lastPlay.media.id.toString()
+                site: config.site,
+                host: data.media.format,
+                host_id: data.media.cid,
             }
         }).then(function (song) {
             if (song !== null) {
@@ -116,18 +118,19 @@ bot.on('advance', function (data) {
 
     // Write current song data to DB
     var songData = {
+        site: config.site,
         site_id: data.media.id.toString(),
         author: data.media.author,
         title: data.media.title,
         name: data.media.name,
         //description: data.media.description,
-        //host: data.media.type,
+        host: data.media.format,
         host_id: data.media.cid,
         duration: data.media.duration,
         image: data.media.image
     };
     models.Song.findOrCreate({
-        where: {site_id: data.media.id.toString()},
+        where: {site: config.site, host: data.media.format, host_id: data.media.cid},
         defaults: songData
     }).spread(function (song) {
         song.updateAttributes(songData);
@@ -248,7 +251,9 @@ bot.on('advance', function (data) {
         else {
             models.Song.find({
                 where: {
-                    site_id: data.media.id,
+                    site: config.site,
+                    host: data.media.format,
+                    host_id: data.media.cid,
                     is_banned: true
                 }
             }).then(function (row) {

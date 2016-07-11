@@ -2,11 +2,13 @@
 module.exports = function (sequelize, DataTypes) {
     var User = sequelize.define('User', {
         id: {type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true},
+        site: {type: DataTypes.STRING, allowNull: false, defaultValue: 'dubtrack'},
         site_id: {type: DataTypes.STRING, allowNull: false, unique: true},
         username: {type: DataTypes.STRING, allowNull: false},
         slug: {type: DataTypes.STRING, allowNull: false},
         locale: {type: DataTypes.STRING, defaultValue: 'en_US'},
         avatar: {type: DataTypes.STRING},
+        badge: {type: DataTypes.STRING},
         bio: {type: DataTypes.TEXT},
         role: {type: DataTypes.STRING },
         site_points: {type: DataTypes.INTEGER.UNSIGNED, defaultValue: 0},
