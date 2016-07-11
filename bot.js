@@ -586,9 +586,13 @@ function updateDbUser(user) {
         site: config.site,
         site_id: user.id,
         username: user.username,
-        language: user.language,
         slug: user.slug,
+        language: user.language,
+        avatar: user.avatarID,
+        badge: user.badge,
+        bio: user.blurb,
         role: user.role,
+        site_points: user.level,
         last_seen: new Date(),
     };
 
