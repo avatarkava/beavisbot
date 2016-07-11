@@ -405,7 +405,6 @@ bot.on('userJoin', function (data) {
                         }
 
                         console.log('[JOIN]', data.username + ' last seen ' + timeSince(dbUser.last_seen));
-                        updateDbUser(data);
                     });
                 });
             }
@@ -432,6 +431,7 @@ bot.on('userJoin', function (data) {
                 });
             }
         });
+        updateDbUser(data);
     }
 });
 
