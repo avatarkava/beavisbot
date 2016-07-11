@@ -82,6 +82,8 @@ bot.on('advance', function (data) {
                         grabs: data.lastPlay.score.grabs,
                         listeners: bot.getUsers().length,
                         skipped: data.lastPlay.score.skipped
+                    }).catch(function (err) {
+                        console.log('[ERROR]', err);
                     });
                 });
             }
@@ -134,6 +136,8 @@ bot.on('advance', function (data) {
         defaults: songData
     }).spread(function (song) {
         song.updateAttributes(songData);
+    }).catch(function (err) {
+        console.log('[ERROR]', err);
     });
 
     if (config.upvoteSongs == 'ALL') {
@@ -600,7 +604,7 @@ function updateDbUser(user) {
         }
         dbUser.updateAttributes(userData);
     }).catch(function (err) {
-        console.log('Error occurred', err);
+        console.log('[ERROR]', err);
     });
 
 }
