@@ -176,7 +176,7 @@ bot.on('advance', function (data) {
     Promise.map(bot.getWaitList(), function (queueItem) {
         if (queueItem.user) {
             return models.User.find({
-                where: {site_id: queueItem.user.id},
+                where: {site_id: queueItem.user.id, site: config.site},
                 include: {
                     model: models.Karma,
                     required: false,
@@ -301,7 +301,7 @@ bot.on('chat', function (data) {
             last_active: new Date(),
             last_seen: new Date(),
             locale: data.from.language
-        }, {where: {site_id: data.from.id.toString()}});
+        }, {where: {site_id: data.from.id.toString(), site: config.site}});
     }
 });
 bot.on('connected', function () {
