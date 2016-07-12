@@ -14,7 +14,7 @@ exports.handler = function (data) {
 
     var usernameFormatted = S(username).chompLeft('@').s;
     var amount = parseInt(input[2]);
-    var user = _.findWhere(bot.getUsers(), {username: usernameFormatted});
+    var user = findUserInList(bot.getUsers(), usernameFormatted);
 
     if (!user) {
         bot.sendChat('/me user ' + username + ' was not found.');

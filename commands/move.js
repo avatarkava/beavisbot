@@ -12,7 +12,7 @@ exports.handler = function (data) {
             var usernameFormatted = S(username).chompLeft('@').s;
             var position = parseInt(_.last(input, 1));
             users = bot.getUsers();
-            var user = _.findWhere(users, {username: usernameFormatted});
+            var user = findUserInList(users, usernameFormatted);
             if (user !== undefined) {
                 var currentPosition = bot.getWaitListPosition(user.id);
                 if (currentPosition === -1) {

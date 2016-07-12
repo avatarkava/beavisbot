@@ -232,6 +232,8 @@ bot.on('advance', function (data) {
             bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
         }
 
+        console.log('****** SONG LENGTH CHECK: ' + config.maxSongLengthSecs + ':::' + data.media.duration);
+
         // Check if the song is too long for room settings.  Then check to see if it's blacklisted
         if (config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
             console.log('[SKIP] Skipped ' + data.dj.username + ' spinning a song of ' + data.media.duration + ' seconds');
@@ -624,7 +626,7 @@ function monitorDJList() {
 function removeIfDownvoting(mehUsername) {
 
     var mehWaitList = bot.getWaitList();
-    var mehUser = _.findWhere(mehWaitList, {username: mehUsername});
+    var mehUser = findUserInList(mehWaitList, mehUsername);
 
     if (config.verboseLogging) {
         console.log('[WAITLIST]' + JSON.stringify(mehWaitList, null, 2));

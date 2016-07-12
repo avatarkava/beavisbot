@@ -133,6 +133,14 @@ module.exports = function (options) {
         return now.diff(timestamp, 'seconds');
     };
 
+    // Case-insensitive search for user
+    findUserInList = function (list, username) {
+        var lowerUser = username.toLowerCase();
+        return _.find(list, function (term) {
+            return term.username.toLowerCase() == lowerUser;
+        });
+    }
+
     getDbUserFromSiteUser = function (siteUser, callback) {
         models.User.find({
             where: {site_id: siteUser.id.toString(), site: config.site}

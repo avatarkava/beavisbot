@@ -8,7 +8,7 @@ exports.handler = function (data) {
         var params = _.rest(data.message.split(' '), 1);
         var username = params.join(' ').trim()
         var usernameFormatted = S(username).chompLeft('@').s;
-        var user = _.findWhere(bot.getUsers(), {username: usernameFormatted});
+        var user = findUserInList(bot.getUsers(), usernameFormatted);
         if (user) {
             if (user.songsInQueue == 0) {
                 bot.sendChat('/me ' + user.username + ' does not have any songs queued');
