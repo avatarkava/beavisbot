@@ -19,11 +19,10 @@ exports.handler = function (data) {
         } else {
             var user = findUserInList(bot.getUsers(), usernameFormatted);
             if (user) {
-                bot.sendChat(JSON.stringify(user, null, 2));
-                bot.sendChat('/me' + user.username + ' is in the room and was last active ' + timeSince(row.last_active));
+                bot.sendChat('/me ' + user.username + ' is in the room and was last active ' + timeSince(row.last_active));
             }
             else {
-                bot.sendChat('/me' + row.username + ' was last seen ' + timeSince(row.last_seen));
+                bot.sendChat('/me ' + row.username + ' was last seen ' + timeSince(row.last_seen));
             }
         }
     });
