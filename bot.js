@@ -107,15 +107,15 @@ bot.on('advance', function (data) {
 
     // Auto skip for "stuck" songs
     clearTimeout(skipTimer);
+    var nextTimerDelay = (data.media.duration + 10) * 1000;
     if (config.skipStuckSongs) {
         skipTimer = setTimeout(function () {
             if (bot.getMedia() && bot.getMedia().id == data.media.id) {
                 console.log('[SKIP]', 'Skipping ' + data.media.name + ' because it appears to be stuck...');
-                //bot.sendChat('Skipping ' + data.media.name + ' because it appears to be stuck...');
-                // @TODO fix crazy skip
-                // bot.moderateForceSkip();
+                bot.sendChat('Skipping ' + data.media.name + ' because it appears to be stuck...');
+                bot.moderateForceSkip();
             }
-        }, (data.media.duration + 10));
+        }, (nextTimerDelay));
     }
 
     // Write current song data to DB
@@ -471,73 +471,78 @@ bot.on('disconnected', function (data) {
     bot.reconnect();
 });
 
-bot.on('djListUpdate', function (data) {
-    if (config.verboseLogging) {
-        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
-    }
-    //saveWaitList(false);
-});
-
 /**
  * @TODO - No current handling
  */
 bot.on('boothLocked', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] boothLocked ', JSON.stringify(data, null, 2));
+    }
 });
 bot.on('chatDelete', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] chatDelete ', JSON.stringify(data, null, 2));
+    }
+});
+bot.on('djListUpdate', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] djListUpdate ', JSON.stringify(data, null, 2));
+    }
+    //saveWaitList(false);
 });
 bot.on('djUpdate', function (data) {
     if (config.verboseLogging) {
-        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+        console.log('[EVENT] djUpdate ', JSON.stringify(data, null, 2));
     }
     //saveWaitList(false);
 });
 bot.on('emote', function (data) {
     if (config.verboseLogging) {
-        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+        console.log('[EVENT] emote ', JSON.stringify(data, null, 2));
     }
     //saveWaitList(false);
 });
 bot.on('followJoin', function (data) {
     if (config.verboseLogging) {
-        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+        console.log('[EVENT] followJoin ', JSON.stringify(data, null, 2));
     }
     //saveWaitList(false);
 });
 
 bot.on('modAddDj', function (data) {
     if (config.verboseLogging) {
-        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+        console.log('[EVENT] modAddDj ', JSON.stringify(data, null, 2));
     }
     //saveWaitList(false);
 });
 bot.on('modBan', function (data) {
     if (config.verboseLogging) {
-        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+        console.log('[EVENT] modBan ', JSON.stringify(data, null, 2));
     }
     //saveWaitList(false);
 });
 bot.on('modMoveDJ', function (data) {
     if (config.verboseLogging) {
-        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+        console.log('[EVENT] modMoveDJ ', JSON.stringify(data, null, 2));
     }
     //saveWaitList(false);
 });
 bot.on('modRemoveDJ', function (data) {
     if (config.verboseLogging) {
-        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+        console.log('[EVENT] modRemoveDJ ', JSON.stringify(data, null, 2));
     }
     //saveWaitList(false);
 });
 bot.on('modSkip', function (data) {
     if (config.verboseLogging) {
-        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+        console.log('[EVENT] modSkip ', JSON.stringify(data, null, 2));
     }
     //saveWaitList(false);
 });
 
 bot.on('roomMinChatLevelUpdate', function (data) {
     if (config.verboseLogging) {
-        console.log('[EVENT] DJ_LIST_UPDATE', JSON.stringify(data, null, 2));
+        console.log('[EVENT] roomMinChatLevelUpdate ', JSON.stringify(data, null, 2));
     }
     //saveWaitList(false);
 });

@@ -14,7 +14,9 @@ exports.handler = function (data) {
         raw: true
     }).then(function (rows) {
         for (var x in rows) {
-            users.push(rows[x].locale + ': ' + rows[x].user_count);
+            if (rows[x].locale !== 'null' && rows[x].user_count > 0) {
+                users.push(rows[x].locale + ': ' + rows[x].user_count);
+            }
         }
         bot.sendChat(users.join(' · '));
     });
