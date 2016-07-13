@@ -451,7 +451,7 @@ bot.on('vote', function (data) {
     if (config.verboseLogging) {
         data.user = user;
         console.log('[VOTE] ' + JSON.stringify(data, null, 2));
-    } else if (user) {
+    } else if (user && data.v == -1) {
         console.log('[VOTE] ' + user.username + ' voted ' + data.v);
     }
 
