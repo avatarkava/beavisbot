@@ -6,52 +6,53 @@ exports.handler = function (data) {
     if (data.from.username == config.superAdmin) {
 
         var input = data.message.split(' ');
+        var debugData = null;
 
         switch (input[1]) {
             case 'admins':
-                data = bot.getAdmins();
+                debugData = bot.getAdmins();
                 break;
             case 'ambassadors':
-                data = bot.getAmbassadors();
+                debugData = bot.getAmbassadors();
                 break;
             case 'audience':
-                data = bot.getAudience();
+                debugData = bot.getAudience();
                 break;
             case 'dj':
-                data = bot.getDJ();
+                debugData = bot.getDJ();
                 break;
             case 'djs':
-                data = bot.getDJs();
+                debugData = bot.getDJs();
                 break;
             case 'host':
-                data = bot.getHost();
+                debugData = bot.getHost();
                 break;
             case 'media':
-                data = bot.getMedia();
+                debugData = bot.getMedia();
                 break;
             case 'roomScore':
-                data = bot.getRoomScore();
+                debugData = bot.getRoomScore();
                 break;
             case 'self':
-                data = bot.getSelf();
+                debugData = bot.getSelf();
                 break;
             case 'staff':
-                data = bot.getStaff();
+                debugData = bot.getStaff();
                 break;
             case 'timeElapsed':
-                data = bot.getTimeElapsed();
+                debugData = bot.getTimeElapsed();
                 break;
             case 'timeRemaining':
-                data = bot.getTimeRemaining();
+                debugData = bot.getTimeRemaining();
                 break;
             case 'user':
-                data = bot.getUser(input[2]);
+                debugData = bot.getUser(input[2]);
                 break;
             case 'waitList':
-                data = bot.getWaitList();
+                debugData = bot.getWaitList();
                 break;
             case 'waitListPosition':
-                data = bot.getWaitListPosition(input[2]);
+                debugData = bot.getWaitListPosition(input[2]);
                 break;
             default:
                 bot.sendChat('/me Command not supported.');
@@ -59,8 +60,12 @@ exports.handler = function (data) {
                 break;
         }
 
-        bot.sendChat('/me Debugging data logged to the console, @' + data.from.username + '...');
-        console.log('[DEBUG] ', data.message + ': ' + JSON.stringify(data, null, 2));
+        if (debugData !== null) {
+            bot.sendChat('/me Debugging data logged to the console, @' + data.from.username + '...');
+            console.log('[DEBUG] ', data.message + ': ' + JSON.stringify(debugData, null, 2));
+        } else {
+            console.log('[DEBUG] ', data.message + ': null returned');
+        }
     }
 };
 
