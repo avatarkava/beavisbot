@@ -156,7 +156,7 @@ module.exports = function (options) {
         }
 
         Promise.map(_.rest(bot.getDJs(), startPosition), function (dj) {
-            return models.User.find({where: {site_id: dj.id}}).then(function (dbUser) {
+            return models.User.find({where: {site_id: dj.id, site: config.site}}).then(function (dbUser) {
                 if (dbUser !== null && dbUser.site_id !== bot.getSelf().id) {
                     if (secondsSince(dbUser.last_active) <= (maxIdleMins * 60)) {
                         activeUsers.push(dbUser);

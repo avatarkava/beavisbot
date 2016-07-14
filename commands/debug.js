@@ -8,6 +8,8 @@ exports.handler = function (data) {
         var input = data.message.split(' ');
         var debugData = null;
 
+        console.log('[DEBUG] ' + JSON.stringify(data, null, 2));
+
         switch (input[1]) {
             case 'admins':
                 debugData = bot.getAdmins();
@@ -52,7 +54,7 @@ exports.handler = function (data) {
                 debugData = bot.getWaitList();
                 break;
             case 'waitListPosition':
-                debugData = bot.getWaitListPosition(input[2]);
+                debugData = bot.getWaitListPosition(parseInt(input[2]));
                 break;
             default:
                 bot.sendChat('/me Command not supported.');

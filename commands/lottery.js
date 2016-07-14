@@ -36,32 +36,38 @@ exports.handler = function (data) {
 
         setTimeout(function () {
             // Only select from users active during the lottery
-            getActiveDJs(mins, 2, function (activeDJs) {
+            var minPosition = 2;
+            getActiveDJs(mins, minPosition, function (activeDJs) {
                 if (activeDJs.length > 0) {
-                    var randomNumber = _.random(1, activeDJs.length);
-                    var winner = activeDJs[(randomNumber - 1)];
+                    var randomNumber = _.random(0, activeDJs.length - 1);
+                    var winner = activeDJs[randomNumber];
+                    var winnerId = parseInt(winner.site_id);
                     var message = ":tada: @" + winner.username + " emerges victorious!";
-                    transferCustomPoints(null, bot.getUser(winner.site_id), 1);
-                    var currentPosition = bot.getWaitListPosition(winner.site_id);
-                    var position = 1;
+                    transferCustomPoints(null, bot.getUser(winnerId), 1);
+                    var currentPosition = bot.getWaitListPosition(winnerId);
+                    var position = minPosition;
                     if (input[0] === 'roulette') {
-                        position = _.random(1, currentPosition - 1);
+                        position = _.random(minPosition, currentPosition - 1);
                     }
-                    if (currentPosition > 1 && currentPosition > position) {
-                        bot.moderateMoveDJ(winner.site_id, position);
+                    if (currentPosition > minPosition && currentPosition > position) {
+                        bot.moderateMoveDJ(winnerId, position);
                         console.log('[LOTTO] Moving ' + winner.username + ' from position ' + currentPosition + ' to position: ' + position);
-                        message += ' Moving to position ' + (position + 1);
+                        message += ' Moving to position ' + position;
+                    } else if (currentPosition == -1) {
+                        console.log('[LOTTO] ' + winner.username + ' detected with waitlist position of -1');
+                        message += ' Not finding ' + winner.username + '\'s position in the wait list.  Need some help @staff';
                     } else if (currentPosition <= position) {
                         console.log('[LOTTO] Leaving ' + winner.username + ' in position: ' + currentPosition + '(' + position + ')');
-                        message += ' Leaving in position ' + (currentPosition + 1);
+                        message += ' Leaving in position ' + currentPosition;
                     }
                     bot.sendChat(message);
-                }
+                    }
                 else {
                     bot.sendChat(":thumbsdown: No one is eligible to win the contest.");
                     console.log('[LOTTO] No one is eligible to win the contest.');
                 }
-            });
+                }
+            );
         }, mins * 60 * 1000);
     }
 };
