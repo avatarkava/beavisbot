@@ -38,7 +38,7 @@ exports.handler = function (data) {
             // Only select from users active during the lottery
             getActiveDJs(mins, 2, function (activeDJs) {
                 if (activeDJs.length > 0) {
-                    var randomNumber = _.random(0, activeDJs.length);
+                    var randomNumber = _.random(1, activeDJs.length);
                     var winner = activeDJs[(randomNumber - 1)];
                     var message = ":tada: @" + winner.username + " emerges victorious!";
                     transferCustomPoints(null, bot.getUser(winner.site_id), 1);
@@ -49,11 +49,11 @@ exports.handler = function (data) {
                     }
                     if (currentPosition > 1 && currentPosition > position) {
                         bot.moderateMoveDJ(winner.site_id, position);
-                        console.log('[LOTTO] Moving ' + winner.username + ' to position: ' + position);
+                        console.log('[LOTTO] Moving ' + winner.username + ' from position ' + currentPosition + ' to position: ' + position);
                         message += ' Moving to position ' + (position + 1);
                     } else if (currentPosition <= position) {
-                        console.log('[LOTTO] Leaving ' + winner.username + ' in position: ' + position);
-                        message += ' Leaving in position ' + (position + 1);
+                        console.log('[LOTTO] Leaving ' + winner.username + ' in position: ' + currentPosition + '(' + position + ')');
+                        message += ' Leaving in position ' + (currentPosition + 1);
                     }
                     bot.sendChat(message);
                 }
