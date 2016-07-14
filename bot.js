@@ -475,14 +475,14 @@ bot.on('disconnected', function (data) {
  * @TODO - No current handling
  */
 bot.on('boothLocked', function (data) {
-    if (config.verboseLogging) {
-        console.log('[EVENT] boothLocked ', JSON.stringify(data, null, 2));
-    }
+    //  if (config.verboseLogging) {
+    console.log('[EVENT] boothLocked ', JSON.stringify(data, null, 2));
+    //  }
 });
 bot.on('chatDelete', function (data) {
-    if (config.verboseLogging) {
-        console.log('[EVENT] chatDelete ', JSON.stringify(data, null, 2));
-    }
+    //   if (config.verboseLogging) {
+    console.log('[EVENT] chatDelete ', JSON.stringify(data, null, 2));
+    //   }
 });
 bot.on('djListUpdate', function (data) {
     if (config.verboseLogging) {
@@ -503,47 +503,47 @@ bot.on('emote', function (data) {
     //saveWaitList(false);
 });
 bot.on('followJoin', function (data) {
-    if (config.verboseLogging) {
-        console.log('[EVENT] followJoin ', JSON.stringify(data, null, 2));
-    }
+    // if (config.verboseLogging) {
+    console.log('[EVENT] followJoin ', JSON.stringify(data, null, 2));
+    // }
     //saveWaitList(false);
 });
 
 bot.on('modAddDj', function (data) {
-    if (config.verboseLogging) {
-        console.log('[EVENT] modAddDj ', JSON.stringify(data, null, 2));
-    }
+    //  if (config.verboseLogging) {
+    console.log('[EVENT] modAddDj ', JSON.stringify(data, null, 2));
+    //  }
     //saveWaitList(false);
 });
 bot.on('modBan', function (data) {
-    if (config.verboseLogging) {
-        console.log('[EVENT] modBan ', JSON.stringify(data, null, 2));
-    }
+    //   if (config.verboseLogging) {
+    console.log('[EVENT] modBan ', JSON.stringify(data, null, 2));
+    //  }
     //saveWaitList(false);
 });
 bot.on('modMoveDJ', function (data) {
-    if (config.verboseLogging) {
-        console.log('[EVENT] modMoveDJ ', JSON.stringify(data, null, 2));
-    }
+    // if (config.verboseLogging) {
+    console.log('[EVENT] modMoveDJ ', JSON.stringify(data, null, 2));
+    // }
     //saveWaitList(false);
 });
 bot.on('modRemoveDJ', function (data) {
-    if (config.verboseLogging) {
-        console.log('[EVENT] modRemoveDJ ', JSON.stringify(data, null, 2));
-    }
+    // if (config.verboseLogging) {
+    console.log('[EVENT] modRemoveDJ ', JSON.stringify(data, null, 2));
+    // }
     //saveWaitList(false);
 });
 bot.on('modSkip', function (data) {
-    if (config.verboseLogging) {
-        console.log('[EVENT] modSkip ', JSON.stringify(data, null, 2));
-    }
+    //  if (config.verboseLogging) {
+    console.log('[EVENT] modSkip ', JSON.stringify(data, null, 2));
+    //   }
     //saveWaitList(false);
 });
 
 bot.on('roomMinChatLevelUpdate', function (data) {
-    if (config.verboseLogging) {
-        console.log('[EVENT] roomMinChatLevelUpdate ', JSON.stringify(data, null, 2));
-    }
+    // if (config.verboseLogging) {
+    console.log('[EVENT] roomMinChatLevelUpdate ', JSON.stringify(data, null, 2));
+    //  }
     //saveWaitList(false);
 });
 
