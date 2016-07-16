@@ -87,6 +87,8 @@ bot.on('advance', function (data) {
                     });
                 });
             }
+        }).then(function () {
+            transferCustomPoints(null, lastDJ, data.lastPlay.score.grabs);
         });
     }
 
@@ -108,7 +110,7 @@ bot.on('advance', function (data) {
     // Auto skip for "stuck" songs
     clearTimeout(skipTimer);
     var nextTimerDelay = (data.media.duration + 10) * 1000;
-    if (config.skipStuckSongs) {
+    if (config.queue.skipStuckSongs) {
         skipTimer = setTimeout(function () {
             if (bot.getMedia() && bot.getMedia().id == data.media.id) {
                 console.log('[SKIP]', 'Skipping ' + data.media.name + ' because it appears to be stuck...');
@@ -140,7 +142,7 @@ bot.on('advance', function (data) {
         console.log('[ERROR]', err);
     });
 
-    if (config.upvoteSongs == 'ALL') {
+    if (config.queue.upvoteSongs == 'ALL') {
         bot.woot();
     }
 
@@ -168,7 +170,7 @@ bot.on('advance', function (data) {
     });
 
 
-    var maxIdleTime = config.activeDJTimeoutMins * 60;
+    var maxIdleTime = config.queue.djIdleAfterMins * 60;
     var idleDJs = [];
     roomHasActiveMods = false;
 
@@ -182,7 +184,7 @@ bot.on('advance', function (data) {
                     required: false,
                     where: {
                         type: 'warn',
-                        created_at: {gte: moment.utc().subtract(config.activeDJTimeoutMins, 'minutes').toDate()}
+                        created_at: {gte: moment.utc().subtract(config.queue.djIdleAfterMins, 'minutes').toDate()}
                     },
                     limit: 1,
                     order: [['created_at', 'DESC']]
@@ -190,7 +192,7 @@ bot.on('advance', function (data) {
             }).then(function (dbUser) {
                 if (dbUser) {
                     var position = bot.getWaitListPosition(dbUser.site_id);
-                    if (bot.getWaitList().length >= config.minActiveDJQueueLength && secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.activeDJTimeoutMins, 'minutes'))) {
+                    if (bot.getWaitList().length >= config.queue.djIdleMinQueueLengthToEnforce && secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.queue.djIdleAfterMins, 'minutes'))) {
                         console.log('[WL-IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                         if (dbUser.Karmas.length > 0) {
                             console.log('[WL-IDLE]', dbUser.username + ' was last warned ' + timeSince(dbUser.Karmas[0].created_at));
@@ -233,10 +235,10 @@ bot.on('advance', function (data) {
         }
 
         // Check if the song is too long for room settings.  Then check to see if it's blacklisted
-        if (config.maxSongLengthSecs > 0 && data.media.duration > config.maxSongLengthSecs) {
+        if (config.queue.maxSongLengthSecs > 0 && data.media.duration > config.queue.maxSongLengthSecs) {
             console.log('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a song of ' + data.media.duration + ' seconds');
-            var maxLengthMins = Math.floor(config.maxSongLengthSecs / 60);
-            var maxLengthSecs = config.maxSongLengthSecs % 60;
+            var maxLengthMins = Math.floor(config.queue.maxSongLengthSecs / 60);
+            var maxLengthSecs = config.queue.maxSongLengthSecs % 60;
             if (maxLengthSecs < 10) {
                 maxLengthSecs = "0" + maxLengthSecs;
             }
@@ -245,7 +247,7 @@ bot.on('advance', function (data) {
             getDbUserFromSiteUser(data.currentDJ, function (dbuser) {
                 var userData = {
                     type: 'skip',
-                    details: 'Skipped for playing a song of ' + data.media.duration + ' (room configured for max of ' + config.maxSongLengthSecs + 's)',
+                    details: 'Skipped for playing a song of ' + data.media.duration + ' (room configured for max of ' + config.queue.maxSongLengthSecs + 's)',
                     user_id: dbuser.id,
                     mod_user_id: botUser.id
                 };
@@ -339,7 +341,7 @@ bot.on('roomJoin', function (data) {
         updateDbUser(user);
     });
 
-    if (config.upvoteSongs == 'ALL') {
+    if (config.queue.upvoteSongs == 'ALL') {
         bot.woot();
     }
 
@@ -473,7 +475,7 @@ bot.on('vote', function (data) {
         console.log('[VOTE] ' + user.username + ' voted ' + data.v);
     }
 
-    if (config.prohibitDownvoteInQueue && data.v == -1 && bot.getWaitListPosition(data.i) > 0) {
+    if (config.queue.prohibitDownvoteInQueue && data.v == -1 && bot.getWaitListPosition(data.i) > 0) {
         bot.sendChat('@' + user.username + ', voting down while in queue is prohibited. Please vote up or leave the queue.');
         setTimeout(function () {
             removeIfDownvoting(user.username);
@@ -551,7 +553,7 @@ bot.on('roomMinChatLevelUpdate', function (data) {
     //saveWaitList(false);
 });
 
-if (config.activeDJTimeoutMins > 0) {
+if (config.queue.djIdleAfterMins > 0) {
     setInterval(monitorDJList, 5000);
 }
 
