@@ -356,7 +356,7 @@ bot.on('userJoin', function (data) {
     var newUser = false;
     var message = "";
 
-    if (data.username !== botUser.username) {
+    if (data.username !== undefined && data.username !== botUser.username) {
         getDbUserFromSiteUser(data, function (dbUser) {
             if (dbUser == null) {
                 newUser = true;
@@ -364,12 +364,30 @@ bot.on('userJoin', function (data) {
                 if (!roomHasActiveMods) {
                     message += ' Type .help if you need it!';
                 }
-                console.log('[JOIN]', data.username + ' is a first-time visitor to the room!');
-                if ((config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
-                    setTimeout(function () {
-                        bot.sendChat(message)
-                    }, 5000);
-                }
+                models.RoomEvent.find({
+                    where: {
+                        starts_at: {lte: new Date()},
+                        ends_at: {gte: new Date()}
+                    }
+                }).then(function (event) {
+                    if (event !== null) {
+                        if (event.type == 'event') {
+                            message += ' :star: SPECIAL EVENT :star: ' + event.title + ' (.event for details)';
+                        }
+                        else if (event.type == 'theme') {
+                            message += ' Theme: ' + event.title + ' (.theme for details)';
+                        }
+                    }
+
+                    console.log('[JOIN]', data.username + ' is a first-time visitor to the room!');
+                    if ((config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
+                        setTimeout(function () {
+                            bot.sendChat(message)
+                        }, 5000);
+                    }
+                });
+
+
             }
             else {
                 models.EventResponse.find({
@@ -475,10 +493,9 @@ bot.on('disconnected', function (data) {
  * @TODO - No current handling
  */
 bot.on('boothLocked', function (data) {
-    //  if (config.verboseLogging) {
     console.log('[EVENT] boothLocked ', JSON.stringify(data, null, 2));
-    //  }
-});
+})
+;
 bot.on('chatDelete', function (data) {
     //   if (config.verboseLogging) {
     console.log('[EVENT] chatDelete ', JSON.stringify(data, null, 2));
@@ -503,47 +520,34 @@ bot.on('emote', function (data) {
     //saveWaitList(false);
 });
 bot.on('followJoin', function (data) {
-    // if (config.verboseLogging) {
     console.log('[EVENT] followJoin ', JSON.stringify(data, null, 2));
-    // }
     //saveWaitList(false);
 });
 
 bot.on('modAddDj', function (data) {
-    //  if (config.verboseLogging) {
     console.log('[EVENT] modAddDj ', JSON.stringify(data, null, 2));
-    //  }
     //saveWaitList(false);
 });
 bot.on('modBan', function (data) {
-    //   if (config.verboseLogging) {
     console.log('[EVENT] modBan ', JSON.stringify(data, null, 2));
-    //  }
     //saveWaitList(false);
 });
 bot.on('modMoveDJ', function (data) {
-    // if (config.verboseLogging) {
     console.log('[EVENT] modMoveDJ ', JSON.stringify(data, null, 2));
-    // }
     //saveWaitList(false);
 });
 bot.on('modRemoveDJ', function (data) {
-    // if (config.verboseLogging) {
     console.log('[EVENT] modRemoveDJ ', JSON.stringify(data, null, 2));
-    // }
+
     //saveWaitList(false);
 });
 bot.on('modSkip', function (data) {
-    //  if (config.verboseLogging) {
     console.log('[EVENT] modSkip ', JSON.stringify(data, null, 2));
-    //   }
     //saveWaitList(false);
 });
 
 bot.on('roomMinChatLevelUpdate', function (data) {
-    // if (config.verboseLogging) {
     console.log('[EVENT] roomMinChatLevelUpdate ', JSON.stringify(data, null, 2));
-    //  }
     //saveWaitList(false);
 });
 
