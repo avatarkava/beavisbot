@@ -8,7 +8,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/AvatarKava/beavisbot-dubtrack-fm.git"
+    "url": "git://github.com/AvatarKava/beavisbot.git"
   },
   "author": "Mike Burke <mburke@phpmonkeys.com>",
   "main": "bot.js",

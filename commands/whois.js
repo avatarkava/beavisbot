@@ -21,7 +21,7 @@ exports.handler = function (data) {
         } else {
             // @TODO - store & display data we can get from the site like 'active', 'playedCount', 'songsInQueue', 'dubs'
             message = row.username;
-            if (row.locale !== 'null') {
+            if (row.locale !== null && row.locale != 'null') {
                 message += ' • ' + row.locale;
 
             }

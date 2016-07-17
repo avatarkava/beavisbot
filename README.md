@@ -13,7 +13,7 @@ Quick Installation
 4a. If you are using MySQL, run the install/tables.sql file against the database to create all the necessary tables
 4b. If you are using SQLite, copy the supplied sample.sqlite to the root folder and rename it to align with your settings in config.json
 
-Known issues are located at https://github.com/AvatarKava/beavisbot-dubtrack-fm/issues - please submit any bug reports or feature requests there!
+Known issues are located at https://github.com/AvatarKava/beavisbot/issues - please submit any bug reports or feature requests there!
 
 Logging and Log Rotation
 ------------------------

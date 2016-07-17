@@ -352,8 +352,9 @@ bot.on('userJoin', function (data) {
 
     if (config.verboseLogging) {
         console.log('[JOIN]', JSON.stringify(data, null, 2));
-    }
-    else {
+    } else if (data.username === undefined) {
+        console.log('[JOIN] Guest joined');
+    } else {
         console.log('[JOIN] ' + data.username + ' joined');
     }
 
