@@ -174,7 +174,7 @@ module.exports = function (options) {
         if (fromUser === null) {
             fromUser = bot.getSelf();
 
-            models.User.update({custom_points: Sequelize.literal('(custom_points + ' + points + ')')}, {where: {site_id: toUser.id}});
+            models.User.update({custom_points: Sequelize.literal('(custom_points + ' + points + ')')}, {where: {site_id: toUser.id.toString()}});
             console.log('[GIFT] ' + fromUser.username + ' awarded ' + points + ' points to ' + toUser.username);
             bot.sendChat(':gift: ' + fromUser.username + ' awarded ' + points + ' ' + config.customPointName + ' to @' +
                 toUser.username + ' :gift:');
@@ -189,8 +189,8 @@ module.exports = function (options) {
                 }
 
                 // Deduct the points from the sender's balance and add to the recipient
-                models.User.update({custom_points: Sequelize.literal('(custom_points - ' + points + ')')}, {where: {site_id: fromUser.id}});
-                models.User.update({custom_points: Sequelize.literal('(custom_points + ' + points + ')')}, {where: {site_id: toUser.id}});
+                models.User.update({custom_points: Sequelize.literal('(custom_points - ' + points + ')')}, {where: {site_id: fromUser.id.toString()}});
+                models.User.update({custom_points: Sequelize.literal('(custom_points + ' + points + ')')}, {where: {site_id: toUser.id.toString()}});
 
                 console.log('[GIFT] ' + fromUser.username + ' gave ' + points + ' points to ' + toUser.username);
                 bot.sendChat(':gift: @' + fromUser.username + ' gave ' + points + ' ' + config.customPointName + ' to @' +
