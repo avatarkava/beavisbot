@@ -86,9 +86,11 @@ bot.on('advance', function (data) {
                         console.log('[ERROR]', err);
                     });
                 });
+
+                if (data.lastPlay.score.grabs > 0) {
+                    transferCustomPoints(null, lastDJ, data.lastPlay.score.grabs);
+                }
             }
-        }).then(function () {
-            transferCustomPoints(null, lastDJ, data.lastPlay.score.grabs);
         });
     }
 
@@ -150,8 +152,8 @@ bot.on('advance', function (data) {
     models.SongResponse.find({
         where: {
             $or: [{
-                $and: [{media_type: 'author'}, {trigger: {$like: '%' + data.media.author + '%'}}],
-                $and: [{media_type: 'title'}, {trigger: {$like: '%' + data.media.title + '%'}}],
+                $and: [{media_type: 'author'}, {pattern: {$like: '%' + data.media.author + '%'}}],
+                $and: [{media_type: 'title'}, {pattern: {$like: '%' + data.media.title + '%'}}],
             }],
             is_active: true
         }
@@ -393,7 +395,7 @@ bot.on('userJoin', function (data) {
             }
             else {
                 models.EventResponse.find({
-                    where: {event_type: 'userJoin', trigger: data.username, is_active: true},
+                    where: {event_type: 'userJoin', pattern: data.username, is_active: true},
                     order: 'RAND()'
                 }).then(function (eventResponse) {
                     if (eventResponse == null) {
@@ -831,7 +833,7 @@ function mentionResponse(data) {
 
 function chatResponse(data) {
     models.EventResponse.find({
-            where: {event_type: 'chat', trigger: data.message, is_active: true},
+            where: {event_type: 'chat', pattern: data.message, is_active: true},
             order: 'RAND()'
         })
         .then(function (row) {

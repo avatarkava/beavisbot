@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS `event_responses`;
 CREATE TABLE `event_responses` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `event_type` varchar(255) NOT NULL,
-  `trigger` varchar(255) DEFAULT NULL,
+  `pattern` varchar(255) DEFAULT NULL,
   `response` varchar(255) NOT NULL,
   `is_active` tinyint(1) DEFAULT '1',
   `created_at` datetime NOT NULL,
@@ -78,7 +78,7 @@ DROP TABLE IF EXISTS `song_responses`;
 CREATE TABLE `song_responses` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `media_type` varchar(255) DEFAULT NULL,
-  `trigger` varchar(255) NOT NULL,
+  `pattern` varchar(255) NOT NULL,
   `response` varchar(255) DEFAULT NULL,
   `rate` int(11) DEFAULT '0',
   `is_active` tinyint(1) DEFAULT '1',
@@ -90,6 +90,7 @@ CREATE TABLE `song_responses` (
 DROP TABLE IF EXISTS `songs`;
 CREATE TABLE `songs` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `site` varchar(50) NOT NULL DEFAULT 'dubtrack',
   `site_id` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `slug` varchar(255) NOT NULL,
@@ -107,17 +108,20 @@ CREATE TABLE `songs` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `site_id` (`site_id`)
+  UNIQUE KEY `site_id` (`site_id`),
+  UNIQUE KEY `site_host_id` (`site`, `host`, `host_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `site` varchar(50) NOT NULL DEFAULT 'dubtrack',
   `site_id` varchar(255) NOT NULL,
   `username` varchar(255) NOT NULL,
   `slug` varchar(255) NOT NULL,
   `locale` varchar(255) DEFAULT 'en_US',
   `avatar` varchar(255) DEFAULT NULL,
+  `badge` varchar(255) DEFAULT NULL,
   `bio` text,
   `role` varchar(255) DEFAULT NULL,
   `site_points` int(10) unsigned DEFAULT '0',
@@ -130,7 +134,7 @@ CREATE TABLE `users` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `site_id` (`site_id`)
+  UNIQUE KEY `site_id` (`site`, `site_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE `games` ADD CONSTRAINT `games_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
