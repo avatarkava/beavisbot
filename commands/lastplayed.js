@@ -22,7 +22,7 @@ exports.handler = function (data) {
         order: [['created_at', 'DESC']]
     }).then(function (row) {
         if (!row && params.length == 0) {
-            bot.sendChat('This is the first time I have seen this song played in this room!');
+            bot.sendChat('This is the first time I have seen this video played in this room!');
         } else if (!row) {
             bot.sendChat('I have not seen a song with id `' + songid + '` played in this room!');
         } else {

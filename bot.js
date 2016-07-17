@@ -88,7 +88,7 @@ bot.on('advance', function (data) {
                 });
 
                 if (data.lastPlay.score.grabs > 0) {
-                    transferCustomPoints(null, lastDJ, data.lastPlay.score.grabs);
+                    transferCustomPoints(null, data.lastPlay.dj, data.lastPlay.score.grabs);
                 }
             }
         });
