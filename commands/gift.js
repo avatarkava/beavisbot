@@ -6,7 +6,7 @@ exports.handler = function (data) {
 
     var input = data.message.split(' ');
     var params = _.rest(input, 1);
-    var username = _.initial(params);
+    var username = _.initial(params).split(' ');
     var amount = parseInt(_.last(params));
 
     if (!amount || isNaN(amount) || amount < 1 || !username) {
