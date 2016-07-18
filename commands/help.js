@@ -7,10 +7,10 @@ exports.handler = function (data) {
     // @TODO - Use this to show all active staff - console.log(bot.getStaff());
 
     if (config.slack.webhookUrl !== '') {
-        bot.sendChat('Need help? Ask a staff member. None around? Try ' + config.commandLiteral + 'callmod');
+        bot.sendChat('Need help? Ask a staff member. None around? Try ' + config.commandLiteral + 'callmod. @staff');
     }
     else {
-        bot.sendChat('Need help? Ask a staff member.');
+        bot.sendChat('Need help? Ask a staff member. @staff');
     }
 
 }
