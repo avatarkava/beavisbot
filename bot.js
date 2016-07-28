@@ -496,7 +496,7 @@ bot.on('userJoin', function (data) {
 
 bot.on('userLeave', function (data) {
     console.log('[LEAVE]', 'User left: ' + data.username);
-    models.User.update({last_leave: new Date()}, {where: {id: data.id}});
+    models.User.update({last_leave: new Date()}, {where: {site: config.site, site_id: data.id.toString()}});
 });
 bot.on('userUpdate', function (data) {
     if (config.verboseLogging) {
@@ -623,14 +623,14 @@ function saveWaitList(wholeRoom) {
             models.User.update({
                 queue_position: position,
                 last_seen: moment.utc().toDate()
-            }, {where: {id: user.id}});
+            }, {where: {site: config.site, site_id: user.id.toString()}});
         }
         else {
-            models.User.update({queue_position: -1}, {where: {id: user.id}});
+            models.User.update({queue_position: -1}, {where: {site: config.site, site_id: user.id.toString()}});
         }
 
         if (config.verboseLogging) {
-            console.log('[WL-UPDATE] ', user.username + ' => ' + position);
+            console.log('[WL-UPDATE]', user.username + ' => ' + position);
         }
 
     });
@@ -705,7 +705,7 @@ function removeIfDownvoting(mehUsername) {
             mod_user_id: botUser.id
         };
         models.Karma.create(userData);
-        models.User.update({queue_position: -1}, {where: {id: mehUser.id}});
+        models.User.update({queue_position: -1}, {where: {site: config.site, site_id: mehUser.id.toString()}});
     }
 }
 
