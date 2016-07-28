@@ -632,7 +632,8 @@ function saveWaitList(wholeRoom) {
     models.User.update({queue_position: -1}, {
         where: {
             last_seen: {lte: moment.utc().subtract(15, 'minutes').toDate()},
-            last_active: {lte: moment.utc().subtract(15, 'minutes').toDate()}
+            last_active: {lte: moment.utc().subtract(15, 'minutes').toDate()},
+            queue_position: {ne: -1}
         }
     });
 
