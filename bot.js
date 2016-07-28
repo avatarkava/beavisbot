@@ -470,20 +470,20 @@ bot.on('userJoin', function (data) {
 
             // Restore spot in line if user has been gone < 15 mins
             var position = bot.getWaitListPosition(data.id);
-            if (!newUser && dbUser.waitlist_position > -1 && secondsSince(dbUser.last_seen) <= 900 && (position === -1 || (position > -1 && position > dbUser.waitlist_position))) {
+            if (!newUser && dbUser.queue_position > -1 && secondsSince(dbUser.last_seen) <= 900 && (position === -1 || (position > -1 && position > dbUser.queue_position))) {
                 bot.moderateAddDJ(data.id, function () {
-                    if (dbUser.waitlist_position < bot.getWaitList().length && position !== dbUser.waitlist_position) {
-                        bot.moderateMoveDJ(data.id, dbUser.waitlist_position);
+                    if (dbUser.queue_position < bot.getWaitList().length && position !== dbUser.queue_position) {
+                        bot.moderateMoveDJ(data.id, dbUser.queue_position);
                         var userData = {
                             type: 'restored',
-                            details: 'Restored to position ' + dbUser.waitlist_position + ' (disconnected for ' + timeSince(dbUser.last_seen, true) + ')',
+                            details: 'Restored to position ' + dbUser.queue_position + ' (disconnected for ' + timeSince(dbUser.last_seen, true) + ')',
                             user_id: data.id,
                             mod_user_id: botUser.id
                         };
                         models.Karma.create(userData);
 
                         setTimeout(function () {
-                            bot.sendChat('/me put @' + data.username + ' back in line :thumbsup:')
+                            bot.sendChat('/me put @' + data.username + ' back in line (reconnected) :thumbsup:')
                         }, 5000);
                     }
 
@@ -705,7 +705,7 @@ function removeIfDownvoting(mehUsername) {
             mod_user_id: botUser.id
         };
         models.Karma.create(userData);
-        models.User.update({waitlist_position: -1}, {where: {id: mehUser.id}});
+        models.User.update({queue_position: -1}, {where: {id: mehUser.id}});
     }
 }
 
