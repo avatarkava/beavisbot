@@ -753,7 +753,7 @@ function handleCommand(data) {
                 time_diff_user -= command.lastRunUsers[data.from.id];
             }
 
-            if (data.from.role >= bot.ROOM_ROLE.MANAGER) {
+            if (data.from.role >= PlugAPI.ROOM_ROLE.MANAGER) {
                 if (command.cdManager >= time_diff) {
                     console.log('[ANTISPAM]', data.from.username + ' cannot run the command, cuz of antispam (Manager+) ' + time_diff);
                     can_run_command = false;
@@ -780,24 +780,20 @@ function handleCommand(data) {
                 // Don't allow @mention to the bot - prevent loopback
                 data.message = data.message.replace('@' + botUser.username, '');
 
-                // Grab the db entries for the user that sent this message
-                if (data.from.id !== null) {
-                    getDbUserFromSiteUser(data.from, function (row) {
-                        data.from.db = row;
-                        command.handler(data);
-                    });
-                }
-                else {
-                    command.handler(data);
-                }
+                // Grab db data for the user that sent this message
+                getDbUserFromSiteUser(data.from, function (row) {
+                    data.from.db = row;
+                    var r = command.handler(data);
+                    if (typeof r === 'object' && 'cdAll' in r && 'cdUser' in r) {
+                        command.lastRun = cur_time - command.cdAll + r.cdAll;
+                        command.lastRunUsers[data.from.id] = cur_time - command.cdUser + r.cdUser;
+                    } else if (r !== false) {
+                        command.lastRun = cur_time;
+                        command.lastRunUsers[data.from.id] = cur_time;
+                    }
+                });
 
-                if (typeof r === 'object' && 'cdAll' in r && 'cdUser' in r) {
-                    command.lastRun = cur_time - command.cdAll + r.cdAll;
-                    command.lastRunUsers[data.from.id] = cur_time - command.cdUser + r.cdUser;
-                } else if (r !== false) {
-                    command.lastRun = cur_time;
-                    command.lastRunUsers[data.from.id] = cur_time;
-                }
+
             }
 
         }

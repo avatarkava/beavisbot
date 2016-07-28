@@ -1,6 +1,6 @@
 module.exports = function (options) {
 
-    //var DubAPI = require('dubapi');
+    PlugAPI = require('plugapi');
     Promise = require('bluebird');
 
     bot = options.bot;
@@ -25,15 +25,6 @@ module.exports = function (options) {
     CircularJSON = require('circular-json');
     commands = [];
     responses = [];
-
-    ROOM_ROLE = {
-        NONE: 0,
-        RESIDENTDJ: 1,
-        BOUNCER: 2,
-        MANAGER: 3,
-        COHOST: 4,
-        HOST: 5
-    };
 
     PERMISSIONS = {
         NONE: 0,
@@ -253,9 +244,9 @@ module.exports = function (options) {
 
     hasPermission = function (user, minRole) {
 
-        if (user.role == bot.ROOM_ROLE.RESIDENTDJ) {
+        if (user.role == PlugAPI.ROOM_ROLE.RESIDENTDJ) {
             return (user.role >= minRole || (minRole == PERMISSIONS.RDJ_PLUS && settings['rdjplus']));
-        } else if (user.role == bot.ROOM_ROLE.BOUNCER) {
+        } else if (user.role == PlugAPI.ROOM_ROLE.BOUNCER) {
             return (user.role >= minRole || (minRole == PERMISSIONS.BOUNCER_PLUS && settings['bouncerplus']));
         }
 
