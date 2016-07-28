@@ -16,7 +16,10 @@ bot.multiLineLimit = 5;
 initializeModules(config.auth, bot);
 
 var roomHasActiveMods = false;
-var mentions = {};
+var mentions = {
+    lastRunAll: 0,
+    lastRunUsers: []
+};
 var skipTimer;
 var botUser = {};
 
@@ -865,12 +868,9 @@ function mentionResponse(data) {
     var cooldown_all = 10;
     var cooldown_user = 30;
     var cur_time = Date.now() / 1000;
-    var time_diff = cur_time;
+    var time_diff = cur_time - mentions.lastRunAll;
     var time_diff_user = cur_time;
 
-    if (mentions.lastRun !== undefined) {
-        time_diff = cur_time - mentions.lastRunAll;
-    }
     if (data.from.id in mentions.lastRunUsers) {
         time_diff_user -= mentions.lastRunUsers[data.from.id];
     }
