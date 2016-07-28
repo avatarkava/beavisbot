@@ -19,7 +19,7 @@ exports.handler = function (data) {
         if (command == 'unmute') {
             bot.moderateUnmuteUser(user.id);
             console.log('[UNMUTE]', data.from.username + ' unmuted ' + usernameFormatted);
-            sendChat('/me ' + usernameFormatted + ' is now unmuted.');
+            bot.sendChat('/me ' + usernameFormatted + ' is now unmuted.');
         } else {
             // @TODO - Make this variable
             var mute_duration = PlugAPI.MUTE.LONG;
