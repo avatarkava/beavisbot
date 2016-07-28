@@ -4,7 +4,7 @@ exports.enabled = true;
 exports.matchStart = true;
 exports.cdAll = 300;
 exports.cdUser = 300;
-exports.cdStaff = 300;
+exports.cdStaff = 180;
 exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
 

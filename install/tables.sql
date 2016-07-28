@@ -4,7 +4,7 @@ CREATE TABLE `event_responses` (
   `event_type` varchar(255) NOT NULL,
   `pattern` varchar(255) DEFAULT NULL,
   `response` varchar(255) NOT NULL,
-  `cooldown` int(10) unsigned DEFAULT '30',
+  `cooldown` int(10) unsigned DEFAULT '10',
   `is_active` tinyint(1) DEFAULT '1',
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,

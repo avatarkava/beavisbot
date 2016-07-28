@@ -761,15 +761,15 @@ function handleCommand(data) {
 
             if (data.from.role >= PlugAPI.ROOM_ROLE.BOUNCER) {
                 if (command.cdStaff >= time_diff) {
-                    console.log('[ANTISPAM]', data.from.username + ' cannot run the command, cuz of antispam (Manager+) ' + time_diff);
+                    console.log('[ANTISPAM]', data.from.username + ' cannot run the command due to antispam (cdStaff) ' + time_diff);
                     can_run_command = false;
                 }
             } else {
                 if (command.cdAll >= time_diff) {
-                    console.log('[ANTISPAM]', data.from.username + ' cannot run the command, cuz of antispam (cdAll) ' + time_diff);
+                    console.log('[ANTISPAM]', data.from.username + ' cannot run the command due to antispam (cdAll) ' + time_diff);
                     can_run_command = false;
                 } else if (command.cdUser >= time_diff_user) {
-                    console.log('[ANTISPAM]', data.from.username + ' cannot run the command, cuz of antispam (cdUser) ' + time_diff_user);
+                    console.log('[ANTISPAM]', data.from.username + ' cannot run the command due to antispam (cdUser) ' + time_diff_user);
                     can_run_command = false;
                 }
             }

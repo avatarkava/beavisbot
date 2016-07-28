@@ -2,9 +2,9 @@ exports.names = ['lastplayed'];
 exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = true;
-exports.cdAll = 60;
-exports.cdUser = 60;
-exports.cdStaff = 60;
+exports.cdAll = 10;
+exports.cdUser = 10;
+exports.cdStaff = 10;
 exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
 

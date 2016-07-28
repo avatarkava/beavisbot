@@ -2,9 +2,9 @@ exports.names = ['lastseen', 'seen'];
 exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = true;
-exports.cdAll = 15;
-exports.cdUser = 15;
-exports.cdStaff = 15;
+exports.cdAll = 10;
+exports.cdUser = 10;
+exports.cdStaff = 10;
 exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
 

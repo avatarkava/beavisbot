@@ -2,9 +2,9 @@ exports.names = ['lottery', 'roulette'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
-exports.cdAll = 300;
-exports.cdUser = 300;
-exports.cdStaff = 300;
+exports.cdAll = 60;
+exports.cdUser = 60;
+exports.cdStaff = 60;
 exports.minRole = PERMISSIONS.BOUNCER;
 exports.handler = function (data) {
 

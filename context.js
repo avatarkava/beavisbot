@@ -219,7 +219,7 @@ module.exports = function (options) {
             models.User.update({custom_points: Sequelize.literal('(custom_points + ' + points + ')')}, {where: {site_id: toUser.id.toString()}});
             console.log('[GIFT] ' + fromUser.username + ' awarded ' + points + ' points to ' + toUser.username);
             bot.sendChat(':gift: ' + fromUser.username + ' awarded ' + points + ' ' + config.customPointName + ' to @' +
-                toUser.username + ' :gift:');
+                toUser.username);
 
             return;
         }

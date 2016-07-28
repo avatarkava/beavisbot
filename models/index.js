@@ -25,11 +25,12 @@ else if (config.db.dialect === 'mysql') {
         dialect: config.db.dialect,
         port: config.db.port,
         logging: logLevel,
+        charset: 'utf8',
+        retry: {match: 'ER_LOCK_DEADLOCK: Deadlock found when trying to get lock; try restarting transaction', max: 3}
     });
 }
 
-fs
-    .readdirSync(__dirname)
+fs.readdirSync(__dirname)
     .filter(function (file) {
         return (file.indexOf('.') !== 0) && (file !== basename);
     })

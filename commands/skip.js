@@ -2,9 +2,9 @@ exports.names = ['skip'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;
-exports.cdAll = 15;
-exports.cdUser = 15;
-exports.cdStaff = 15;
+exports.cdAll = 10;
+exports.cdUser = 10;
+exports.cdStaff = 10;
 exports.minRole = PERMISSIONS.RDJ_PLUS;
 exports.handler = function (data) {
 

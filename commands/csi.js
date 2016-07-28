@@ -2,9 +2,9 @@ exports.names = ['csi'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = false;
-exports.cdAll = 300;
-exports.cdUser = 300;
-exports.cdStaff = 300;
+exports.cdAll = 30;
+exports.cdUser = 30;
+exports.cdStaff = 30;
 exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
     bot.sendChat('http://media1.giphy.com/media/v9rfTQBNqdsSA/giphy.gif');
