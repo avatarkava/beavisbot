@@ -16,8 +16,8 @@ bot.multiLineLimit = 5;
 initializeModules(config.auth, bot);
 
 var roomHasActiveMods = false;
+var mentions = {};
 var skipTimer;
-var realWaitList = {};
 var botUser = {};
 
 bot.connect(config.roomName); // The part after https://plug.dj
@@ -733,6 +733,9 @@ function handleCommand(data) {
         // Chop off the command literal
         data.message = data.message.substr(1);
 
+        // Don't allow @mention to the bot - prevent loopback
+        data.message = data.message.replace('@' + botUser.username, '');
+
         var command = commands.filter(function (cmd) {
             var found = false;
             for (i = 0; i < cmd.names.length; i++) {
@@ -753,8 +756,8 @@ function handleCommand(data) {
                 time_diff_user -= command.lastRunUsers[data.from.id];
             }
 
-            if (data.from.role >= PlugAPI.ROOM_ROLE.MANAGER) {
-                if (command.cdManager >= time_diff) {
+            if (data.from.role >= PlugAPI.ROOM_ROLE.BOUNCER) {
+                if (command.cdStaff >= time_diff) {
                     console.log('[ANTISPAM]', data.from.username + ' cannot run the command, cuz of antispam (Manager+) ' + time_diff);
                     can_run_command = false;
                 }
@@ -777,8 +780,6 @@ function handleCommand(data) {
             }
 
             if (can_run_command && hasPermission(data.from, command.minRole)) {
-                // Don't allow @mention to the bot - prevent loopback
-                data.message = data.message.replace('@' + botUser.username, '');
 
                 // Grab db data for the user that sent this message
                 getDbUserFromSiteUser(data.from, function (row) {
@@ -792,10 +793,7 @@ function handleCommand(data) {
                         command.lastRunUsers[data.from.id] = cur_time;
                     }
                 });
-
-
             }
-
         }
         else if (!config.quietMode) {
             // @TODO - Build the list of possible commands on init() instead of querying every time
@@ -862,37 +860,58 @@ function suggestNewSongMetadata(valueToCorrect) {
 }
 
 function mentionResponse(data) {
-    // How much ADHD does the bot have?
-    chatRandomnessPercentage = 5;
-    if (config.chatRandomnessPercentage) {
-        chatRandomnessPercentage = config.chatRandomnessPercentage;
+
+    // Antispam
+    var cooldown_all = 10;
+    var cooldown_user = 30;
+    var cur_time = Date.now() / 1000;
+    var time_diff = cur_time;
+    var time_diff_user = cur_time;
+
+    if (mentions.lastRun !== undefined) {
+        time_diff = cur_time - mentions.lastRunAll;
+    }
+    if (data.from.id in mentions.lastRunUsers) {
+        time_diff_user -= mentions.lastRunUsers[data.from.id];
     }
 
-    if (_.random(1, 100) > chatRandomnessPercentage) {
-        cleverMessage = data.message.replace('@' + botUser.username, '').trim();
-        Cleverbot.prepare(function () {
-            cleverbot.write(cleverMessage, function (response) {
-                if (config.verboseLogging) {
-                    console.log('[CLEVERBOT]', JSON.stringify(response, null, 2));
-                }
-                bot.sendChat('@' + data.from.username + ', ' + response.message);
-            });
-        });
-    }
-    else {
-        models.EventResponse.find({
-                where: {event_type: 'mention', is_active: true},
-                order: 'RAND()'
-            })
-            .then(function (row) {
-                if (row === null) {
-                    return;
-                }
-                else {
-                    bot.sendChat(row.response.replace('{sender}', data.from.username));
-                }
+    if (cooldown_all >= time_diff) {
+        console.log('[ANTISPAM]', data.from.username + ' cannot chat with the bot - antispam (all) ' + time_diff);
+    } else if (cooldown_user >= time_diff_user) {
+        console.log('[ANTISPAM]', data.from.username + ' cannot chat with the bot - antispam (user) ' + time_diff_user);
+    } else {
+        // How much ADHD does the bot have?
+        chatRandomnessPercentage = 5;
+        if (config.chatRandomnessPercentage) {
+            chatRandomnessPercentage = config.chatRandomnessPercentage;
+        }
 
+        if (_.random(1, 100) > chatRandomnessPercentage) {
+            cleverMessage = data.message.replace('@' + botUser.username, '').trim();
+            Cleverbot.prepare(function () {
+                cleverbot.write(cleverMessage, function (response) {
+                    if (config.verboseLogging) {
+                        console.log('[CLEVERBOT]', JSON.stringify(response, null, 2));
+                    }
+                    bot.sendChat('@' + data.from.username + ', ' + response.message);
+                });
             });
+        }
+        else {
+            models.EventResponse.find({
+                    where: {event_type: 'mention', is_active: true},
+                    order: 'RAND()'
+                })
+                .then(function (row) {
+                    if (row === null) {
+                        return;
+                    }
+                    else {
+                        bot.sendChat(row.response.replace('{sender}', data.from.username));
+                    }
+
+                });
+        }
     }
 }
 

@@ -5,7 +5,7 @@ exports.enabled = true;
 exports.matchStart = false;
 exports.cdAll = 30;
 exports.cdUser = 30;
-exports.cdManager = 30;
+exports.cdStaff = 30;
 exports.minRole = PERMISSIONS.RDJ_PLUS;
 exports.handler = function (data) {
     bot.woot();

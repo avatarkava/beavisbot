@@ -4,7 +4,7 @@ exports.enabled = true;
 exports.matchStart = false;
 exports.cdAll = 15;
 exports.cdUser = 15;
-exports.cdManager = 15;
+exports.cdStaff = 15;
 exports.minRole = PERMISSIONS.RDJ_PLUS;
 exports.handler = function (data) {
 

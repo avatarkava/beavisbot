@@ -4,7 +4,7 @@ exports.enabled = true;
 exports.matchStart = true;
 exports.cdAll = 15;
 exports.cdUser = 15;
-exports.cdManager = 0;
+exports.cdStaff = 0;
 exports.minRole = PERMISSIONS.BOUNCER_PLUS;
 exports.handler = function (data) {
 

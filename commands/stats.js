@@ -4,7 +4,7 @@ exports.enabled = true;
 exports.matchStart = false;
 exports.cdAll = 30;
 exports.cdUser = 30;
-exports.cdManager = 30;
+exports.cdStaff = 30;
 exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
     bot.sendChat('Individual and room stats are being moved to our new website and will be available via API.  Stay tuned for details!');
