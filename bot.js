@@ -239,7 +239,6 @@ bot.on('advance', function (data) {
                                 mod_user_id: botUser.db.id
                             };
                             models.Karma.create(userData);
-                            models.User.update({queue_position: -1}, {where: {id: dbUser.id}});
                         }
                         else if (position > 1) {
                             var userData = {
@@ -474,11 +473,12 @@ bot.on('userJoin', function (data) {
                     if (dbUser.queue_position < bot.getWaitList().length && position !== dbUser.queue_position) {
                         bot.moderateMoveDJ(data.id, dbUser.queue_position);
                     }
+
                     var userData = {
                         type: 'restored',
                         details: 'Restored to position ' + dbUser.queue_position + ' (disconnected for ' + timeSince(dbUser.last_seen, true) + ')',
-                        user_id: data.id,
-                        mod_user_id: botUser.id
+                        user_id: dbUser.id,
+                        mod_user_id: botUser.db.id
                     };
                     models.Karma.create(userData);
 
@@ -694,14 +694,15 @@ function removeIfDownvoting(mehUsername) {
         var position = bot.getWaitListPosition(mehUser.id);
         bot.moderateRemoveDJ(mehUser.id);
         bot.sendChat('@' + mehUser.username + ', voting MEH/Chato/:thumbsdown: while in line is prohibited. Check .rules.');
-        var userData = {
-            type: 'remove',
-            details: 'Removed from position ' + position + ' for mehing',
-            user_id: mehUser.id,
-            mod_user_id: botUser.id
-        };
-        models.Karma.create(userData);
-        models.User.update({queue_position: -1}, {where: {site: config.site, site_id: mehUser.id.toString()}});
+        getDbUserFromSiteUser(mehUser.id, function (row) {
+            var userData = {
+                type: 'remove',
+                details: 'Removed from position ' + position + ' for mehing',
+                user_id: row.id,
+                mod_user_id: botUser.db.id
+            };
+            models.Karma.create(userData);
+        });
     }
 }
 
