@@ -562,23 +562,18 @@ bot.on('followJoin', function (data) {
 
 bot.on('modAddDj', function (data) {
     console.log('[EVENT] modAddDj ', JSON.stringify(data, null, 2));
-    saveWaitList(false);
 });
 bot.on('modBan', function (data) {
     console.log('[EVENT] modBan ', JSON.stringify(data, null, 2));
-    saveWaitList(false);
 });
 bot.on('modMoveDJ', function (data) {
     console.log('[EVENT] modMoveDJ ', JSON.stringify(data, null, 2));
-    saveWaitList(false);
 });
 bot.on('modRemoveDJ', function (data) {
     console.log('[EVENT] modRemoveDJ ', JSON.stringify(data, null, 2));
-    saveWaitList(true);
 });
 bot.on('modSkip', function (data) {
     console.log('[EVENT] modSkip ', JSON.stringify(data, null, 2));
-    saveWaitList(true);
 });
 bot.on('roomMinChatLevelUpdate', function (data) {
     console.log('[EVENT] roomMinChatLevelUpdate ', JSON.stringify(data, null, 2));
