@@ -328,7 +328,7 @@ bot.on('chat', function (data) {
     if (config.verboseLogging) {
         console.log('[CHAT]', JSON.stringify(data, null, 2));
     }
-    else if (data.from.username !== undefined && data.from.username !== null) {
+    else if (data.from !== null && data.from.username !== undefined && data.from.username !== null) {
         console.log('[CHAT]', data.from.username + ': ' + data.message);
     }
 
@@ -880,6 +880,13 @@ function mentionResponse(data) {
     } else if (cooldown_user >= time_diff_user) {
         console.log('[ANTISPAM]', data.from.username + ' cannot chat with the bot - antispam (user) ' + time_diff_user);
     } else {
+
+        if (config.verboseLogging) {
+            console.log('[ANTISPAM]', data.from.username + ' passed antispam (user) ' + time_diff_user + ':' + time_diff);
+        }
+        mentions.lastRunAll = cur_time;
+        mentions.lastRunUsers[data.from.id] = cur_time;
+
         // How much ADHD does the bot have?
         chatRandomnessPercentage = 5;
         if (config.chatRandomnessPercentage) {
