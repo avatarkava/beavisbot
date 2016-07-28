@@ -473,18 +473,18 @@ bot.on('userJoin', function (data) {
                 bot.moderateAddDJ(data.id, function () {
                     if (dbUser.queue_position < bot.getWaitList().length && position !== dbUser.queue_position) {
                         bot.moderateMoveDJ(data.id, dbUser.queue_position);
-                        var userData = {
-                            type: 'restored',
-                            details: 'Restored to position ' + dbUser.queue_position + ' (disconnected for ' + timeSince(dbUser.last_seen, true) + ')',
-                            user_id: data.id,
-                            mod_user_id: botUser.id
-                        };
-                        models.Karma.create(userData);
-
-                        setTimeout(function () {
-                            bot.sendChat('/me put @' + data.username + ' back in line (reconnected) :thumbsup:')
-                        }, 5000);
                     }
+                    var userData = {
+                        type: 'restored',
+                        details: 'Restored to position ' + dbUser.queue_position + ' (disconnected for ' + timeSince(dbUser.last_seen, true) + ')',
+                        user_id: data.id,
+                        mod_user_id: botUser.id
+                    };
+                    models.Karma.create(userData);
+
+                    setTimeout(function () {
+                        bot.sendChat('/me put @' + data.username + ' back in line (reconnected) :thumbsup:')
+                    }, 5000);
 
                 });
             }
