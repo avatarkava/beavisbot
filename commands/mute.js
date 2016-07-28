@@ -18,10 +18,15 @@ exports.handler = function (data) {
     if (user !== undefined) {
         if (command == 'unmute') {
             bot.moderateUnmuteUser(user.id);
+            console.log('[UNMUTE]', data.from.username + ' unmuted ' + usernameFormatted);
+            sendChat('/me ' + usernameFormatted + ' is now unmuted.');
         } else {
-            bot.moderateMuteUser(user.id, 1, PlugAPI.MUTE.LONG);
+            // @TODO - Make this variable
+            var mute_duration = PlugAPI.MUTE.LONG;
+
+            bot.moderateMuteUser(user.id, 1, mute_duration);
+            console.log('[MUTE]', data.from.username + ' muted ' + usernameFormatted + ' for ' + mute_duration + ' minutes.');
         }
-        console.log('Muting ' + usernameFormatted);
     }
 
 };
