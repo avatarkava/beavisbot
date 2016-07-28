@@ -14,13 +14,12 @@ exports.handler = function (data) {
     var username = _.rest(input, 1);
     var usernameFormatted = S(username).chompLeft('@').s;
 
-    users = bot.getUsers();
-    var user = findUserInList(users, usernameFormatted);
+    var user = findUserInList(bot.getUsers(), usernameFormatted);
     if (user !== undefined) {
         if (command == 'unmute') {
             bot.moderateUnmuteUser(user.id);
         } else {
-            bot.moderateMuteUser(user.id, 1, mute_duration, PlugAPI.MUTE.LONG);
+            bot.moderateMuteUser(user.id, 1, PlugAPI.MUTE.LONG);
         }
         console.log('Muting ' + usernameFormatted);
     }
