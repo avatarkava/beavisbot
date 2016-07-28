@@ -30,7 +30,8 @@
     "sequelize": "*",
     "sqlite3": "*",
     "string": "*",
-    "underscore": "git://github.com/jashkenas/underscore.git"
+    "underscore": "git://github.com/jashkenas/underscore.git",
+    "youtube-api": "*"
   },
   "devDependencies": {
   },

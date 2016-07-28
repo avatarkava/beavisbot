@@ -2,6 +2,10 @@ exports.names = ['fixsong'];
 exports.hidden = true;
 exports.enabled = false;
 exports.matchStart = true;
+exports.cdAll = 30;
+exports.cdUser = 30;
+exports.cdManager = 30;
+exports.minRole = PERMISSIONS.RDJ_PLUS;
 exports.handler = function (data) {
     function checkEchoNest(valueToCorrect) {
         request('http://developer.echonest.com/api/v4/song/search?api_key=' + config.apiKeys.echoNest + '&format=json&results=1&combined=' + S(valueToCorrect).escapeHTML().stripPunctuation().s, function (error, response, body) {

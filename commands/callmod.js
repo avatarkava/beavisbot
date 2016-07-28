@@ -2,6 +2,10 @@ exports.names = ['callmod'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
+exports.cdAll = 300;
+exports.cdUser = 300;
+exports.cdManager = 300;
+exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
 
     var message = data.message.split(' ').slice(1).join(' ').trim();

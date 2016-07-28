@@ -2,6 +2,10 @@ exports.names = ['blacklist'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
+exports.cdAll = 0;
+exports.cdUser = 0;
+exports.cdManager = 0;
+exports.minRole = PERMISSIONS.RDJ_PLUS;
 exports.handler = function (data) {
 
     var dj = bot.getDJ();

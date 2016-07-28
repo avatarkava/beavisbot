@@ -2,6 +2,10 @@ exports.names = ['lastseen', 'seen'];
 exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = true;
+exports.cdAll = 15;
+exports.cdUser = 15;
+exports.cdManager = 15;
+exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
 
     var params = _.rest(data.message.split(' '), 1);

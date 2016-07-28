@@ -10,14 +10,15 @@ module.exports = function (sequelize, DataTypes) {
         avatar: {type: DataTypes.STRING},
         badge: {type: DataTypes.STRING},
         bio: {type: DataTypes.TEXT},
-        role: {type: DataTypes.STRING },
+        role: {type: DataTypes.STRING},
         site_points: {type: DataTypes.INTEGER.UNSIGNED, defaultValue: 0},
         custom_points: {type: DataTypes.INTEGER.UNSIGNED, defaultValue: 0},
         joined: {type: DataTypes.DATE, defaultValue: DataTypes.NOW},
         birthday: {type: DataTypes.DATEONLY},
         queue_position: {type: DataTypes.INTEGER, defaultValue: -1},
         last_seen: {type: DataTypes.DATE, defaultValue: DataTypes.NOW},
-        last_active: {type: DataTypes.DATE, defaultValue: DataTypes.NOW}
+        last_active: {type: DataTypes.DATE, defaultValue: DataTypes.NOW},
+        last_leave: {type: DataTypes.DATE, defaultValue: DataTypes.NOW}
     }, {
         underscored: true,
         tableName: 'users',

@@ -4,6 +4,7 @@ var fs = require('fs');
 var config = require(path.resolve(__dirname, 'config.json'));
 var models = require(path.resolve(__dirname, 'models'));
 var PlugAPI = require('plugapi');
+var Youtube = require('youtube-api');
 
 var bot = new PlugAPI({
     email: config.auth.username,
@@ -16,9 +17,22 @@ initializeModules(config.auth, bot);
 
 var roomHasActiveMods = false;
 var skipTimer;
+var realWaitList = {};
 var botUser = {};
 
 bot.connect(config.roomName); // The part after https://plug.dj
+
+if (config.apiKeys.youtube !== undefined) {
+    console.log('[YOUTUBE]', 'Authenticating with youtube...');
+    Youtube.authenticate({
+        type: "oauth",
+        refresh_token: config.apiKeys.youtube.refresh_token,
+        client_id: config.apiKeys.youtube.client_id,
+        client_secret: config.apiKeys.youtube.client_secret,
+        redirect_url: config.apiKeys.youtube.redirect_url,
+    });
+    console.log('[YOUTUBE]', 'Authenticated!')
+}
 
 bot.on('advance', function (data) {
 
@@ -28,39 +42,7 @@ bot.on('advance', function (data) {
         console.log('[EVENT] advance');
     }
 
-    //saveWaitList(true);
-
-    // Writes current room state to outfile so it can be used for the web
-    if (config.roomStateFile) {
-
-        var JSONstats = {}
-
-        JSONstats.media = bot.getMedia();
-        JSONstats.dj = bot.getDJ();
-        JSONstats.roomQueue = bot.getWaitList();
-        JSONstats.users = bot.getUsers();
-        JSONstats.staff = bot.getStaff();
-
-        fs.writeFile(
-            config.roomStateFile,
-            CircularJSON.stringify(JSONstats, function (key, value) {
-                if (key == 'parent') {
-                    return value.id;
-                }
-                else {
-                    return value;
-                }
-            }, 2),
-
-            function (err) {
-                if (err) {
-                    console.log(err);
-                    return console.log(err);
-                }
-            }
-        );
-
-    }
+    saveWaitList(true);
 
     // Write previous play data to DB
     if (data.lastPlay !== undefined && data.lastPlay !== null && data.lastPlay.media !== undefined && data.lastPlay.media !== null) {
@@ -139,8 +121,56 @@ bot.on('advance', function (data) {
         where: {site: config.site, host: data.media.format, host_id: data.media.cid},
         defaults: songData
     }).spread(function (song) {
-        song.updateAttributes(songData);
-    }).catch(function (err) {
+            if (data.media.format == 1) {
+                song.permalink = 'https://youtu.be/' + data.media.cid;
+                song.updateAttributes(songData);
+                writeRoomState(song.permalink);
+
+                if (config.apiKeys.youtube !== undefined) {
+                    Youtube.videos.list({
+                        "part": "id,status",
+                        "id": data.media.cid,
+                    }, function (err, api_data) {
+                        if (api_data) {
+                            var needsSkip = false;
+                            if (config.verboseLogging) {
+                                console.log(api_data);
+                            }
+                            if (api_data.items.length === 0) {
+                                /* The video is not available. */
+                                needsSkip = true;
+                            } else {
+                                var item = _.first(api_data.items);
+                                if (item.status) {
+                                    if (item.status.embeddable === false) {
+                                        needsSkip = true;
+                                    }
+                                }
+                            }
+
+                            if (needsSkip) {
+                                console.log('[SKIP] Song was skipped because it is not available or embeddable');
+                                bot.sendChat('/me Skipping this video because it is not available or embeddable.');
+                                bot.moderateForceSkip();
+                            }
+                        }
+                    });
+                }
+            } else if (data.media.format == 2) {
+                soundcloud_get_track(data.media.cid, function (json_data) {
+                    song.permalink = json_data.permalink_url;
+                    song.updateAttributes(songData);
+                    writeRoomState(song.permalink);
+
+                    if (!json_data.streamable) {
+                        console.log('[SKIP] Song was skipped because it is not available or embeddable');
+                        bot.sendChat('/me Skipping this video because it is not available or embeddable.');
+                        bot.moderateForceSkip();
+                    }
+                });
+            }
+        }
+    ).catch(function (err) {
         console.log('[ERROR]', err);
     });
 
@@ -154,6 +184,7 @@ bot.on('advance', function (data) {
             $or: [{
                 $and: [{media_type: 'author'}, {pattern: {$like: '%' + data.media.author + '%'}}],
                 $and: [{media_type: 'title'}, {pattern: {$like: '%' + data.media.title + '%'}}],
+                $and: [{media_type: 'id'}, {pattern: data.media.cid}]
             }],
             is_active: true
         }
@@ -177,10 +208,10 @@ bot.on('advance', function (data) {
     roomHasActiveMods = false;
 
     // @FIXME - This should probably be recoded using Promise.all so it's in order
-    Promise.map(bot.getWaitList(), function (queueItem) {
-        if (queueItem.user) {
+    Promise.map(bot.getWaitList(), function (dj) {
+        if (dj.id) {
             return models.User.find({
-                where: {site_id: queueItem.user.id, site: config.site},
+                where: {site_id: dj.id, site: config.site},
                 include: {
                     model: models.Karma,
                     required: false,
@@ -193,7 +224,7 @@ bot.on('advance', function (data) {
                 }
             }).then(function (dbUser) {
                 if (dbUser) {
-                    var position = bot.getWaitListPosition(dbUser.site_id);
+                    var position = bot.getWaitListPosition(dj.id);
                     if (bot.getWaitList().length >= config.queue.djIdleMinQueueLengthToEnforce && secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.queue.djIdleAfterMins, 'minutes'))) {
                         console.log('[WL-IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                         if (dbUser.Karmas.length > 0) {
@@ -333,7 +364,9 @@ bot.on('roomJoin', function (data) {
         botUser.db = row;
     });
 
-    console.log('[INIT] Data loaded for ' + botUser.username + '\n ' + JSON.stringify(botUser, null, 2));
+    if (config.verboseLogging) {
+        console.log('[INIT] Data loaded for ' + botUser.username + '\n ' + JSON.stringify(botUser, null, 2));
+    }
 
     if (config.responses.botConnect !== "") {
         bot.sendChat(config.responses.botConnect);
@@ -460,7 +493,7 @@ bot.on('userJoin', function (data) {
 
 bot.on('userLeave', function (data) {
     console.log('[LEAVE]', 'User left: ' + data.username);
-    // models.User.update({last_seen: new Date()}, {where: {id: data.id}});
+    models.User.update({last_leave: new Date()}, {where: {id: data.id}});
 });
 bot.on('userUpdate', function (data) {
     if (config.verboseLogging) {
@@ -502,58 +535,70 @@ bot.on('boothLocked', function (data) {
 })
 ;
 bot.on('chatDelete', function (data) {
-    //   if (config.verboseLogging) {
     console.log('[EVENT] chatDelete ', JSON.stringify(data, null, 2));
-    //   }
 });
 bot.on('djListUpdate', function (data) {
     if (config.verboseLogging) {
         console.log('[EVENT] djListUpdate ', JSON.stringify(data, null, 2));
     }
-    //saveWaitList(false);
+    saveWaitList(true);
 });
 bot.on('djUpdate', function (data) {
     if (config.verboseLogging) {
         console.log('[EVENT] djUpdate ', JSON.stringify(data, null, 2));
     }
-    //saveWaitList(false);
 });
 bot.on('emote', function (data) {
     if (config.verboseLogging) {
         console.log('[EVENT] emote ', JSON.stringify(data, null, 2));
     }
-    //saveWaitList(false);
 });
 bot.on('followJoin', function (data) {
     console.log('[EVENT] followJoin ', JSON.stringify(data, null, 2));
-    //saveWaitList(false);
 });
 
 bot.on('modAddDj', function (data) {
     console.log('[EVENT] modAddDj ', JSON.stringify(data, null, 2));
-    //saveWaitList(false);
+    saveWaitList(false);
 });
 bot.on('modBan', function (data) {
     console.log('[EVENT] modBan ', JSON.stringify(data, null, 2));
-    //saveWaitList(false);
+    saveWaitList(false);
 });
 bot.on('modMoveDJ', function (data) {
     console.log('[EVENT] modMoveDJ ', JSON.stringify(data, null, 2));
-    //saveWaitList(false);
+    saveWaitList(false);
 });
 bot.on('modRemoveDJ', function (data) {
     console.log('[EVENT] modRemoveDJ ', JSON.stringify(data, null, 2));
-
-    //saveWaitList(false);
+    saveWaitList(true);
 });
 bot.on('modSkip', function (data) {
     console.log('[EVENT] modSkip ', JSON.stringify(data, null, 2));
-    //saveWaitList(false);
+    saveWaitList(true);
 });
-
 bot.on('roomMinChatLevelUpdate', function (data) {
     console.log('[EVENT] roomMinChatLevelUpdate ', JSON.stringify(data, null, 2));
-    //saveWaitList(false);
+});
+bot.on('tcpConnect', function (socket) {
+    console.log('[TCP] Connected!');
+});
+bot.on('tcpMessage', function (socket, msg) {
+    if (typeof msg !== "undefined" && msg.length > 2) {
+        console.log('[TCP] ' + msg);
+        // Convert into same format as incoming chat messages through the UI
+        var data = {
+            message: msg,
+            from: bot.getUser()
+        };
+
+        if (data.message.indexOf('.') === 0) {
+            handleCommand(data);
+        }
+        else {
+            bot.sendChat(msg);
+        }
+    }
 });
 
 if (config.queue.djIdleAfterMins > 0) {
@@ -580,8 +625,9 @@ function saveWaitList(wholeRoom) {
         else {
             models.User.update({queue_position: -1}, {where: {id: user.id}});
         }
+
         if (config.verboseLogging) {
-            console.log('Wait List Update', user.username + ' => ' + position);
+            console.log('[WL-UPDATE] ', user.username + ' => ' + position);
         }
 
     });
@@ -663,23 +709,7 @@ function removeIfDownvoting(mehUsername) {
 function initializeModules(auth, bot) {
     // load context
     require(path.resolve(__dirname, 'context.js'))({auth: auth, config: config, bot: bot});
-
-    // Load commands
-    try {
-        fs.readdirSync(path.resolve(__dirname, 'commands')).forEach(function (file) {
-            var command = require(path.resolve(__dirname, 'commands/' + file));
-            commands.push({
-                names: command.names,
-                handler: command.handler,
-                hidden: command.hidden,
-                enabled: command.enabled,
-                matchStart: command.matchStart
-            })
-        });
-    }
-    catch (e) {
-        console.error('Unable to load command: ', e);
-    }
+    loadCommands();
 }
 
 function handleCommand(data) {
@@ -715,23 +745,61 @@ function handleCommand(data) {
 
         if (command && command.enabled) {
 
+            var can_run_command = true;
+            var cur_time = Date.now() / 1000;
+            var time_diff = cur_time - command.lastRun;
+            var time_diff_user = cur_time;
+            if (data.from.id in command.lastRunUsers) {
+                time_diff_user -= command.lastRunUsers[data.from.id];
+            }
+
+            if (data.from.role >= PlugAPI.ROOM_ROLE.MANAGER) {
+                if (command.cdManager >= time_diff) {
+                    console.log('[ANTISPAM]', data.from.username + ' cannot run the command, cuz of antispam (Manager+) ' + time_diff);
+                    can_run_command = false;
+                }
+            } else {
+                if (command.cdAll >= time_diff) {
+                    console.log('[ANTISPAM]', data.from.username + ' cannot run the command, cuz of antispam (cdAll) ' + time_diff);
+                    can_run_command = false;
+                } else if (command.cdUser >= time_diff_user) {
+                    console.log('[ANTISPAM]', data.from.username + ' cannot run the command, cuz of antispam (cdUser) ' + time_diff_user);
+                    can_run_command = false;
+                }
+            }
+
             if (config.verboseLogging) {
                 console.log('[COMMAND]', JSON.stringify(data, null, 2));
             }
 
-            // Don't allow @mention to the bot - prevent loopback
-            data.message = data.message.replace('@' + botUser.username, '');
+            if (config.removeCommands && command.removeCommand !== false) {
+                bot.moderateDeleteChat(data.id);
+            }
 
-            // Grab the db entries for the user that sent this message
-            if (data.from.id !== null) {
-                getDbUserFromSiteUser(data.from, function (row) {
-                    data.from.db = row;
+            if (can_run_command && hasPermission(data.from, command.minRole)) {
+                // Don't allow @mention to the bot - prevent loopback
+                data.message = data.message.replace('@' + botUser.username, '');
+
+                // Grab the db entries for the user that sent this message
+                if (data.from.id !== null) {
+                    getDbUserFromSiteUser(data.from, function (row) {
+                        data.from.db = row;
+                        command.handler(data);
+                    });
+                }
+                else {
                     command.handler(data);
-                });
+                }
+
+                if (typeof r === 'object' && 'cdAll' in r && 'cdUser' in r) {
+                    command.lastRun = cur_time - command.cdAll + r.cdAll;
+                    command.lastRunUsers[data.from.id] = cur_time - command.cdUser + r.cdUser;
+                } else if (r !== false) {
+                    command.lastRun = cur_time;
+                    command.lastRunUsers[data.from.id] = cur_time;
+                }
             }
-            else {
-                command.handler(data);
-            }
+
         }
         else if (!config.quietMode) {
             // @TODO - Build the list of possible commands on init() instead of querying every time
@@ -850,4 +918,38 @@ function chatResponse(data) {
 
 function addCustomPoint(data) {
 
+}
+function writeRoomState(permalink) {
+    // Writes current room state to outfile so it can be used for the web
+    if (config.roomStateFile) {
+
+        var JSONstats = {}
+
+        JSONstats.media = bot.getMedia();
+        JSONstats.permalink = permalink;
+        JSONstats.dj = bot.getDJ();
+        JSONstats.roomQueue = bot.getWaitList();
+        JSONstats.users = bot.getUsers();
+        JSONstats.staff = bot.getStaff();
+
+        fs.writeFile(
+            config.roomStateFile,
+            CircularJSON.stringify(JSONstats, function (key, value) {
+                if (key == 'parent') {
+                    return value.id;
+                }
+                else {
+                    return value;
+                }
+            }, 2),
+
+            function (err) {
+                if (err) {
+                    console.log(err);
+                    return console.log(err);
+                }
+            }
+        );
+
+    }
 }

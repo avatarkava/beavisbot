@@ -2,44 +2,47 @@ exports.names = ['settings', 'set'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
+exports.cdAll = 15;
+exports.cdUser = 15;
+exports.cdManager = 0;
+exports.minRole = PERMISSIONS.BOUNCER_PLUS;
 exports.handler = function (data) {
-    if (data.from.role > 2) {
 
-        var input = data.message.split(' ');
-        // Settings to support direct access to
-        supported = ['activeDJTimeoutMins',
-            'minActiveDJQueueLength',
-            'maxSongLengthSecs',
-            'chatRandomnessPercentage',
-            'quietMode',
-            'upvoteSongs',
-            'verboseLogging',
-            'welcomeUsers'
-        ];
+    var input = data.message.split(' ');
+    // Settings to support direct access to
+    supported = ['activeDJTimeoutMins',
+        'minActiveDJQueueLength',
+        'maxSongLengthSecs',
+        'chatRandomnessPercentage',
+        'quietMode',
+        'upvoteSongs',
+        'verboseLogging',
+        'welcomeUsers'
+    ];
 
-        var settings = [];
-        var chatMessage = "";
+    var settings = [];
+    var chatMessage = "";
 
-        if (input.length < 3) {
-            for (var key in config) {
-                if (config.hasOwnProperty(key) && _.contains(supported, key)) {
-                    chatMessage += key + ': ' + config[key] + ', ';
-                }
+    if (input.length < 3) {
+        for (var key in config) {
+            if (config.hasOwnProperty(key) && _.contains(supported, key)) {
+                chatMessage += key + ': ' + config[key] + ', ';
             }
-            bot.sendChat('Current settings: ' + chatMessage);
+        }
+        bot.sendChat('Current settings: ' + chatMessage);
+    }
+    else {
+        var key = input[1];
+        var value = _.rest(input, 2).join(' ');
+
+        if (_.contains(supported, key)) {
+            config[key] = value;
+            bot.sendChat('/me set: ' + key + ' = ' + value + ' @djs');
         }
         else {
-            var key = input[1];
-            var value = _.rest(input, 2).join(' ');
-
-            if (_.contains(supported, key)) {
-                config[key] = value;
-                bot.sendChat('/me set: ' + key + ' = ' + value + ' @djs');
-            }
-            else {
-                bot.sendChat('/me unknown setting: ' + key);
-            }
+            bot.sendChat('/me unknown setting: ' + key);
         }
     }
+
 };
 

@@ -2,42 +2,45 @@ exports.names = ['lottery', 'roulette'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
+exports.cdAll = 300;
+exports.cdUser = 300;
+exports.cdManager = 300;
+exports.minRole = PERMISSIONS.BOUNCER;
 exports.handler = function (data) {
 
     var input = data.message.split(' ');
     var mins = 1;
 
-    if (data.from.role > 1) {
 
-        if (input.length >= 2) {
-            mins = parseInt(_.last(input, 1));
-        }
-        else {
-            mins = 5;
-        }
+    if (input.length >= 2) {
+        mins = parseInt(_.last(input, 1));
+    }
+    else {
+        mins = 5;
+    }
 
-        // Sanity check!
-        if (mins < 1 || mins > 120) {
-            mins = 5;
-        }
+    // Sanity check!
+    if (mins < 1 || mins > 120) {
+        mins = 5;
+    }
 
-        if (input[0] === 'roulette') {
-            bot.sendChat('Wait list roulette in ' + mins + ' minutes! Chat and be in line within ' + mins + ' minutes to enter.  Winner gets moved up a random number of spots! @djs');
-        }
-        else {
-            bot.sendChat('Wait list lottery in ' + mins + ' minutes! Chat and be in line within ' + mins + ' minutes to enter.  Winner gets the #2 spot! @djs');
-        }
+    if (input[0] === 'roulette') {
+        bot.sendChat('Wait list roulette in ' + mins + ' minutes! Chat and be in line within ' + mins + ' minutes to enter.  Winner gets moved up a random number of spots! @djs');
+    }
+    else {
+        bot.sendChat('Wait list lottery in ' + mins + ' minutes! Chat and be in line within ' + mins + ' minutes to enter.  Winner gets the #2 spot! @djs');
+    }
 
-        if (mins > 1) {
-            setTimeout(function () {
-                bot.sendChat("Contest ending in ONE MINUTE - be in line and chat to enter! @djs");
-            }, (mins - 1) * 60 * 1000);
-        }
-
+    if (mins > 1) {
         setTimeout(function () {
-            // Only select from users active during the lottery
-            var minPosition = 2;
-            getActiveDJs(mins, minPosition, function (activeDJs) {
+            bot.sendChat("Contest ending in ONE MINUTE - be in line and chat to enter! @djs");
+        }, (mins - 1) * 60 * 1000);
+    }
+
+    setTimeout(function () {
+        // Only select from users active during the lottery
+        var minPosition = 2;
+        getActiveDJs(mins, minPosition, function (activeDJs) {
                 if (activeDJs.length > 0) {
                     var randomNumber = _.random(0, activeDJs.length - 1);
                     var winner = activeDJs[randomNumber];
@@ -61,13 +64,13 @@ exports.handler = function (data) {
                         message += ' Leaving in position ' + currentPosition;
                     }
                     bot.sendChat(message);
-                    }
+                }
                 else {
                     bot.sendChat(":thumbsdown: No one is eligible to win the contest.");
                     console.log('[LOTTO] No one is eligible to win the contest.');
                 }
-                }
-            );
-        }, mins * 60 * 1000);
-    }
+            }
+        );
+    }, mins * 60 * 1000);
+
 };

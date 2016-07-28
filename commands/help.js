@@ -2,6 +2,10 @@ exports.names = ['help', 'support'];
 exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = true;
+exports.cdAll = 30;
+exports.cdUser = 30;
+exports.cdManager = 30;
+exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
 
     // @TODO - Use this to show all active staff - console.log(bot.getStaff());

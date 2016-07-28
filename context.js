@@ -24,8 +24,59 @@ module.exports = function (options) {
     moment = require('moment');
     CircularJSON = require('circular-json');
     commands = [];
+    responses = [];
+
+    ROOM_ROLE = {
+        NONE: 0,
+        RESIDENTDJ: 1,
+        BOUNCER: 2,
+        MANAGER: 3,
+        COHOST: 4,
+        HOST: 5
+    };
+
+    PERMISSIONS = {
+        NONE: 0,
+        RDJ: 1,
+        RDJ_PLUS: 1.5,
+        BOUNCER: 2,
+        BOUNCER_PLUS: 2.5,
+        MANAGER: 3,
+        COHOST: 4,
+        HOST: 5
+    };
+
     uptime = new Date();
     lastRpcMessage = new Date();
+
+    settings = {
+        'autoskip': false,
+        'timeguard': false,
+        'motd': 'u wot m8?',
+        'motd_interval': 10,
+        'dctimer': 20 * 60,
+        'maxlength': 300,
+        'lockdown': false,
+        'cleverbot': false,
+        'lockskippos': 3,
+        'bouncerplus': false,
+        'skipunavailable': true,
+        'maxlength_buffer': 10,
+    };
+    setting_names = {
+        'autoskip': 'Autoskip',
+        'timeguard': 'Timeguard',
+        'motd': 'MotD',
+        'motd_interval': 'MotD interval',
+        'dctimer': 'DC timer',
+        'maxlength': 'Max length',
+        'lockdown': 'Lockdown',
+        'cleverbot': 'Cleverbot',
+        'lockskippos': 'Lock skip position',
+        'bouncerplus': 'Bouncer+',
+        'skipunavailable': 'Skip unavailable songs',
+        'maxlength_buffer': 'Max length buffer',
+    };
 
     iso_languages = {
         'af': 'Afrikkans',
@@ -166,7 +217,7 @@ module.exports = function (options) {
         }).then(function () {
             callback(activeUsers);
         });
-    }
+    };
 
     transferCustomPoints = function (fromUser, toUser, points) {
 
@@ -198,6 +249,45 @@ module.exports = function (options) {
 
             });
         }
-    }
+    };
+
+    hasPermission = function (user, minRole) {
+
+        if (user.role == PlugAPI.ROOM_ROLE.RESIDENTDJ) {
+            return (user.role >= minRole || (minRole == PERMISSIONS.RDJ_PLUS && settings['rdjplus']));
+        } else if (user.role == PlugAPI.ROOM_ROLE.BOUNCER) {
+            return (user.role >= minRole || (minRole == PERMISSIONS.BOUNCER_PLUS && settings['bouncerplus']));
+        }
+
+        return user.role >= minRole;
+    };
+
+    loadCommands = function () {
+        commands.length = 0;
+        commands = [];
+
+        // Load commands
+        try {
+            fs.readdirSync(path.resolve(__dirname, 'commands')).forEach(function (file) {
+                var command = require(path.resolve(__dirname, 'commands/' + file));
+
+                command.lastRun = 0;
+                command.lastRunUsers = {};
+
+                if (command.minRole === undefined) {
+                    command.minRole = PERMISSIONS.NONE;
+                }
+                commands.push(command);
+            });
+        } catch (e) {
+            console.error('Unable to load command: ', e);
+        }
+    };
+
+    loadResponses = function () {
+        // @TODO: Load chat responses from the bot to prevent roundtrips to the DB we don't need
+    };
+
+
 
 };

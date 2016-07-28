@@ -2,6 +2,10 @@ exports.names = ['lastplayed'];
 exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = true;
+exports.cdAll = 60;
+exports.cdUser = 60;
+exports.cdManager = 60;
+exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
 
     var params = _.rest(data.message.split(' '), 1);

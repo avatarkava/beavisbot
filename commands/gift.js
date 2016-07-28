@@ -2,6 +2,10 @@ exports.names = ['gift'];
 exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = true;
+exports.cdAll = 15;
+exports.cdUser = 15;
+exports.cdManager = 15;
+exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
 
     var input = data.message.split(' ');

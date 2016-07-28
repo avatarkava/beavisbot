@@ -2,6 +2,10 @@ exports.names = ['define'];
 exports.hidden = false;
 exports.enabled = true;
 exports.matchStart = true;
+exports.cdAll = 30;
+exports.cdUser = 30;
+exports.cdManager = 30;
+exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
 
     var input = _.rest(data.message.split(' '), 1).join(' ').trim();

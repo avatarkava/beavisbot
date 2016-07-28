@@ -2,11 +2,15 @@ exports.names = ['idle'];
 exports.hidden = true;
 exports.enabled = true;
 exports.matchStart = true;
+exports.cdAll = 30;
+exports.cdUser = 30;
+exports.cdManager = 30;
+exports.minRole = PERMISSIONS.RDJ_PLUS;
 exports.handler = function (data) {
 
     var input = data.message.split(' ');
 
-    if (data.from.role > 1 && config.queue.djIdleAfterMins > 0) {
+    if (config.queue.djIdleAfterMins > 0) {
 
         if (input.length >= 2) {
             var username = _.rest(input, 1);

@@ -13,6 +13,7 @@ module.exports = function (sequelize, DataTypes) {
         tags: {type: DataTypes.STRING},
         host: {type: DataTypes.STRING, allowNull: false, defaultValue: 'youtube', unique: 'site_host_id'},
         host_id: {type: DataTypes.STRING, allowNull: false, unique: 'site_host_id'},
+        permalink: {type: DataTypes.STRING},
         duration: {type: DataTypes.INTEGER.UNSIGNED},
         image: {type: DataTypes.STRING},
         is_banned: {type: DataTypes.BOOLEAN, defaultValue: 0},
