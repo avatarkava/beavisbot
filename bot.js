@@ -753,7 +753,7 @@ function handleCommand(data) {
                 time_diff_user -= command.lastRunUsers[data.from.id];
             }
 
-            if (data.from.role >= PlugAPI.ROOM_ROLE.MANAGER) {
+            if (data.from.role >= bot.ROOM_ROLE.MANAGER) {
                 if (command.cdManager >= time_diff) {
                     console.log('[ANTISPAM]', data.from.username + ' cannot run the command, cuz of antispam (Manager+) ' + time_diff);
                     can_run_command = false;

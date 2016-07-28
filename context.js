@@ -253,9 +253,9 @@ module.exports = function (options) {
 
     hasPermission = function (user, minRole) {
 
-        if (user.role == PlugAPI.ROOM_ROLE.RESIDENTDJ) {
+        if (user.role == bot.ROOM_ROLE.RESIDENTDJ) {
             return (user.role >= minRole || (minRole == PERMISSIONS.RDJ_PLUS && settings['rdjplus']));
-        } else if (user.role == PlugAPI.ROOM_ROLE.BOUNCER) {
+        } else if (user.role == bot.ROOM_ROLE.BOUNCER) {
             return (user.role >= minRole || (minRole == PERMISSIONS.BOUNCER_PLUS && settings['bouncerplus']));
         }
 
