@@ -45,8 +45,6 @@ bot.on('advance', function (data) {
         console.log('[EVENT] advance');
     }
 
-    saveWaitList(true);
-
     // Write previous play data to DB
     if (data.lastPlay !== undefined && data.lastPlay !== null && data.lastPlay.media !== undefined && data.lastPlay.media !== null) {
         models.Song.find({
@@ -322,6 +320,7 @@ bot.on('advance', function (data) {
         }
 
     });
+    saveWaitList(true);
 });
 bot.on('chat', function (data) {
 
@@ -544,7 +543,7 @@ bot.on('djListUpdate', function (data) {
     if (config.verboseLogging) {
         console.log('[EVENT] djListUpdate ', JSON.stringify(data, null, 2));
     }
-    saveWaitList(true);
+    saveWaitList(false);
 });
 bot.on('djUpdate', function (data) {
     if (config.verboseLogging) {
@@ -571,6 +570,7 @@ bot.on('modMoveDJ', function (data) {
 });
 bot.on('modRemoveDJ', function (data) {
     console.log('[EVENT] modRemoveDJ ', JSON.stringify(data, null, 2));
+    saveWaitList(true);
 });
 bot.on('modSkip', function (data) {
     console.log('[EVENT] modSkip ', JSON.stringify(data, null, 2));
