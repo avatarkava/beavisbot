@@ -320,6 +320,32 @@ bot.on('advance', function (data) {
 
     });
     saveWaitList(true);
+
+    var waitListSize = bot.getWaitList().length;
+
+    if (waitListSize >= settings.djidleminqueue && settings.djidle == false) {
+        config.queue.djIdleMinQueueLengthToEnforce = settings.maxdjidletime;
+        settings.djidle = true;
+        bot.sendChat('/me Wait List at ' + waitListSize + ' djs.  Idle timer enabled and cycle disabled @djs');
+        bot.changeDJCycle(false);
+    } else if (waitListSize < settings.djidleminqueue && settings.djidle == true) {
+        config.queue.djIdleMinQueueLengthToEnforce = 999;
+        settings.djidle = false;
+        bot.sendChat('/me Wait List at ' + waitListSize + ' djs.  Idle timer disabled and cycle enabled @djs');
+        bot.changeDJCycle(true);
+    }
+
+    if (roomHasActiveMods && (settings.rdjplus || settings.bouncerplus)) {
+        bot.sendChat('/me Active mods detected. Revoking temporary extra permissions @staff @rdjs');
+        settings.rdjplus = false;
+        settings.bouncerplus = false;
+    }
+    else if (!roomHasActiveMods && (!settings.rdjplus || !settings.bouncerplus)) {
+        bot.sendChat('/me No active mods detected. Granting Bouncers and RDJs temporary extra permissions @staff @rdjs');
+        settings.rdjplus = true;
+        settings.bouncerplus = true;
+    }
+
 });
 bot.on('chat', function (data) {
 
