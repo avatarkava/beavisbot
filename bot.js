@@ -230,7 +230,7 @@ bot.on('advance', function (data) {
                         console.log('[WL-IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                         if (dbUser.Karmas.length > 0) {
                             console.log('[WL-IDLE]', dbUser.username + ' was last warned ' + timeSince(dbUser.Karmas[0].created_at));
-                            bot.moderateRemoveDJ(dbUser.site_id);
+                            bot.moderateRemoveDJ(dj.id);
                             bot.sendChat('@' + dbUser.username + ' ' + config.responses.activeDJRemoveMessage);
                             var userData = {
                                 type: 'remove',
