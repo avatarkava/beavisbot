@@ -15,7 +15,6 @@ bot.multiLineLimit = 5;
 
 initializeModules(config.auth, bot);
 
-var startupTimestamp = moment.utc().toDate();
 var roomHasActiveMods = false;
 var mentions = {
     lastRunAll: 0,
@@ -323,7 +322,7 @@ bot.on('advance', function (data) {
     saveWaitList(true);
 
     // Don't be a spammy bot right on connect
-    if (moment.utc().isAfter(moment.utc(startupTimestamp).add('5 minutes'))) {
+    if (moment.utc().isAfter(moment.utc(startupTimestamp).add(5, 'minutes'))) {
         var waitListSize = bot.getWaitList().length;
 
         if (waitListSize >= settings.djidleminqueue && settings.djidle == false) {
