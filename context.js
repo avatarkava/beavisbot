@@ -41,18 +41,18 @@ module.exports = function (options) {
     lastRpcMessage = new Date();
 
     settings = {
-        'autoskip': false,
-        'timeguard': false,
-        'maxdctime': 15 * 60,
-        'maxsonglength': 7 * 60,
-        'maxdjidletime': 60 * 60,
-        'djidle': false,
-        'djidleminqueue': 6,
-        'djcyclemaxqueue': 5,
-        'lockdown': false,
-        'cleverbot': false,
-        'rdjplus': false,
-        'bouncerplus': false
+        autoskip: false,
+        timeguard: false,
+        maxdctime: 15 * 60,
+        maxsonglength: 7 * 60,
+        maxdjidletime: 60 * 60,
+        djidle: false,
+        djidleminqueue: 6,
+        djcyclemaxqueue: 5,
+        lockdown: false,
+        cleverbot: false,
+        rdjplus: false,
+        bouncerplus: false
     };
     setting_names = {
         'autoskip': 'Autoskip',
