@@ -16,7 +16,7 @@ exports.handler = function (data) {
     }
 
     var position = bot.getWaitListPosition(data.from.id);
-    if (currentPosition > 0) {
+    if (position > 0) {
         var newPosition = position + spots;
         bot.moderateMoveDJ(user.id, newPosition);
         console.log('[MOVE]', 'Moving ' + data.from.username + ' to position: ' + newPosition + ' (requested delay)');
