@@ -18,7 +18,7 @@ exports.handler = function (data) {
     var position = bot.getWaitListPosition(data.from.id);
     if (position > 0) {
         var newPosition = position + spots;
-        bot.moderateMoveDJ(user.id, newPosition);
+        bot.moderateMoveDJ(data.from.id, newPosition);
         console.log('[MOVE]', 'Moving ' + data.from.username + ' to position: ' + newPosition + ' (requested delay)');
         bot.sendChat('/me Moved you down the wait list @' + data.from.username + '. You can request another delay after 30 minutes.');
     }
