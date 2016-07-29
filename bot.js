@@ -15,6 +15,7 @@ bot.multiLineLimit = 5;
 
 initializeModules(config.auth, bot);
 
+var startupTimestamp = moment.utc().toDate();
 var roomHasActiveMods = false;
 var mentions = {
     lastRunAll: 0,

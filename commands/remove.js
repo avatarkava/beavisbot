@@ -25,12 +25,12 @@ exports.handler = function (data) {
         getDbUserFromSiteUser(user, function (row) {
             var userData = {
                 type: 'remove',
-                details: 'Paused queue for ' + data.username,
+                details: 'Removed ' + data.username + ' from the wait list',
                 user_id: row.id,
                 mod_user_id: data.from.db.id
             };
             models.Karma.create(userData);
-            console.log('[REMOVE] ' + data.from.username + ' paused the queue for ' + user.username);
+            console.log('[REMOVE] ' + data.from.username + ' removed ' + user.username + ' from the wait list');
             models.User.update({queue_position: -1}, {where: {id: row.id}});
         });
 
