@@ -31,7 +31,7 @@ exports.handler = function (data) {
             };
             models.Karma.create(userData);
             console.log('[REMOVE] ' + data.from.username + ' paused the queue for ' + user.username);
-            models.User.update({queue_position: -1}, {where: {site_id: user.id}});
+            models.User.update({queue_position: -1}, {where: {id: row.id}});
         });
 
     }

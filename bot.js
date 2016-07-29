@@ -326,12 +326,12 @@ bot.on('advance', function (data) {
     if (waitListSize >= settings.djidleminqueue && settings.djidle == false) {
         config.queue.djIdleMinQueueLengthToEnforce = settings.maxdjidletime;
         settings.djidle = true;
-        bot.sendChat('/me Wait List at ' + waitListSize + ' djs.  Idle timer enabled and cycle disabled @djs');
+        bot.sendChat('/me Wait List at ' + waitListSize + ' DJs.  Idle timer enabled and cycle disabled @djs');
         bot.changeDJCycle(false);
     } else if (waitListSize < settings.djidleminqueue && settings.djidle == true) {
         config.queue.djIdleMinQueueLengthToEnforce = 999;
         settings.djidle = false;
-        bot.sendChat('/me Wait List at ' + waitListSize + ' djs.  Idle timer disabled and cycle enabled @djs');
+        bot.sendChat('/me Wait List at ' + waitListSize + ' DJs.  Idle timer disabled and cycle enabled @djs');
         bot.changeDJCycle(true);
     }
 
