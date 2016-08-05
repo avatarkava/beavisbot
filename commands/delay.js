@@ -12,7 +12,7 @@ exports.handler = function (data) {
     var spots = 1;
 
     if (input.length == 2) {
-        spots = parseInt(input[1]);
+        spots = Math.abs(parseInt(input[1]));
     }
 
     var position = bot.getWaitListPosition(data.from.id);

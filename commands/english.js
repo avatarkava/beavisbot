@@ -60,4 +60,6 @@ exports.handler = function (data) {
             break;
     }
 
+    bot.sendChat(ch);
+
 };
