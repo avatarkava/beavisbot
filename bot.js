@@ -321,22 +321,21 @@ bot.on('advance', function (data) {
     });
     saveWaitList(true);
 
-    // Don't be a spammy bot right on connect
-    if (moment.utc().isAfter(moment.utc(startupTimestamp).add(5, 'minutes'))) {
-        var waitListSize = bot.getWaitList().length;
+    var waitListSize = bot.getWaitList().length;
 
-        if (waitListSize >= settings.djidleminqueue && settings.djidle == false) {
-            config.queue.djIdleMinQueueLengthToEnforce = settings.maxdjidletime;
-            settings.djidle = true;
-            bot.sendChat('/me Wait List at ' + waitListSize + ' @djs.  Idle timer enabled and cycle disabled');
-            bot.changeDJCycle(false);
-        } else if (waitListSize < settings.djidleminqueue && settings.djidle == true) {
-            config.queue.djIdleMinQueueLengthToEnforce = 999;
-            settings.djidle = false;
-            bot.sendChat('/me Wait List at ' + waitListSize + ' @djs.  Idle timer disabled and cycle enabled');
-            bot.changeDJCycle(true);
-        }
+    if (waitListSize >= settings.djidleminqueue && settings.djidle == false) {
+        config.queue.djIdleMinQueueLengthToEnforce = settings.djidleminqueue;
+        settings.djidle = true;
+        bot.sendChat('/me Wait List at ' + waitListSize + ' @djs.  Idle timer enabled and cycle disabled');
+        bot.changeDJCycle(false);
+    } else if (waitListSize < settings.djidleminqueue && settings.djidle == true) {
+        config.queue.djIdleMinQueueLengthToEnforce = 999;
+        settings.djidle = false;
+        bot.sendChat('/me Wait List at ' + waitListSize + ' @djs.  Idle timer disabled and cycle enabled');
+        bot.changeDJCycle(true);
+    }
 
+    if (moment.utc().isAfter(moment.utc(startupTimestamp).add(config.queue.djIdleAfterMins, 'minutes'))) {
         if (roomHasActiveMods && (settings.rdjplus || settings.bouncerplus)) {
             bot.sendChat('/me Active @staff detected. Revoking temporary extra permissions @rdjs');
             settings.rdjplus = false;
@@ -348,6 +347,7 @@ bot.on('advance', function (data) {
             settings.bouncerplus = true;
         }
     }
+
 
 });
 bot.on('chat', function (data) {
@@ -512,7 +512,7 @@ bot.on('userJoin', function (data) {
                     models.Karma.create(userData);
 
                     setTimeout(function () {
-                        bot.sendChat('/me put @' + data.username + ' back in line (reconnected) :thumbsup:')
+                        bot.sendChat('/me put @' + data.username + ' back in line (reconnected after ' + timeSince(dbUser.last_seen, true) + ') :thumbsup:')
                     }, 5000);
 
                 });
