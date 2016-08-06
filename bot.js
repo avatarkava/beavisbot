@@ -232,7 +232,7 @@ bot.on('advance', function (data) {
                     if (position == -1) {
                         // Don't do anything, user is not in line
                     }
-                    else if (settings.djidle && secondsSince(dbUser.last_active) >= maxdjidletime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.queue.djIdleAfterMins, 'minutes'))) {
+                    else if (settings.djidle && secondsSince(dbUser.last_active) >= settings.maxdjidletime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.queue.djIdleAfterMins, 'minutes'))) {
                         console.log('[WL-IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                         if (dbUser.Karmas.length > 0) {
                             console.log('[WL-IDLE]', dbUser.username + ' was last warned ' + timeSince(dbUser.Karmas[0].created_at));
