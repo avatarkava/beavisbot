@@ -29,13 +29,13 @@ exports.handler = function (data) {
             } else {
                 var userData = {
                     type: 'blacklist',
-                    details: 'Blacklisted ' + media.name + ' (spun by ' + row.username + ')',
+                    details: 'Blacklisted ' + row.name + ' (spun by ' + row.username + ')',
                     user_id: row.user_id,
                     mod_user_id: data.user.db.id
                 };
                 models.Karma.create(userData);
 
-                console.log('[BLACKLIST] ' + data.user.username + ' blacklisted ' + media.title);
+                console.log('[BLACKLIST] ' + data.user.username + ' blacklisted ' + row.title);
                 models.Song.update({is_banned: 1}, {where: {host_id: songid}});
                 bot.sendChat("The song \"" + row.author + " - " + row.title + "\" has been blacklisted.");
             }
