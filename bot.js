@@ -204,12 +204,12 @@ bot.on('advance', function (data) {
     });
 
 
-    var maxIdleTime = config.queue.djIdleAfterMins * 60;
-    var idleDJs = [];
+    // Check for active mods
     roomHasActiveMods = false;
 
     // @FIXME - This should probably be recoded using Promise.all so it's in order
-    Promise.map(bot.getWaitList(), function (dj) {
+    var idleDJs = [];
+    Promise.map(bot.getUsers(), function (dj) {
         if (dj.id) {
             return models.User.find({
                 where: {site_id: dj.id, site: config.site},
@@ -226,7 +226,13 @@ bot.on('advance', function (data) {
             }).then(function (dbUser) {
                 if (dbUser) {
                     var position = bot.getWaitListPosition(dj.id);
-                    if (bot.getWaitList().length >= config.queue.djIdleMinQueueLengthToEnforce && secondsSince(dbUser.last_active) >= maxIdleTime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.queue.djIdleAfterMins, 'minutes'))) {
+                    if (dbUser.role > 1 && secondsSince(dbUser.last_active) <= 300) {
+                        roomHasActiveMods = true;
+                    }
+                    if (position == -1) {
+                        // Don't do anything, user is not in line
+                    }
+                    else if (settings.djidle && secondsSince(dbUser.last_active) >= maxdjidletime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.queue.djIdleAfterMins, 'minutes'))) {
                         console.log('[WL-IDLE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                         if (dbUser.Karmas.length > 0) {
                             console.log('[WL-IDLE]', dbUser.username + ' was last warned ' + timeSince(dbUser.Karmas[0].created_at));
@@ -252,9 +258,6 @@ bot.on('advance', function (data) {
                         }
                     }
                     else {
-                        if (dbUser.role > 1) {
-                            roomHasActiveMods = true;
-                        }
                         console.log('[WL-ACTIVE]', position + '. ' + dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                     }
                 }
