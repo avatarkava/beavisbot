@@ -338,7 +338,7 @@ bot.on('advance', function (data) {
         bot.changeDJCycle(true);
     }
 
-    if (moment.utc().isAfter(moment.utc(startupTimestamp).add(config.queue.djIdleAfterMins, 'minutes'))) {
+    if (moment.utc().isAfter(moment.utc(startupTimestamp).add(5, 'minutes'))) {
         if (roomHasActiveMods && (settings.rdjplus || settings.bouncerplus)) {
             bot.sendChat('/me Active @staff detected. Revoking temporary extra permissions @rdjs');
             settings.rdjplus = false;
