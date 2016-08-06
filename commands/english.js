@@ -16,7 +16,7 @@ exports.handler = function (data) {
         usernameFormatted = S(username).chompLeft('@').s;
         var user = findUserInList(bot.getUsers(), usernameFormatted);
         if (user) {
-            ch += '@' + username + ' ';
+            ch += '@' + usernameFormatted + ' ';
             lang = user.language;
         }
     }
