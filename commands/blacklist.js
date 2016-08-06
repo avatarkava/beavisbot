@@ -20,7 +20,7 @@ exports.handler = function (data) {
         models.Play.findOne({
             include: [{
                 model: models.Song,
-                where: {$and: [{site: config.site}, {host: media.format}, {host_id: songid}]}
+                where: {$and: [{site: config.site}, {host_id: songid}]}
             }, models.User],
             order: [['created_at', 'DESC']]
         }).then(function (row) {
