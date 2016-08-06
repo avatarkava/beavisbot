@@ -227,8 +227,10 @@ bot.on('advance', function (data) {
                 if (dbUser) {
                     var position = bot.getWaitListPosition(dj.id);
                     if (dbUser.role > 1 && secondsSince(dbUser.last_active) <= 300) {
+                        console.log('[MOD-ACTIVE]', dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                         roomHasActiveMods = true;
                     }
+
                     if (position == -1) {
                         // Don't do anything, user is not in line
                     }
