@@ -15,7 +15,6 @@ bot.multiLineLimit = 5;
 
 initializeModules(config.auth, bot);
 
-var roomHasActiveMods = false;
 var mentions = {
     lastRunAll: 0,
     lastRunUsers: []
@@ -205,7 +204,7 @@ bot.on('advance', function (data) {
 
 
     // Check for active mods
-    roomHasActiveMods = false;
+    roomHasActiveStaff = false;
 
     // @FIXME - This should probably be recoded using Promise.all so it's in order
     var idleDJs = [];
@@ -226,9 +225,10 @@ bot.on('advance', function (data) {
             }).then(function (dbUser) {
                 if (dbUser) {
                     var position = bot.getWaitListPosition(dj.id);
-                    if (botUser.db.id !== dbUser.id && dbUser.role > 1 && secondsSince(dbUser.last_active) <= 300) {
-                        console.log('[MOD-ACTIVE]', dbUser.username + ' last active ' + timeSince(dbUser.last_active));
-                        roomHasActiveMods = true;
+
+                    if (botUser.db.id !== dbUser.id && dbUser.role > 1 && (secondsSince(dbUser.last_active) <= 300 || position >= 0)) {
+                        console.log('[STAFF-ACTIVE]', dbUser.username + ' last active ' + timeSince(dbUser.last_active));
+                        roomHasActiveStaff = true;
                     }
 
                     if (position < 1) {
@@ -324,12 +324,12 @@ bot.on('advance', function (data) {
         }
 
         if (moment.utc().isAfter(moment.utc(startupTimestamp).add(5, 'minutes'))) {
-            if (roomHasActiveMods && (settings.rdjplus || settings.bouncerplus)) {
+            if (roomHasActiveStaff && (settings.rdjplus || settings.bouncerplus)) {
                 bot.sendChat('/me Active @staff detected. Revoking temporary extra permissions @rdjs');
                 settings.rdjplus = false;
                 settings.bouncerplus = false;
             }
-            else if (!roomHasActiveMods && (!settings.rdjplus || !settings.bouncerplus)) {
+            else if (!roomHasActiveStaff && (!settings.rdjplus || !settings.bouncerplus)) {
                 bot.sendChat('/me No active @staff detected. Granting Bouncers and @rdjs temporary extra permissions');
                 settings.rdjplus = true;
                 settings.bouncerplus = true;
@@ -434,7 +434,7 @@ bot.on('userJoin', function (data) {
             if (dbUser == null) {
                 newUser = true;
                 message = config.responses.welcome.newUser.replace('{username}', data.username);
-                if (!roomHasActiveMods) {
+                if (!roomHasActiveStaff) {
                     message += ' Type .help if you need it!';
                 }
                 models.RoomEvent.find({
