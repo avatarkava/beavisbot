@@ -226,12 +226,12 @@ bot.on('advance', function (data) {
             }).then(function (dbUser) {
                 if (dbUser) {
                     var position = bot.getWaitListPosition(dj.id);
-                    if (dbUser.role > 1 && secondsSince(dbUser.last_active) <= 300) {
+                    if (botUser.db.id !== dbUser.id && dbUser.role > 1 && secondsSince(dbUser.last_active) <= 300) {
                         console.log('[MOD-ACTIVE]', dbUser.username + ' last active ' + timeSince(dbUser.last_active));
                         roomHasActiveMods = true;
                     }
 
-                    if (position == -1) {
+                    if (position < 1) {
                         // Don't do anything, user is not in line
                     }
                     else if (settings.djidle && secondsSince(dbUser.last_active) >= settings.maxdjidletime && moment.utc().isAfter(moment.utc(startupTimestamp).add(config.queue.djIdleAfterMins, 'minutes'))) {
@@ -323,6 +323,19 @@ bot.on('advance', function (data) {
             });
         }
 
+        if (moment.utc().isAfter(moment.utc(startupTimestamp).add(5, 'minutes'))) {
+            if (roomHasActiveMods && (settings.rdjplus || settings.bouncerplus)) {
+                bot.sendChat('/me Active @staff detected. Revoking temporary extra permissions @rdjs');
+                settings.rdjplus = false;
+                settings.bouncerplus = false;
+            }
+            else if (!roomHasActiveMods && (!settings.rdjplus || !settings.bouncerplus)) {
+                bot.sendChat('/me No active @staff detected. Granting Bouncers and @rdjs temporary extra permissions');
+                settings.rdjplus = true;
+                settings.bouncerplus = true;
+            }
+        }
+
     });
     saveWaitList(true);
 
@@ -338,19 +351,6 @@ bot.on('advance', function (data) {
         settings.djidle = false;
         bot.sendChat('/me Wait List at ' + waitListSize + ' @djs.  Idle timer disabled and cycle enabled');
         bot.changeDJCycle(true);
-    }
-
-    if (moment.utc().isAfter(moment.utc(startupTimestamp).add(5, 'minutes'))) {
-        if (roomHasActiveMods && (settings.rdjplus || settings.bouncerplus)) {
-            bot.sendChat('/me Active @staff detected. Revoking temporary extra permissions @rdjs');
-            settings.rdjplus = false;
-            settings.bouncerplus = false;
-        }
-        else if (!roomHasActiveMods && (!settings.rdjplus || !settings.bouncerplus)) {
-            bot.sendChat('/me No active @staff detected. Granting Bouncers and @rdjs temporary extra permissions');
-            settings.rdjplus = true;
-            settings.bouncerplus = true;
-        }
     }
 
 
