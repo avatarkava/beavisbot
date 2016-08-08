@@ -12,6 +12,7 @@ exports.handler = function (data) {
     var command = _.first(input);
     var params = _.rest(input);
     var username = '';
+    var duration = 'PERMA';
 
     if (params.length >= 2) {
         username = _.initial(params).join(' ').trim();
@@ -19,7 +20,6 @@ exports.handler = function (data) {
     }
     else if (params.length == 1) {
         username = params.join(' ').trim();
-        var duration = 'PERMA';
     }
     else {
         bot.sendChat('Usage: .[ban|unban|kick] username [PERMA|DAY|HOUR]');
@@ -35,14 +35,14 @@ exports.handler = function (data) {
 
     switch (duration) {
         case 'DAY':
-            apiDuration = 1440;
+            apiDuration = PlugAPI.BAN.DAY;
             break;
         case 'PERMA':
-            apiDuration = -1;
+            apiDuration = PlugAPI.BAN.PERMA;
             break;
         case 'HOUR':
         default:
-            apiDuration = 60;
+            apiDuration = PlugAPI.BAN.HOUR;
             break;
 
     }
@@ -52,29 +52,22 @@ exports.handler = function (data) {
             bot.sendChat('/me ' + usernameFormatted + ' was not found.');
         } else {
             switch (command) {
-                case '.ban':
+                case 'ban':
                     bot.moderateBanUser(row.site_id, 0, apiDuration, function () {
                         console.log('[BAN] ' + usernameFormatted + ' was banned for ' + duration + ' by ' + data.from.username);
-                    }
+                    });
                     break;
-                case '.unban':
+                case 'unban':
                     bot.moderateUnbanUser(row.site_id, function () {
                         bot.sendChat('/me unbanning ' + usernameFormatted + '. This can take a few moments...');
                         console.log('[UNBAN] ' + usernameFormatted + ' was unbanned by ' + data.from.username);
-                    }
+                    });
                     break;
             }
         }
     });
 
     // @TODO - Add Karmas
-
-    //db.get('SELECT * FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE username = ?', [username.substring(1)], function (error, row) {
-    //    if (row) {
-    //        switch (command) {
-    //            case '.ban':
-    //                bot.moderateBanUser(row.id, 0, apiDuration, function () {
-    //                    logger.warning('[BAN] ' + username + ' was banned for ' + duration + ' by ' + data.from.username);
     //                    var userData = {
     //                        type: 'ban',
     //                        details: 'Banned for ' + duration + ' by ' + data.from.username,
@@ -82,12 +75,6 @@ exports.handler = function (data) {
     //                        mod_user_id: data.from.id
     //                    };
     //                    Karma.create(userData);
-    //                });
-    //                break;
-    //            case '.unban':
-    //                bot.moderateUnbanUser(row.userid, function () {
-    //                    bot.sendChat('/me unbanning ' + username + '. This can take a few moments...');
-    //                    logger.info('[UNBAN] ' + username + ' was unbanned by ' + data.from.username);
     //                    var userData = {
     //                        type: 'unban',
     //                        details: 'Unbanned by ' + data.from.username,
@@ -95,13 +82,5 @@ exports.handler = function (data) {
     //                        mod_user_id: data.from.id
     //                    };
     //                    Karma.create(userData);
-    //                });
-    //                break;
-    //            default:
-    //                logger.error('Invalid command called: ' + command);
-    //                break;
-    //        }
-    //    }
-    //});
 
 };
