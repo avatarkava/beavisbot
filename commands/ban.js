@@ -29,7 +29,7 @@ exports.handler = function (data) {
     var usernameFormatted = S(username).chompLeft('@').s;
 
     // Don't let bouncers get too feisty (API should prohibit this, but just making sure!
-    if (data.from.role == 2) {
+    if (!settings.bouncerplus && data.from.role == 2) {
         duration = 'HOUR';
     }
 
@@ -46,6 +46,28 @@ exports.handler = function (data) {
             break;
 
     }
+
+    models.User.find({where: {username: usernameFormatted, site: config.site}}).then(function (row) {
+        if (row === null) {
+            bot.sendChat('/me ' + usernameFormatted + ' was not found.');
+        } else {
+            switch (command) {
+                case '.ban':
+                    bot.moderateBanUser(row.site_id, 0, apiDuration, function () {
+                        console.log('[BAN] ' + usernameFormatted + ' was banned for ' + duration + ' by ' + data.from.username);
+                    }
+                    break;
+                case '.unban':
+                    bot.moderateUnbanUser(row.site_id, function () {
+                        bot.sendChat('/me unbanning ' + usernameFormatted + '. This can take a few moments...');
+                        console.log('[UNBAN] ' + usernameFormatted + ' was unbanned by ' + data.from.username);
+                    }
+                    break;
+            }
+        }
+    });
+
+    // @TODO - Add Karmas
 
     //db.get('SELECT * FROM USERS LEFT JOIN DISCIPLINE USING(userid) WHERE username = ?', [username.substring(1)], function (error, row) {
     //    if (row) {
