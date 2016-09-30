@@ -58,7 +58,7 @@ exports.handler = function (data) {
                     bot.moderateBanUser(row.site_id, 0, apiDuration, function () {
                         message = '[BAN] ' + usernameFormatted + ' was banned for ' + duration + ' by ' + data.from.username;
                         console.log(message);
-                        sendToSlack('@channel - ' + message);
+                        sendToSlack(message);
                     });
                     break;
                 case 'unban':
@@ -66,7 +66,7 @@ exports.handler = function (data) {
                         bot.sendChat('/me unbanning ' + usernameFormatted + '. This can take a few moments...');
                         message = '[UNBAN] ' + usernameFormatted + ' was unbanned by ' + data.from.username;
                         console.log(message);
-                        sendToSlack('@channel - ' + message);
+                        sendToSlack(message);
                     });
                     break;
             }

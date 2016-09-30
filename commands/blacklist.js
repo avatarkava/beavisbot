@@ -39,7 +39,7 @@ exports.handler = function (data) {
                 bot.sendChat("The song \"" + row.Song.name + "\" has been blacklisted.");
                 message = '[BLACKLIST] ' + data.from.username + ' blacklisted ' + row.Song.name;
                 console.log(message);
-                sendToSlack('@channel - ' + message);
+                sendToSlack(message);
             }
         });
     }
@@ -51,7 +51,7 @@ exports.handler = function (data) {
         bot.moderateForceSkip();
         message = '[BLACKLIST] ' + data.from.username + ' blacklisted ' + media.title;
         console.log(message);
-        sendToSlack('@channel - ' + message);
+        sendToSlack(message);
     }
 
 

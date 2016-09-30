@@ -21,7 +21,7 @@ exports.handler = function (data) {
             bot.moderateUnmuteUser(user.id);
             message = '[UNMUTE] ' + data.from.username + ' unmuted ' + usernameFormatted;
             console.log(message);
-            sendToSlack('@channel - ' + message);
+            sendToSlack(message);
             bot.sendChat('/me ' + usernameFormatted + ' is now unmuted.');
         } else {
             // @TODO - Make this variable
@@ -30,7 +30,7 @@ exports.handler = function (data) {
             bot.moderateMuteUser(user.id, 1, mute_duration);
             message = '[MUTE] ' + data.from.username + ' muted ' + usernameFormatted + ' for ' + mute_duration + ' minutes.'
             console.log(message);
-            sendToSlack('@channel - ' + message);
+            sendToSlack(message);
         }
     }
 
