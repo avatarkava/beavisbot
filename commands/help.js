@@ -11,10 +11,10 @@ exports.handler = function (data) {
     // @TODO - Use this to show all active staff - console.log(bot.getStaff());
 
     if (config.slack.webhookUrl !== '') {
-        bot.sendChat('Need help? Ask a staff member. None around? Try ' + config.commandLiteral + 'callmod. @staff');
+        bot.sendChat('Need help? Ask a staff member. None around? Try ' + config.commandLiteral + 'callmod or /sos @staff');
     }
     else {
-        bot.sendChat('Need help? Ask a staff member. @staff');
+        bot.sendChat('Need help? Ask a staff member or use /sos. @staff');
     }
 
 }
