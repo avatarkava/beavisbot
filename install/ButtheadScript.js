@@ -222,7 +222,7 @@ var nx = {
         }
 
         if (idleSeconds > 3600) {
-            nxUserPosition = '\n<span class="pos" style="position: absolute; left: auto; right: 30px;top: 0px;display: inline;"><img src="//ilovethe80sand90s.phpmonkeys.com/images/icons/time.png" /></span>';
+            nxUserPosition = '\n<span class="pos" style="position: absolute; left: auto; right: 30px;top: 0px;display: inline;"><img src="//ilove80sand90s.com/images/icons/time.png" /></span>';
         }
         else {
             nxUserPosition = '\n<span class="pos" style="position: absolute; left: auto; right: 30px;top: 0px;display: inline;">' + (b.wlIndex + 1) + "</span>";

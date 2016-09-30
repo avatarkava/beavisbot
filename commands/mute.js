@@ -13,19 +13,24 @@ exports.handler = function (data) {
     var command = _.first(input);
     var username = _.rest(input, 1);
     var usernameFormatted = S(username).chompLeft('@').s;
+    var message = '';
 
     var user = findUserInList(bot.getUsers(), usernameFormatted);
     if (user !== undefined) {
         if (command == 'unmute') {
             bot.moderateUnmuteUser(user.id);
-            console.log('[UNMUTE]', data.from.username + ' unmuted ' + usernameFormatted);
+            message = '[UNMUTE] ' + data.from.username + ' unmuted ' + usernameFormatted;
+            console.log(message);
+            sendToSlack('@channel - ' + message);
             bot.sendChat('/me ' + usernameFormatted + ' is now unmuted.');
         } else {
             // @TODO - Make this variable
             var mute_duration = PlugAPI.MUTE.LONG;
 
             bot.moderateMuteUser(user.id, 1, mute_duration);
-            console.log('[MUTE]', data.from.username + ' muted ' + usernameFormatted + ' for ' + mute_duration + ' minutes.');
+            message = '[MUTE] ' + data.from.username + ' muted ' + usernameFormatted + ' for ' + mute_duration + ' minutes.'
+            console.log(message);
+            sendToSlack('@channel - ' + message);
         }
     }
 

@@ -10,6 +10,7 @@ exports.handler = function (data) {
 
     var params = _.rest(data.message.split(' '), 1);
     var dj = bot.getDJ();
+    var message = '';
 
     if (dj == null) {
         return;
@@ -34,20 +35,23 @@ exports.handler = function (data) {
                     mod_user_id: data.from.db.id
                 };
                 models.Karma.create(userData);
-
-                console.log('[BLACKLIST] ' + data.from.username + ' blacklisted ' + row.Song.name);
                 models.Song.update({is_banned: 1}, {where: {host_id: songid}});
                 bot.sendChat("The song \"" + row.Song.name + "\" has been blacklisted.");
+                message = '[BLACKLIST] ' + data.from.username + ' blacklisted ' + row.Song.name;
+                console.log(message);
+                sendToSlack('@channel - ' + message);
             }
         });
     }
     else {
         var media = bot.getMedia();
         var songid = media.cid;
-        console.log('[BLACKLIST] ' + data.from.username + ' blacklisted ' + media.title);
         models.Song.update({is_banned: 1}, {where: {site_id: media.id}});
         bot.sendChat("The song \"" + media.name + "\" has been blacklisted.");
         bot.moderateForceSkip();
+        message = '[BLACKLIST] ' + data.from.username + ' blacklisted ' + media.title;
+        console.log(message);
+        sendToSlack('@channel - ' + message);
     }
 
 

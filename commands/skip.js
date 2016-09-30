@@ -23,7 +23,9 @@ exports.handler = function (data) {
     }
 
     if (media) {
-        console.log('[SKIP] ' + data.from.username + ' skipped ' + dj.username + ' - ' + media.name + ' (' + media.id + '): ' + message);
+        var slackMessage = '[SKIP] ' + data.from.username + ' skipped ' + dj.username + ' - ' + media.name + ' (' + media.id + '): ' + message;
+        console.log(slackMessage);
+        sendToSlack('@channel - ' + slackMessage);
         bot.moderateForceSkip();
 
         getDbUserFromSiteUser(dj, function (row) {

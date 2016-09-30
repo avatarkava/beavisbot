@@ -30,7 +30,9 @@ exports.handler = function (data) {
                 mod_user_id: data.from.db.id
             };
             models.Karma.create(userData);
-            console.log('[REMOVE] ' + data.from.username + ' removed ' + user.username + ' from the wait list');
+            var message = '[REMOVE] ' + data.from.username + ' removed ' + user.username + ' from the wait list';
+            console.log(message);
+            sendToSlack('@channel - ' + message);
             models.User.update({queue_position: -1}, {where: {id: row.id}});
         });
 
@@ -38,5 +40,5 @@ exports.handler = function (data) {
     else {
         bot.sendChat('/me ' + usernameFormatted + ' not found in the room');
     }
-    
+
 };

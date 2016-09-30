@@ -17,30 +17,8 @@ exports.handler = function (data) {
         bot.sendChat('Need help? Type '  + config.commandLiteral + 'callmod with the nature of your request - for example `' + config.commandLiteral + 'callmod Someone is spamming the chat!` (Don\'t abuse this!)');
     }
     else {
-
-        var formPayload = {
-            text: '@channel - ' + data.from.username + ' requested help in https://www.dubtrack.fm/join/' + config.roomName + " \n`" + message + "`",
-            username: bot.getSelf().username,
-            link_names: 1,
-            channel: config.slack.default.channel,
-            icon_url: config.slack.default.icon_url
+        if (sendToSlack('@channel - ' + data.from.username + ' requested help in https://plug.dj/' + config.roomName + " \n`" + message + "`")) {
+            bot.sendChat('A mod has been contacted and will be on the way if available, @' + data.from.username + '. @staff');
         }
-
-        formPayload = JSON.stringify(formPayload);
-
-        request.post(config.slack.webhook_url, {form: {payload: formPayload}}, function (error, response, body) {
-
-            if (!error && response.statusCode == 200) {
-                if (body == 'ok') {
-                    bot.sendChat('A mod has been contacted and will be on the way if available, @' + data.from.username + '. @staff');
-                }
-                else {
-                    bot.sendChat('There was an error sending your request.');
-                }
-            }
-            else {
-                console.log(error);
-            }
-        });
     }
 }

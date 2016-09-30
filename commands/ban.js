@@ -13,6 +13,7 @@ exports.handler = function (data) {
     var params = _.rest(input);
     var username = '';
     var duration = 'PERMA';
+    var message = '';
 
     if (params.length >= 2) {
         username = _.initial(params).join(' ').trim();
@@ -53,14 +54,19 @@ exports.handler = function (data) {
         } else {
             switch (command) {
                 case 'ban':
+                    console.log('[BAN] ' + usernameFormatted + ' attempting ban for ' + duration + ' (' + apiDuration + ') by ' + data.from.username);
                     bot.moderateBanUser(row.site_id, 0, apiDuration, function () {
-                        console.log('[BAN] ' + usernameFormatted + ' was banned for ' + duration + ' by ' + data.from.username);
+                        message = '[BAN] ' + usernameFormatted + ' was banned for ' + duration + ' by ' + data.from.username;
+                        console.log(message);
+                        sendToSlack('@channel - ' + message);
                     });
                     break;
                 case 'unban':
                     bot.moderateUnbanUser(row.site_id, function () {
                         bot.sendChat('/me unbanning ' + usernameFormatted + '. This can take a few moments...');
-                        console.log('[UNBAN] ' + usernameFormatted + ' was unbanned by ' + data.from.username);
+                        message = '[UNBAN] ' + usernameFormatted + ' was unbanned by ' + data.from.username;
+                        console.log(message);
+                        sendToSlack('@channel - ' + message);
                     });
                     break;
             }
