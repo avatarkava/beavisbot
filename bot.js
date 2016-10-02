@@ -355,6 +355,12 @@ bot.on('advance', function (data) {
 
 
 });
+bot.on('boothCycle', function (data) {
+    console.log('[EVENT] boothCycle ', JSON.stringify(data, null, 2));
+});
+bot.on('boothLocked', function (data) {
+    console.log('[EVENT] boothLocked ', JSON.stringify(data, null, 2));
+});
 bot.on('chat', function (data) {
 
     if (config.verboseLogging) {
@@ -374,8 +380,41 @@ bot.on('chat', function (data) {
         }, {where: {site_id: data.from.id.toString(), site: config.site}});
     }
 });
+bot.on('chatDelete', function (data) {
+    console.log('[EVENT] chatDelete ', JSON.stringify(data, null, 2));
+});
+bot.on('command', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] command ', JSON.stringify(data, null, 2));
+    }
+});
 bot.on('connected', function () {
     console.log('Connected!');
+});
+bot.on('disconnected', function (data) {
+    bot.reconnect();
+});
+bot.on('djListUpdate', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] djListUpdate ', JSON.stringify(data, null, 2));
+    }
+    saveWaitList(false);
+});
+bot.on('djUpdate', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] djUpdate ', JSON.stringify(data, null, 2));
+    }
+});
+bot.on('emote', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] emote ', JSON.stringify(data, null, 2));
+    }
+});
+bot.on('error', function (msg, trace) {
+    console.log("Got an error from the virtual browser: ", msg, trace);
+});
+bot.on('followJoin', function (data) {
+    console.log('[EVENT] followJoin ', JSON.stringify(data, null, 2));
 });
 bot.on('grab', function (data) {
 
@@ -386,6 +425,48 @@ bot.on('grab', function (data) {
     } else if (user) {
         console.log('[GRAB]', user.username + ' grabbed this song');
     }
+});
+bot.on('modAddDj', function (data) {
+    console.log('[EVENT] modAddDj ', JSON.stringify(data, null, 2));
+});
+bot.on('modBan', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] modBan ', JSON.stringify(data, null, 2));
+    }
+    var message = '[BAN] ' + data.username + ' was banned for ' + data.duration + ' by ' + data.moderator + '( ' + data.ref + ':' + data.reason + ')';
+    console.log(message);
+    sendToSlack(message);
+});
+bot.on('modMoveDJ', function (data) {
+    console.log('[EVENT] modMoveDJ ', JSON.stringify(data, null, 2));
+});
+bot.on('modMute', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] modMute ', JSON.stringify(data, null, 2));
+    }
+    var message = '[MUTE] ' + data.moderator + ' muted ' + data.username + ' for ' + data.duration + ' minutes.'
+    console.log(message);
+    sendToSlack(message);
+});
+bot.on('modRemoveDJ', function (data) {
+    console.log('[EVENT] modRemoveDJ ', JSON.stringify(data, null, 2));
+    saveWaitList(true);
+});
+bot.on('modSkip', function (data) {
+    if(config.verboseLogging) {
+        console.log('[EVENT] modSkip ', JSON.stringify(data, null, 2));
+    }
+    var message = '[SKIP] ' + data.m + ' skipped a song. ' + JSON.stringify(data, null, 2);
+    console.log(message);
+    sendToSlack(message);
+});
+bot.on('modUnban', function (data) {
+    if (config.verboseLogging) {
+        console.log('[EVENT] modUnban ', JSON.stringify(data, null, 2));
+    }
+    var message = '[UNBAN] ' + data.username + ' was unbanned by ' + data.moderator;
+    console.log(message);
+    sendToSlack(message);
 });
 bot.on('roomJoin', function (data) {
     console.log('[EVENT] Ready - joined room: ' + config.roomName);
@@ -415,6 +496,29 @@ bot.on('roomJoin', function (data) {
         bot.woot();
     }
 
+});
+bot.on('roomMinChatLevelUpdate', function (data) {
+    console.log('[EVENT] roomMinChatLevelUpdate ', JSON.stringify(data, null, 2));
+});
+bot.on('tcpConnect', function (socket) {
+    console.log('[TCP] Connected!');
+});
+bot.on('tcpMessage', function (socket, msg) {
+    if (typeof msg !== "undefined" && msg.length > 2) {
+        console.log('[TCP] ' + msg);
+        // Convert into same format as incoming chat messages through the UI
+        var data = {
+            message: msg,
+            from: bot.getUser()
+        };
+
+        if (data.message.indexOf('.') === 0) {
+            handleCommand(data);
+        }
+        else {
+            bot.sendChat(msg);
+        }
+    }
 });
 bot.on('userJoin', function (data) {
 
@@ -526,7 +630,6 @@ bot.on('userJoin', function (data) {
         updateDbUser(data);
     }
 });
-
 bot.on('userLeave', function (data) {
     console.log('[LEAVE]', 'User left: ' + data.username);
     models.User.update({last_leave: new Date()}, {where: {site: config.site, site_id: data.id.toString()}});
@@ -555,83 +658,6 @@ bot.on('vote', function (data) {
     }
 });
 
-
-bot.on('error', function (msg, trace) {
-    console.log("Got an error from the virtual browser: ", msg, trace);
-});
-bot.on('disconnected', function (data) {
-    bot.reconnect();
-});
-
-/**
- * @TODO - No current handling
- */
-bot.on('boothLocked', function (data) {
-    console.log('[EVENT] boothLocked ', JSON.stringify(data, null, 2));
-})
-;
-bot.on('chatDelete', function (data) {
-    console.log('[EVENT] chatDelete ', JSON.stringify(data, null, 2));
-});
-bot.on('djListUpdate', function (data) {
-    if (config.verboseLogging) {
-        console.log('[EVENT] djListUpdate ', JSON.stringify(data, null, 2));
-    }
-    saveWaitList(false);
-});
-bot.on('djUpdate', function (data) {
-    if (config.verboseLogging) {
-        console.log('[EVENT] djUpdate ', JSON.stringify(data, null, 2));
-    }
-});
-bot.on('emote', function (data) {
-    if (config.verboseLogging) {
-        console.log('[EVENT] emote ', JSON.stringify(data, null, 2));
-    }
-});
-bot.on('followJoin', function (data) {
-    console.log('[EVENT] followJoin ', JSON.stringify(data, null, 2));
-});
-
-bot.on('modAddDj', function (data) {
-    console.log('[EVENT] modAddDj ', JSON.stringify(data, null, 2));
-});
-bot.on('modBan', function (data) {
-    console.log('[EVENT] modBan ', JSON.stringify(data, null, 2));
-});
-bot.on('modMoveDJ', function (data) {
-    console.log('[EVENT] modMoveDJ ', JSON.stringify(data, null, 2));
-});
-bot.on('modRemoveDJ', function (data) {
-    console.log('[EVENT] modRemoveDJ ', JSON.stringify(data, null, 2));
-    saveWaitList(true);
-});
-bot.on('modSkip', function (data) {
-    console.log('[EVENT] modSkip ', JSON.stringify(data, null, 2));
-});
-bot.on('roomMinChatLevelUpdate', function (data) {
-    console.log('[EVENT] roomMinChatLevelUpdate ', JSON.stringify(data, null, 2));
-});
-bot.on('tcpConnect', function (socket) {
-    console.log('[TCP] Connected!');
-});
-bot.on('tcpMessage', function (socket, msg) {
-    if (typeof msg !== "undefined" && msg.length > 2) {
-        console.log('[TCP] ' + msg);
-        // Convert into same format as incoming chat messages through the UI
-        var data = {
-            message: msg,
-            from: bot.getUser()
-        };
-
-        if (data.message.indexOf('.') === 0) {
-            handleCommand(data);
-        }
-        else {
-            bot.sendChat(msg);
-        }
-    }
-});
 
 if (config.queue.djIdleAfterMins > 0) {
     setInterval(monitorDJList, 5000);

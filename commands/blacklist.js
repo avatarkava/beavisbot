@@ -49,7 +49,7 @@ exports.handler = function (data) {
         models.Song.update({is_banned: 1}, {where: {site_id: media.id}});
         bot.sendChat("The song \"" + media.name + "\" has been blacklisted.");
         bot.moderateForceSkip();
-        message = '[BLACKLIST] ' + data.from.username + ' blacklisted ' + media.title;
+        message = '[BLACKLIST] ' + data.from.username + ' blacklisted ' + media.name + ' (ID:' + media.cid + ')';
         console.log(message);
         sendToSlack(message);
     }

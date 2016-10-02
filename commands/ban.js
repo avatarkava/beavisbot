@@ -55,25 +55,18 @@ exports.handler = function (data) {
             switch (command) {
                 case 'ban':
                     console.log('[BAN] ' + usernameFormatted + ' attempting ban for ' + duration + ' (' + apiDuration + ') by ' + data.from.username);
-                    bot.moderateBanUser(row.site_id, 0, apiDuration, function () {
-                        message = '[BAN] ' + usernameFormatted + ' was banned for ' + duration + ' by ' + data.from.username;
-                        console.log(message);
-                        sendToSlack(message);
-                    });
+                    bot.moderateBanUser(row.site_id, 0, apiDuration);
                     break;
                 case 'unban':
                     bot.moderateUnbanUser(row.site_id, function () {
                         bot.sendChat('/me unbanning ' + usernameFormatted + '. This can take a few moments...');
-                        message = '[UNBAN] ' + usernameFormatted + ' was unbanned by ' + data.from.username;
-                        console.log(message);
-                        sendToSlack(message);
                     });
                     break;
             }
         }
     });
 
-    // @TODO - Add Karmas
+    // @TODO - Add Karmas (this may be better in bot.js where it isn't dependent on .command)
     //                    var userData = {
     //                        type: 'ban',
     //                        details: 'Banned for ' + duration + ' by ' + data.from.username,

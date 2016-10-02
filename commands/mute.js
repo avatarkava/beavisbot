@@ -26,11 +26,7 @@ exports.handler = function (data) {
         } else {
             // @TODO - Make this variable
             var mute_duration = PlugAPI.MUTE.LONG;
-
             bot.moderateMuteUser(user.id, 1, mute_duration);
-            message = '[MUTE] ' + data.from.username + ' muted ' + usernameFormatted + ' for ' + mute_duration + ' minutes.'
-            console.log(message);
-            sendToSlack(message);
         }
     }
 
