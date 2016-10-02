@@ -45,8 +45,7 @@ exports.handler = function (data) {
     }
     else {
         var media = bot.getMedia();
-        var songid = media.cid;
-        models.Song.update({is_banned: 1}, {where: {site_id: media.id}});
+        models.Song.update({is_banned: 1}, {where: {host_id: media.c1id}});
         bot.sendChat("The song \"" + media.name + "\" has been blacklisted.");
         bot.moderateForceSkip();
         message = '[BLACKLIST] ' + data.from.username + ' blacklisted ' + media.name + ' (ID:' + media.cid + ')';
