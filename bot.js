@@ -434,6 +434,7 @@ bot.on('modBan', function (data) {
         console.log('[EVENT] modBan ', JSON.stringify(data, null, 2));
     }
     var message = '[BAN] ' + data.username + ' was banned for ' + data.duration + ' by ' + data.moderator + '( ' + data.ref + ':' + data.reason + ')';
+
     console.log(message);
     sendToSlack(message);
 });
