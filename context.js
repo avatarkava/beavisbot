@@ -45,7 +45,7 @@ module.exports = function (options) {
         timeguard: false,
         maxdctime: 15 * 60,
         maxsonglength: config.queue.maxSongLengthSecs,
-        maxdjidletime: config.queue.djIdleAfterMins,
+        maxdjidletime: config.queue.djIdleAfterMins * 60,
         djidle: false,
         djidleminqueue: config.queue.djIdleMinQueueLengthToEnforce,
         djcyclemaxqueue: config.queue.djCycleMaxQueueLength,
