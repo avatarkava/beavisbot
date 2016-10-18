@@ -433,7 +433,7 @@ bot.on('modBan', function (data) {
     if (config.verboseLogging) {
         console.log('[EVENT] modBan ', JSON.stringify(data, null, 2));
     }
-    var message = '[BAN] ' + data.username + ' was banned for ' + data.duration + ' by ' + data.moderator + '( ' + data.ref + ':' + data.reason + ')';
+    var message = '[BAN] ' + data.t + ' was banned for ' + data.d + ' by ' + data.m;
 
     console.log(message);
     sendToSlack(message);
@@ -444,8 +444,9 @@ bot.on('modMoveDJ', function (data) {
 bot.on('modMute', function (data) {
     if (config.verboseLogging) {
         console.log('[EVENT] modMute ', JSON.stringify(data, null, 2));
+        nop
     }
-    var message = '[MUTE] ' + data.moderator + ' muted ' + data.username + ' for ' + data.duration + ' minutes.'
+    var message = '[MUTE] ' + data.m + ' muted ' + data.t + ' for ' + data.d + ' minutes.'
     console.log(message);
     sendToSlack(message);
 });

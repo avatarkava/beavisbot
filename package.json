@@ -11,6 +11,7 @@
     "url": "git://github.com/AvatarKava/beavisbot.git"
   },
   "author": "Mike Burke <mburke@phpmonkeys.com>",
+  "license": "MIT",
   "main": "bot.js",
   "directories": {
     "commands": "commands"
