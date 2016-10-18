@@ -430,10 +430,24 @@ bot.on('modAddDj', function (data) {
     console.log('[EVENT] modAddDj ', JSON.stringify(data, null, 2));
 });
 bot.on('modBan', function (data) {
-    if (config.verboseLogging) {
-        console.log('[EVENT] modBan ', JSON.stringify(data, null, 2));
+    //if (config.verboseLogging) {
+    console.log('[EVENT] modBan ', JSON.stringify(data, null, 2));
+    //}
+
+    var duration = 'unknown';
+    switch (data.d) {
+        case 'h':
+            duration = '1 hour';
+            break;
+        case 'd':
+            duration = '1 day';
+            break;
+        case 'f':
+            duration = 'eternity';
+            break;
     }
-    var message = '[BAN] ' + data.t + ' was banned for ' + data.d + ' by ' + data.m;
+
+    var message = '[BAN] ' + data.t + ' was banned for ' + duration + ' by ' + data.m;
 
     console.log(message);
     sendToSlack(message);
@@ -442,11 +456,24 @@ bot.on('modMoveDJ', function (data) {
     console.log('[EVENT] modMoveDJ ', JSON.stringify(data, null, 2));
 });
 bot.on('modMute', function (data) {
-    if (config.verboseLogging) {
-        console.log('[EVENT] modMute ', JSON.stringify(data, null, 2));
-        nop
+    //if (config.verboseLogging) {
+    console.log('[EVENT] modMute ', JSON.stringify(data, null, 2));
+    //}
+
+    var duration = 'unknown';
+    switch (data.d) {
+        case 's':
+            duration = '15';
+            break;
+        case 'm':
+            duration = '30';
+            break;
+        case 'l':
+            duration = '45';
+            break;
     }
-    var message = '[MUTE] ' + data.m + ' muted ' + data.t + ' for ' + data.d + ' minutes.'
+
+    var message = '[MUTE] ' + data.m + ' muted ' + data.t + ' for ' + duration + ' minutes.';
     console.log(message);
     sendToSlack(message);
 });
@@ -455,9 +482,9 @@ bot.on('modRemoveDJ', function (data) {
     saveWaitList(true);
 });
 bot.on('modSkip', function (data) {
-    if(config.verboseLogging) {
-        console.log('[EVENT] modSkip ', JSON.stringify(data, null, 2));
-    }
+    //if(config.verboseLogging) {
+    console.log('[EVENT] modSkip ', JSON.stringify(data, null, 2));
+    //}
     var message = '[SKIP] ' + data.m + ' skipped a song. ' + JSON.stringify(data, null, 2);
     console.log(message);
     sendToSlack(message);
