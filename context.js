@@ -190,6 +190,14 @@ module.exports = function (options) {
         });
     };
 
+    getDbUserFromUsername = function (siteUsername, callback) {
+        models.User.find({
+            where: {username: siteUsername, site: config.site}
+        }).then(function (row) {
+            callback(row);
+        });
+    };
+
     getActiveDJs = function (maxIdleMins, startPosition, callback) {
         var activeUsers = [];
         if (startPosition === undefined) {

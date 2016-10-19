@@ -30,7 +30,7 @@ exports.handler = function (data) {
     var usernameFormatted = S(username).chompLeft('@').s;
 
     // Don't let bouncers get too feisty (API should prohibit this, but just making sure!
-    if (!settings.bouncerplus && data.from.role == 2) {
+    if (!settings.bouncerplus && data.from.role < 3) {
         duration = 'HOUR';
     }
 

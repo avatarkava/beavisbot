@@ -447,10 +447,17 @@ bot.on('modBan', function (data) {
             break;
     }
 
-    var message = '[BAN] ' + data.t + ' was banned for ' + duration + ' by ' + data.m;
+    getDbUserFromUsername(data.t, function (dbUser) {
+        var message;
+        if (dbUser == null) {
+            message = '[BAN] ' + data.t + ' was banned for ' + duration + ' by ' + data.m;
+        } else {
+            message = '[BAN] ' + data.t + '(ID: ' + dbUser.site_id + ', LVL: ' + dbUser.site_points + ') was banned for ' + duration + ' by ' + data.m;
+        }
+        console.log(message);
+        sendToSlack(message);
+    });
 
-    console.log(message);
-    sendToSlack(message);
 });
 bot.on('modMoveDJ', function (data) {
     console.log('[EVENT] modMoveDJ ', JSON.stringify(data, null, 2));
@@ -473,9 +480,16 @@ bot.on('modMute', function (data) {
             break;
     }
 
-    var message = '[MUTE] ' + data.m + ' muted ' + data.t + ' for ' + duration + ' minutes.';
-    console.log(message);
-    sendToSlack(message);
+    getDbUserFromUsername(data.t, function (dbUser) {
+        var message;
+        if (dbUser == null) {
+            message = '[MUTE] ' + data.t + '(ID: ' + data.i + ') was muted for ' + duration + ' minutes by ' + data.m;
+        } else {
+            message = '[BAN] ' + data.t + '(ID: ' + data.i + ', LVL: ' + dbUser.site_points + ') was muted for ' + duration + ' minutes by ' + data.m;
+        }
+        console.log(message);
+        sendToSlack(message);
+    });
 });
 bot.on('modRemoveDJ', function (data) {
     console.log('[EVENT] modRemoveDJ ', JSON.stringify(data, null, 2));

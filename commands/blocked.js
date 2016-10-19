@@ -66,6 +66,9 @@ exports.handler = function (data) {
             else if (blockedcountries.length == 0) {
                 bot.sendChat('Yay! This song has no restrictions');
             }
+            else if (blockedcountries.length > 24) {
+                bot.sendChat('This song is blocked in ' + blockedcountries.length + ' countries, so I won\'t list them all.');
+            }
             else {
                 bot.sendChat('This song is blocked in: ' + blockedcountries.join(', '));
             }
