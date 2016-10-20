@@ -26,13 +26,13 @@ exports.handler = function (data) {
         order: [['created_at', 'DESC']]
     }).then(function (row) {
         if (!row && params.length == 0) {
-            bot.sendChat('This is the first time I have seen this video played in this room!');
+            bot.sendChat('/me This is the first time I have seen this video played in this room!');
         } else if (!row) {
-            bot.sendChat('I have not seen a song with id `' + songid + '` played in this room!');
+            bot.sendChat('/me I have not seen a song with id `' + songid + '` played in this room!');
         } else {
             message = row.Song.name + ' • last played ' + timeSince(row.created_at) + ' by ' + row.User.username
                 + ' • ' + row.listeners + ' :ear: • ' + row.positive + ' :+1: • ' + row.grabs + ' :star: • ' + row.negative + ' :-1:';
-            bot.sendChat(message);
+            bot.sendChat('/me ' + message);
         }
     });
 };

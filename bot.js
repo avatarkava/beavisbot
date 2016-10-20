@@ -104,11 +104,11 @@ bot.on('advance', function (data) {
         order: [['created_at', 'DESC']]
     }).then(function (row) {
         if (!row) {
-            bot.sendChat('This is the first time I have seen this video of ' + data.media.author + ' - ' + data.media.title + ' played in this room!');
+            bot.sendChat('/me This is the first time I have seen this video of ' + data.media.author + ' - ' + data.media.title + ' played in this room!');
         } else {
             message = row.Song.name + ' • last played ' + timeSince(row.created_at) + ' by ' + row.User.username
                 + ' • ' + row.listeners + ' :ear: • ' + row.positive + ' :+1: • ' + row.grabs + ' :star: • ' + row.negative + ' :-1:';
-            bot.sendChat(message);
+            bot.sendChat('/me ' + message);
         }
     });
 
