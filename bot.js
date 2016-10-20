@@ -99,7 +99,7 @@ bot.on('advance', function (data) {
     models.Play.findOne({
         include: [{
             model: models.Song,
-            where: {$and: [{site: config.site}, {host: media.format}, {host_id: data.media.cid}]}
+            where: {$and: [{site: config.site}, {host: data.media.format}, {host_id: data.media.cid}]}
         }, models.User],
         order: [['created_at', 'DESC']]
     }).then(function (row) {
