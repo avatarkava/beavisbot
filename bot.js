@@ -104,7 +104,7 @@ bot.on('advance', function (data) {
         order: [['created_at', 'DESC']]
     }).then(function (row) {
         if (!row) {
-            bot.sendChat('/me This is the first time I have seen this video of `' + data.media.author + ' - ' + data.media.title + '` played in this room!');
+            bot.sendChat('/me This is the first time I have seen this video of `' + data.media.author + ' - ' + data.media.title + '` played!');
         } else {
             message = row.Song.name + ' • last played ' + timeSince(row.created_at) + ' by ' + row.User.username
                 + ' • ' + row.listeners + ' :ear: • ' + row.positive + ' :+1: • ' + row.grabs + ' :star: • ' + row.negative + ' :-1:';
@@ -474,7 +474,7 @@ bot.on('modBan', function (data) {
         if (dbUser == null) {
             message = '[BAN] ' + data.t + ' was banned for ' + duration + ' by ' + data.m;
         } else {
-            message = '[BAN] ' + data.t + '(ID: ' + dbUser.site_id + ', LVL: ' + dbUser.site_points + ') was banned for ' + duration + ' by ' + data.m;
+            message = '[BAN] ' + data.t + ' (ID: ' + dbUser.site_id + ', LVL: ' + dbUser.site_points + ') was banned for ' + duration + ' by ' + data.m;
         }
         console.log(message);
         sendToSlack(message);
@@ -505,9 +505,9 @@ bot.on('modMute', function (data) {
     getDbUserFromUsername(data.t, function (dbUser) {
         var message;
         if (dbUser == null) {
-            message = '[MUTE] ' + data.t + '(ID: ' + data.i + ') was muted for ' + duration + ' minutes by ' + data.m;
+            message = '[MUTE] ' + data.t + ' (ID: ' + data.i + ') was muted for ' + duration + ' minutes by ' + data.m;
         } else {
-            message = '[BAN] ' + data.t + '(ID: ' + data.i + ', LVL: ' + dbUser.site_points + ') was muted for ' + duration + ' minutes by ' + data.m;
+            message = '[BAN] ' + data.t + ' (ID: ' + data.i + ', LVL: ' + dbUser.site_points + ') was muted for ' + duration + ' minutes by ' + data.m;
         }
         console.log(message);
         sendToSlack(message);
