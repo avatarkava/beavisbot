@@ -452,9 +452,9 @@ bot.on('modAddDj', function (data) {
     console.log('[EVENT] modAddDj ', JSON.stringify(data, null, 2));
 });
 bot.on('modBan', function (data) {
-    //if (config.verboseLogging) {
-    console.log('[EVENT] modBan ', JSON.stringify(data, null, 2));
-    //}
+    if (config.verboseLogging) {
+        console.log('[EVENT] modBan ', JSON.stringify(data, null, 2));
+    }
 
     var duration = 'unknown';
     switch (data.d) {
@@ -485,9 +485,9 @@ bot.on('modMoveDJ', function (data) {
     console.log('[EVENT] modMoveDJ ', JSON.stringify(data, null, 2));
 });
 bot.on('modMute', function (data) {
-    //if (config.verboseLogging) {
-    console.log('[EVENT] modMute ', JSON.stringify(data, null, 2));
-    //}
+    if (config.verboseLogging) {
+        console.log('[EVENT] modMute ', JSON.stringify(data, null, 2));
+    }
 
     var duration = 'unknown';
     switch (data.d) {
@@ -518,12 +518,12 @@ bot.on('modRemoveDJ', function (data) {
     saveWaitList(true);
 });
 bot.on('modSkip', function (data) {
-    //if(config.verboseLogging) {
-    console.log('[EVENT] modSkip ', JSON.stringify(data, null, 2));
-    //}
+    if (config.verboseLogging) {
+        console.log('[EVENT] modSkip ', JSON.stringify(data, null, 2));
+    }
 
     // Send this if the skip didn't come via [SKIP]
-    if (data.m !== botUser.db.site_id) {
+    if (data.mi != botUser.db.site_id) {
         message = '[SKIP] ' + data.m + ' skipped a song.';
         console.log(message + ' ' + JSON.stringify(data, null, 2));
         sendToSlack(message);
