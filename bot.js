@@ -96,6 +96,22 @@ bot.on('advance', function (data) {
         correctMetadata();
     }
 
+    models.Play.findOne({
+        include: [{
+            model: models.Song,
+            where: {$and: [{site: config.site}, {host: media.format}, {host_id: data.media.cid}]}
+        }, models.User],
+        order: [['created_at', 'DESC']]
+    }).then(function (row) {
+        if (!row) {
+            bot.sendChat('This is the first time I have seen this video played in this room!');
+        } else {
+            message = row.Song.name + ' • last played ' + timeSince(row.created_at) + ' by ' + row.User.username
+                + ' • ' + row.listeners + ' :ear: • ' + row.positive + ' :+1: • ' + row.grabs + ' :star: • ' + row.negative + ' :-1:';
+            bot.sendChat(message);
+        }
+    });
+
     // Auto skip for "stuck" songs
     clearTimeout(skipTimer);
     var nextTimerDelay = (data.media.duration + 10) * 1000;
@@ -514,8 +530,9 @@ bot.on('modSkip', function (data) {
     }
 
     // Data from last song played
-    message = JSON.stringify(bot.mediaHistory[0], null, 2);
-    console.log(message);
+    var skippedSong = bot.mediaHistory[1];
+    message = '[SKIP] Skipped song: ' + skippedSong.media.name + ' (https://www.youtube.com/watch?v=' + skippedSong.media.cid + ') played by ' + skippedSong.user.username + ' (ID: ' + skippedSong.user.id + ')';
+    console.log('[SKIP] ' + JSON.stringify(skippedSong, null, 2));
     sendToSlack(message);
 
 

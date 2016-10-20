@@ -23,11 +23,12 @@ exports.handler = function (data) {
     }
 
     if (media) {
-        bot.moderateForceSkip();
 
         var message = '[SKIP] ' + data.from.username + ' skipped a song.';
         console.log(message + ' ' + JSON.stringify(data, null, 2));
         sendToSlack(message);
+
+        bot.moderateForceSkip();
 
         getDbUserFromSiteUser(dj, function (row) {
             var userData = {
