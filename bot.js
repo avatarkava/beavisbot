@@ -44,6 +44,11 @@ bot.on('advance', function (data) {
         console.log('[EVENT] advance');
     }
 
+    bot.getHistory(function (history) {
+        bot.mediaHistory = history;
+    });
+
+
     // Write previous play data to DB
     if (data.lastPlay !== undefined && data.lastPlay !== null && data.lastPlay.media !== undefined && data.lastPlay.media !== null) {
         models.Song.find({
@@ -297,27 +302,28 @@ bot.on('advance', function (data) {
                 where: {
                     site: config.site,
                     host: data.media.format,
-                    host_id: data.media.cid,
-                    is_banned: true
+                    host_id: data.media.cid
                 }
             }).then(function (row) {
                 if (row !== null) {
-                    console.log('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a blacklisted song: ' + data.media.name + ' (id: ' + data.media.id + ')');
-                    var message = 'Sorry @' + data.currentDJ.username + ', this video has been blacklisted in our song database.';
-                    if (row.message) {
-                        message += ' (' + row.message + ')';
+                    if (row.is_banned) {
+                        console.log('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a blacklisted song: ' + data.media.name + ' (id: ' + data.media.id + ')');
+                        var message = 'Sorry @' + data.currentDJ.username + ', this video has been blacklisted in our song database.';
+                        if (row.message) {
+                            message += ' (' + row.message + ')';
+                        }
+                        bot.sendChat(message);
+                        bot.moderateForceSkip();
+                        getDbUserFromSiteUser(data.currentDJ, function (dbuser) {
+                            var userData = {
+                                type: 'skip',
+                                details: 'Skipped for playing a blacklisted song: ' + data.media.name + ' (id: ' + data.media.id + ')',
+                                user_id: dbuser.id,
+                                mod_user_id: botUser.id
+                            };
+                            models.Karma.create(userData);
+                        });
                     }
-                    bot.sendChat(message);
-                    bot.moderateForceSkip();
-                    getDbUserFromSiteUser(data.currentDJ, function (dbuser) {
-                        var userData = {
-                            type: 'skip',
-                            details: 'Skipped for playing a blacklisted song: ' + data.media.name + ' (id: ' + data.media.id + ')',
-                            user_id: dbuser.id,
-                            mod_user_id: botUser.id
-                        };
-                        models.Karma.create(userData);
-                    });
 
                 }
             });
@@ -499,9 +505,20 @@ bot.on('modSkip', function (data) {
     //if(config.verboseLogging) {
     console.log('[EVENT] modSkip ', JSON.stringify(data, null, 2));
     //}
-    var message = '[SKIP] ' + data.m + ' skipped a song. ' + JSON.stringify(data, null, 2);
+
+    // Send this if the skip didn't come via [SKIP]
+    if (data.m !== botUser.db.site_id) {
+        message = '[SKIP] ' + data.m + ' skipped a song.';
+        console.log(message + ' ' + JSON.stringify(data, null, 2));
+        sendToSlack(message);
+    }
+
+    // Data from last song played
+    message = JSON.stringify(bot.mediaHistory[0], null, 2);
     console.log(message);
     sendToSlack(message);
+
+
 });
 bot.on('modUnban', function (data) {
     if (config.verboseLogging) {
@@ -1053,6 +1070,7 @@ function writeRoomState(permalink) {
         JSONstats.roomQueue = bot.getWaitList();
         JSONstats.users = bot.getUsers();
         JSONstats.staff = bot.getStaff();
+        JSONstats.mediaHistory = bot.mediaHistory;
 
         fs.writeFile(
             config.roomStateFile,
