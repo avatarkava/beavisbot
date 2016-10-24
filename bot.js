@@ -1,6 +1,6 @@
-path = require('path');
+dpath = require('path');
 fs = require('fs');
-config = require(path.resolve(__dirname, 'config.json'));
+config = require(dpath.resolve(__dirname, 'config.json'));
 PlugAPI = require('plugapi');
 
 new PlugAPI({
@@ -27,9 +27,10 @@ function initializeModules(bot) {
 
     // Initialize functions, commands, events and extended stuff
     try {
-        fs.readdirSync('./functions').forEach(function (file) {
+        var dir = dpath.resolve(__dirname, 'functions') + '/';
+        fs.readdirSync(dir).forEach(function (file) {
             if (file.indexOf(".js") > -1) {
-                require('./functions/' + file)(bot);
+                require(dir + file)(bot);
             }
         });
     } catch (e) {

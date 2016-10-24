@@ -6,7 +6,7 @@ module.exports = function (bot) {
 
         // Load commands
         try {
-            var dir = process.cwd() + '/commands/';
+            var dir = dpath.resolve(__dirname, '../commands') + '/';
             fs.readdirSync(dir).forEach(function (file) {
                 if (file.indexOf(".js") > -1) {
                     var command = require(dir + file);
@@ -28,7 +28,7 @@ module.exports = function (bot) {
 
     loadEvents = function (bot) {
         try {
-            var dir = process.cwd() + '/events/';
+            var dir = dpath.resolve(__dirname, '../events') + '/';
             fs.readdirSync(dir).forEach(function (file) {
                 if (file.indexOf(".js") > -1) {
                     require(dir + file)(bot);
@@ -42,7 +42,7 @@ module.exports = function (bot) {
 
     loadExtensions = function (bot) {
         try {
-            var dir = process.cwd() + '/extensions/';
+            var dir = dpath.resolve(__dirname, '../extensions') + '/';
             fs.readdirSync(dir).forEach(function (file) {
                 if (file.indexOf(".js") > -1) {
                     require(dir + file)(bot);
