@@ -19,7 +19,7 @@ if (config.db.dialect === 'sqlite') {
         logging: logLevel
     });
 }
-else if (config.db.dialect === 'mysql') {
+else if (config.db.dialect === 'mariadb' || config.db.dialect === 'mysql') {
     var sequelize = new Sequelize(config.db.database, config.db.username, config.db.password, {
         host: config.db.host,
         dialect: config.db.dialect,
