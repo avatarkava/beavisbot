@@ -37,7 +37,7 @@ exports.handler = function (data) {
                 models.Karma.create(userData);
                 models.Song.update({is_banned: 1}, {where: {host_id: songid}});
                 bot.sendChat("The song \"" + row.Song.name + "\" has been blacklisted.");
-                message = '[BLACKLIST] ' + data.from.username + ' blacklisted ' + row.Song.name;
+                message = '[BLACKLIST] ' + data.from.username + ' blacklisted ' + row.Song.name + ' (ID:' + row.Song.host_id + ')';
                 console.log(message);
                 sendToSlack(message);
             }

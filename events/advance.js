@@ -113,33 +113,58 @@ module.exports = function (bot) {
                     song.updateAttributes(songData);
                     writeRoomState(song.permalink);
 
-                    if (config.apiKeys.youtube !== undefined) {
-                        Youtube.videos.list({
-                            "part": "id,status",
+                    if (config.apiKeys.youtube.client_id !== undefined) {
+                        YouTube.videos.list({
+                            "part": "id,snippet,status,statistics",
                             "id": data.media.cid,
                         }, function (err, api_data) {
                             if (api_data) {
-                                var needsSkip = false;
                                 if (config.verboseLogging) {
-                                    console.log(api_data);
+                                    console.log('[YOUTUBE] ' + JSON.stringify(api_data, null, 2));
                                 }
+
+                                var available = true;
+                                var banned = false;
+                                var lowViewCount = false;
+
                                 if (api_data.items.length === 0) {
-                                    /* The video is not available. */
-                                    needsSkip = true;
+                                    available = false;
                                 } else {
                                     var item = _.first(api_data.items);
-                                    if (item.status) {
-                                        if (item.status.embeddable === false) {
-                                            needsSkip = true;
-                                        }
+                                    if (!item.status || item.status.embeddable === false) {
+                                        available = false;
+                                    }
+                                    if (item.statistics && item.statistics.viewCount < 100) {
+                                        lowViewCount = true;
+                                    }
+
+                                    //@FIXME - Move this to a databased instance
+                                    bannedChannels = [
+                                        'UC90G3mvOacBC2oAC25BUrNw',
+                                        'UCvPkfnQuDr6sXzRw7K5x3nA'
+                                    ];
+                                    if (_.contains(bannedChannels, item.snippet.channelId)) {
+                                        banned = true;
                                     }
                                 }
 
-                                if (needsSkip) {
+                                if (banned) {
+                                    models.Song.update({is_banned: 1}, {where: {host_id: data.media.cid}});
+                                    bot.moderateForceSkip();
+                                    bot.moderateBanUser(data.currentDJ.id, 0, PlugAPI.BAN.PERMA);
+                                    bot.sendChat('NOOOOOOOOOPE.');
+                                } else if (!available) {
                                     console.log('[SKIP] Song was skipped because it is not available or embeddable');
                                     bot.sendChat('/me Skipping this video because it is not available or embeddable.');
                                     bot.moderateForceSkip();
+                                } else if (lowViewCount) {
+                                    var message = '[YOUTUBE] The current video played has very few views. You may want to check it for :trollface:... ' + data.media.name + ' (https://www.youtube.com/watch?v=' + data.media.cid + ') played by ' + data.currentDJ.username + ' (ID: ' + data.currentDJ.id + ')';
+                                    console.log(message);
+                                    sendToSlack(message);
+
                                 }
+                            } else {
+                                console.log(err);
                             }
                         });
                     }

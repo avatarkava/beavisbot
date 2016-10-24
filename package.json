@@ -32,7 +32,7 @@
     "sqlite3": "*",
     "string": "*",
     "underscore": "git://github.com/jashkenas/underscore.git",
-    "youtube-api": "*"
+    "youtube-node": "*"
   },
   "devDependencies": {
   },

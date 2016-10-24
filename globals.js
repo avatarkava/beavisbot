@@ -27,6 +27,15 @@ module.exports = function (options) {
         console.log('Connected to ' + config.db.dialect + ' database: ' + config.db.database);
     });
 
+    if (config.apiKeys.youtube !== undefined) {
+        console.log('[YOUTUBE]', 'Authenticating with youtube...');
+        var oauth = YouTube.authenticate({
+            type: "key",
+            key: config.apiKeys.youtube.api_key
+        });
+        console.log('[YOUTUBE]', 'Authenticated! ' + JSON.stringify(oauth, null, 2));
+    }
+
     cleverbot = new Cleverbot;
 
     PERMISSIONS = {
@@ -169,17 +178,5 @@ module.exports = function (options) {
             callback(activeUsers);
         });
     };
-
-    //if (config.apiKeys.youtube !== undefined) {
-    //    console.log('[YOUTUBE]', 'Authenticating with youtube...');
-    //    Youtube.authenticate({
-    //        type: "oauth",
-    //        refresh_token: config.apiKeys.youtube.refresh_token,
-    //        client_id: config.apiKeys.youtube.client_id,
-    //        client_secret: config.apiKeys.youtube.client_secret,
-    //        redirect_url: config.apiKeys.youtube.redirect_url,
-    //    });
-    //    console.log('[YOUTUBE]', 'Authenticated!')
-    //}
 
 };
