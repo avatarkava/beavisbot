@@ -27,6 +27,7 @@
     "mariasql": "*",
     "moment": "*",
     "node-datatable": "git://github.com/jpravetz/node-datatable.git",
+    "path": "*",
     "request": "*",
     "sequelize": "*",
     "sqlite3": "*",

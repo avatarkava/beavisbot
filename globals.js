@@ -6,6 +6,7 @@ module.exports = function (options) {
     Cleverbot = require('cleverbot-node');
     fs = require('fs');
     moment = require('moment');
+    path = require('path');
     //PlugAPI = require('plugapi');
     Promise = require('bluebird');
     request = require('request');
@@ -15,7 +16,7 @@ module.exports = function (options) {
 
     config = options.config;
     bot = options.bot;
-    models = require('./models/index');
+    models = require(path.resolve(__dirname, 'models/index'));
 
     mentions = {
         lastRunAll: 0,

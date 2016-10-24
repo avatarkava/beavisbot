@@ -1,5 +1,6 @@
+path = require('path');
 fs = require('fs');
-config = require(process.cwd() + '/config.json');
+config = require(path.resolve(__dirname, 'config.json'));
 PlugAPI = require('plugapi');
 
 new PlugAPI({
