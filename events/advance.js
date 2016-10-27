@@ -84,7 +84,9 @@ module.exports = function (bot) {
         if (config.queue.skipStuckSongs) {
             skipTimer = setTimeout(function () {
                 if (bot.getMedia() && bot.getMedia().id == data.media.id) {
-                    console.log('[SKIP]', 'Skipping ' + data.media.name + ' because it appears to be stuck...');
+                    var message = '[SKIP] Skipping ' + data.media.name + ' because it appears to be stuck...';
+                    console.log(message);
+                    sendToSlack(message);
                     bot.sendChat('Skipping ' + data.media.name + ' because it appears to be stuck...');
                     bot.moderateForceSkip();
                 }
@@ -154,8 +156,10 @@ module.exports = function (bot) {
                                     bot.moderateBanUser(data.currentDJ.id, 0, PlugAPI.BAN.PERMA);
                                     bot.sendChat('NOOOOOOOOOPE.');
                                 } else if (!available) {
-                                    console.log('[SKIP] Song was skipped because it is not available or embeddable');
-                                    bot.sendChat('/me Skipping this video because it is not available or embeddable.');
+                                    var message = '[SKIP] Song was skipped because it is not available or embeddable';
+                                    console.log(message);
+                                    sendToSlack(message);
+                                    bot.sendChat('/me @' + data.currentDJ.username + ', skipping this video because it is not available or embeddable. Please update your playlist!');
                                     bot.moderateForceSkip();
                                 } else if (lowViewCount) {
                                     var message = '[YOUTUBE] The current video played has very few views. You may want to check it for :trollface:... ' + data.media.name + ' (https://www.youtube.com/watch?v=' + data.media.cid + ') played by ' + data.currentDJ.username + ' (ID: ' + data.currentDJ.id + ')';
