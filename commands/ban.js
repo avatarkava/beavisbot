@@ -1,7 +1,6 @@
 exports.names = ['ban', 'unban'];
 exports.hidden = true;
 exports.enabled = true;
-exports.matchStart = true;
 exports.cdAll = 10;
 exports.cdUser = 10;
 exports.cdStaff = 10;
@@ -66,20 +65,5 @@ exports.handler = function (data) {
         }
     });
 
-    // @TODO - Add Karmas (this may be better in bot.js where it isn't dependent on .command)
-    //                    var userData = {
-    //                        type: 'ban',
-    //                        details: 'Banned for ' + duration + ' by ' + data.from.username,
-    //                        user_id: row.id,
-    //                        mod_user_id: data.from.id
-    //                    };
-    //                    Karma.create(userData);
-    //                    var userData = {
-    //                        type: 'unban',
-    //                        details: 'Unbanned by ' + data.from.username,
-    //                        user_id: row.id,
-    //                        mod_user_id: data.from.id
-    //                    };
-    //                    Karma.create(userData);
 
 };

@@ -27,6 +27,16 @@ module.exports = function(bot) {
             }
             console.log(message);
             sendToSlack(message);
+
+            getDbUserFromUsername(data.m, function (modUser) {
+                var userData = {
+                    type: 'ban',
+                    details: 'Banned for ' + duration + ' by ' + data.m,
+                    user_id: dbUser.id,
+                    mod_user_id: modUser.id
+                };
+                models.Karma.create(userData);
+            });
         });
 
     });

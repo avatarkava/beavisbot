@@ -1,7 +1,6 @@
 exports.names = ['theme'];
 exports.hidden = false;
 exports.enabled = true;
-exports.matchStart = true;
 exports.cdAll = 10;
 exports.cdUser = 30;
 exports.cdStaff = 30;

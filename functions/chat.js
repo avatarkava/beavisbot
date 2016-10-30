@@ -44,7 +44,7 @@ module.exports = function () {
                 var found = false;
                 for (i = 0; i < cmd.names.length; i++) {
                     if (!found) {
-                        found = (cmd.names[i] == data.message.toLowerCase() || (cmd.matchStart && data.message.toLowerCase().indexOf(cmd.names[i]) == 0));
+                        found = (cmd.names[i] == _.first(data.message.toLowerCase().split(' ')));
                     }
                 }
                 return found;

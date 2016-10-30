@@ -320,8 +320,8 @@ module.exports = function (bot) {
                         if (row.is_banned) {
                             console.log('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a blacklisted song: ' + data.media.name + ' (id: ' + data.media.id + ')');
                             var message = 'Sorry @' + data.currentDJ.username + ', this video has been blacklisted in our song database.';
-                            if (row.message) {
-                                message += ' (' + row.message + ')';
+                            if (row.banned_reason) {
+                                message += ' (' + row.banned_reason + ')';
                             }
                             bot.sendChat(message);
                             bot.moderateForceSkip();
@@ -330,10 +330,27 @@ module.exports = function (bot) {
                                     type: 'skip',
                                     details: 'Skipped for playing a blacklisted song: ' + data.media.name + ' (id: ' + data.media.id + ')',
                                     user_id: dbuser.id,
-                                    mod_user_id: botUser.id
+                                    mod_user_id: botUser.db.id
                                 };
                                 models.Karma.create(userData);
                             });
+                        } else if (row.release_date != null && config.queue.minSongReleaseDate != null && config.queue.maxSongReleaseDate != null) {
+                            if (moment(row.release_date).isBefore(config.queue.minSongReleaseDate) || moment(row.release_date).isAfter(config.queue.maxSongReleaseDate)) {
+                                var releaseYear = moment(row.release_date).format("Y");
+                                console.log('[SKIP] Skipped ' + data.currentDJ.username + ' spinning an out-of-range song from ' + releaseYear + ': ' + data.media.name + ' (id: ' + data.media.id + ')');
+                                var message = 'Sorry @' + data.currentDJ.username + ', this song is out of range for the current theme (' + releaseYear + ').';
+                                bot.sendChat(message);
+                                bot.moderateForceSkip();
+                                getDbUserFromSiteUser(data.currentDJ, function (dbuser) {
+                                    var userData = {
+                                        type: 'skip',
+                                        details: 'Skipped for playing an out-of-range song: ' + data.media.name + ' (id: ' + data.media.id + ')',
+                                        user_id: dbuser.id,
+                                        mod_user_id: botUser.db.id
+                                    };
+                                    models.Karma.create(userData);
+                                });
+                            }
                         }
 
                     }

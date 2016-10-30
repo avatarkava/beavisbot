@@ -1,7 +1,6 @@
 exports.names = ['callmod'];
 exports.hidden = true;
 exports.enabled = true;
-exports.matchStart = true;
 exports.cdAll = 300;
 exports.cdUser = 300;
 exports.cdStaff = 180;

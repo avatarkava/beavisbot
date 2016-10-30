@@ -1,7 +1,6 @@
 exports.names = ['gift'];
 exports.hidden = false;
 exports.enabled = true;
-exports.matchStart = true;
 exports.cdAll = 10;
 exports.cdUser = 10;
 exports.cdStaff = 10;

@@ -1,7 +1,6 @@
 exports.names = ['event', 'calendar'];
 exports.hidden = false;
 exports.enabled = true;
-exports.matchStart = true;
 exports.cdAll = 30;
 exports.cdUser = 30;
 exports.cdStaff = 30;

@@ -1,7 +1,6 @@
 exports.names = ['quake'];
 exports.hidden = true;
 exports.enabled = true;
-exports.matchStart = false;
 exports.cdAll = 30;
 exports.cdUser = 30;
 exports.cdStaff = 30;

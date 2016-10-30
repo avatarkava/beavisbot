@@ -1,7 +1,6 @@
 exports.names = ['fixsong'];
 exports.hidden = true;
 exports.enabled = false;
-exports.matchStart = true;
 exports.cdAll = 30;
 exports.cdUser = 30;
 exports.cdStaff = 30;

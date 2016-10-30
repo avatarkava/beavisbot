@@ -1,7 +1,6 @@
 exports.names = ['deli'];
 exports.hidden = true;
 exports.enabled = true;
-exports.matchStart = false;
 exports.cdAll = 10;
 exports.cdUser = 30;
 exports.cdStaff = 30;

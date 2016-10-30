@@ -1,5 +1,36 @@
 module.exports = function (bot) {
 
+    blacklistSongById = function (songid, from) {
+        models.Play.findOne({
+            include: [{
+                model: models.Song,
+                where: {$and: [{site: config.site}, {host_id: songid}]}
+            }, models.User],
+            order: [['created_at', 'DESC']]
+        }).then(function (row) {
+            if (!row) {
+                bot.sendChat('I have not seen a song with id `' + songid + '` played in this room!');
+            } else {
+                var userData = {
+                    type: 'blacklist',
+                    details: 'Blacklisted ' + row.Song.name + ' (spun by ' + row.User.username + ')',
+                    user_id: row.User.id,
+                    mod_user_id: from.db.id
+                };
+                models.Karma.create(userData);
+                models.Song.update({is_banned: 1}, {where: {host_id: songid}});
+                bot.sendChat("The song \"" + row.Song.name + "\" has been blacklisted.");
+                message = '[BLACKLIST] ' + from.username + ' blacklisted ' + row.Song.name + ' (ID:' + row.Song.host_id + ')';
+                console.log(message);
+                sendToSlack(message);
+            }
+        });
+    };
+
+    monitorDJList = function () {
+
+    };
+
     removeIfDownvoting = function (mehUsername) {
 
         var mehWaitList = bot.getWaitList();
@@ -25,8 +56,4 @@ module.exports = function (bot) {
             });
         }
     };
-
-    monitorDJList = function () {
-
-    }
 };

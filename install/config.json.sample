@@ -20,7 +20,13 @@
     "echoNest": "###",
     "lastFm": "lastFmApiKey",
     "lastFm_secret": "lastfmSecretKey",
-    "wordnik": "wordnikApiKey"
+    "wordnik": "wordnikApiKey",
+    "youtube": {
+        "api_key": "youtubeApiKey",
+        "client_id": "clientid.apps.googleusercontent.com",
+        "client_secret": "clientSecret"
+    }
+
   },
   "slack": {
     "webhook_url": "https://xxxxxx.slack.com/services/hooks/incoming-webhook?token=xxxxxxxxxxx",
@@ -55,6 +61,8 @@
     "activateCycleAtQueueLength": 4,
     "deactivateCycleAtQueueLength": 5,
     "maxSongLengthSeconds": 420,
+    "minSongReleaseDate": "1900-01-01",
+    "maxSongReleaseDate": "2099-12-31",
     "prohibitDownvoteInQueue": false,
     "skipStuckSongs": true,
     "upvoteSongs": "ALL"

@@ -1,7 +1,6 @@
 exports.names = ['help', 'support'];
 exports.hidden = false;
 exports.enabled = true;
-exports.matchStart = true;
 exports.cdAll = 60;
 exports.cdUser = 60;
 exports.cdStaff = 30;
