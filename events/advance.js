@@ -288,9 +288,14 @@ module.exports = function (bot) {
                 bot.sendChat('@' + idleDJsList + ' ' + config.responses.activeDJReminder);
             }
 
+            var message = '';
+            var logMessage = '';
+
             // Check if the song is too long for room settings.  Then check to see if it's blacklisted
             if (config.queue.maxSongLengthSecs > 0 && data.media.duration > config.queue.maxSongLengthSecs) {
-                console.log('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a song of ' + data.media.duration + ' seconds');
+                logMessage = '[SKIP] Skipped ' + data.currentDJ.username + ' spinning a song of ' + data.media.duration + ' seconds';
+                console.log(logMessage);
+                sendToSlack(logMessage);
                 var maxLengthMins = Math.floor(config.queue.maxSongLengthSecs / 60);
                 var maxLengthSecs = config.queue.maxSongLengthSecs % 60;
                 if (maxLengthSecs < 10) {
@@ -318,11 +323,14 @@ module.exports = function (bot) {
                 }).then(function (row) {
                     if (row !== null) {
                         if (row.is_banned) {
-                            console.log('[SKIP] Skipped ' + data.currentDJ.username + ' spinning a blacklisted song: ' + data.media.name + ' (id: ' + data.media.id + ')');
-                            var message = 'Sorry @' + data.currentDJ.username + ', this video has been blacklisted in our song database.';
+                            logMessage = '[SKIP] Skipped ' + data.currentDJ.username + ' spinning a blacklisted song: ' + data.media.name + ' (id: ' + data.media.id + ')';
+                            message = 'Sorry @' + data.currentDJ.username + ', this video has been blacklisted in our song database.';
                             if (row.banned_reason) {
                                 message += ' (' + row.banned_reason + ')';
+                                logMessage += ' (' + row.banned_reason + ')';
                             }
+                            console.log(logMessage);
+                            sendToSlack(logMessage);
                             bot.sendChat(message);
                             bot.moderateForceSkip();
                             getDbUserFromSiteUser(data.currentDJ, function (dbuser) {
@@ -337,8 +345,10 @@ module.exports = function (bot) {
                         } else if (row.release_date != null && config.queue.minSongReleaseDate != null && config.queue.maxSongReleaseDate != null) {
                             if (moment(row.release_date).isBefore(config.queue.minSongReleaseDate) || moment(row.release_date).isAfter(config.queue.maxSongReleaseDate)) {
                                 var releaseYear = moment(row.release_date).format("Y");
-                                console.log('[SKIP] Skipped ' + data.currentDJ.username + ' spinning an out-of-range song from ' + releaseYear + ': ' + data.media.name + ' (id: ' + data.media.id + ')');
-                                var message = 'Sorry @' + data.currentDJ.username + ', this song is out of range for the current theme (' + releaseYear + ').';
+                                logMessage = '[SKIP] Skipped ' + data.currentDJ.username + ' spinning an out-of-range song from ' + releaseYear + ': ' + data.media.name + ' (id: ' + data.media.id + ')'
+                                message = 'Sorry @' + data.currentDJ.username + ', this song is out of range for the current theme (' + releaseYear + ').';
+                                console.log(logMessage);
+                                sendToSlack(logMessage);
                                 bot.sendChat(message);
                                 bot.moderateForceSkip();
                                 getDbUserFromSiteUser(data.currentDJ, function (dbuser) {
