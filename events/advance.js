@@ -110,10 +110,12 @@ module.exports = function (bot) {
             where: {site: config.site, host: data.media.format, host_id: data.media.cid},
             defaults: songData
         }).spread(function (song) {
-                if (data.media.format == 1) {
+                if (data.media.duration == 0) {
+                    console.log('[ZEROLENGTH] Song was advanced by the site because it reported a duration of 0');
+                    bot.sendChat('/me @' + data.currentDJ.username + ', this song was reported as 0:00 long. Please check your playlist or try .zerolength for more info.');
+                }
+                else if (data.media.format == 1) {
                     song.permalink = 'https://youtu.be/' + data.media.cid;
-                    song.updateAttributes(songData);
-                    writeRoomState(song.permalink);
 
                     if (config.apiKeys.youtube.client_id !== undefined) {
                         YouTube.videos.list({
@@ -175,8 +177,6 @@ module.exports = function (bot) {
                 } else if (data.media.format == 2) {
                     soundcloud_get_track(data.media.cid, function (json_data) {
                         song.permalink = json_data.permalink_url;
-                        song.updateAttributes(songData);
-                        writeRoomState(song.permalink);
 
                         if (!json_data.streamable) {
                             console.log('[SKIP] Song was skipped because it is not available or embeddable');
@@ -185,6 +185,9 @@ module.exports = function (bot) {
                         }
                     });
                 }
+
+                song.updateAttributes(songData);
+                writeRoomState(song.permalink);
             }
         ).catch(function (err) {
             console.log('[ERROR]', err);
