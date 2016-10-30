@@ -47,6 +47,11 @@ exports.handler = function (data) {
                 addToBlacklist = true;
                 banUser = false;
                 break;
+            case 'skipnsfw':
+                reason = 'NSFW/Nudity';
+                addToBlacklist = true;
+                banUser = false;
+                break;
             case 'skiptroll':
                 reason = 'Troll/Not Music';
                 addToBlacklist = true;
