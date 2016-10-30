@@ -76,6 +76,7 @@ exports.handler = function (data) {
             message = '[BLACKLIST] ' + data.from.username + ' blacklisted ' + media.name + ' (ID:' + media.cid + ')';
         } else if (addToBlacklist) {
             blacklistSongById(notes, data.from);
+            return;
         } else if (command == 'skipoor' && params.length > 0) {
             if (notes.match(/\d{4}$/)) {
                 var releaseDate = notes + '-01-01';
