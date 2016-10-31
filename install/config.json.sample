@@ -65,7 +65,11 @@
     "maxSongReleaseDate": "2099-12-31",
     "prohibitDownvoteInQueue": false,
     "skipStuckSongs": true,
-    "upvoteSongs": "ALL"
+    "upvoteSongs": "ALL",
+    "bannedChannels": {
+          "youtube": [
+          ]
+        }
   }
   "autoSuggestCorrections": false,
   "chatRandomnessPercentage": 5,
