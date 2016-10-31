@@ -7,7 +7,7 @@ exports.cdStaff = 60;
 exports.minRole = PERMISSIONS.MANAGER;
 exports.handler = function (data) {
 
-    config = require(dpath.resolve(__dirname, 'config.json'));
+    config = require(dpath.resolve(__dirname, '../config.json'));
 
     loadEvents(bot);
     loadCommands(bot);
