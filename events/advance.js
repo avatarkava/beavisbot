@@ -143,11 +143,7 @@ module.exports = function (bot) {
                                     }
 
                                     //@FIXME - Move this to a databased instance
-                                    bannedChannels = [
-                                        'UC90G3mvOacBC2oAC25BUrNw',
-                                        'UCvPkfnQuDr6sXzRw7K5x3nA'
-                                    ];
-                                    if (_.contains(bannedChannels, item.snippet.channelId)) {
+                                    if (_.contains(config.queue.bannedChannels.youtube, item.snippet.channelId)) {
                                         banned = true;
                                     }
                                 }
@@ -157,6 +153,9 @@ module.exports = function (bot) {
                                     bot.moderateForceSkip();
                                     bot.moderateBanUser(data.currentDJ.id, 0, PlugAPI.BAN.PERMA);
                                     bot.sendChat('NOOOOOOOOOPE.');
+                                    var message = '[SKIPBAN] Song ' + song.permalink + ' skipped and ' + data.currentDJ.username + '(ID: ' + data.currentDJ.id + ') banned because they used a song from a blacklisted channel.';
+                                    console.log(message);
+                                    sendToSlack(message);
                                 } else if (!available) {
                                     var message = '[SKIP] Song was skipped because it is not available or embeddable';
                                     console.log(message);
@@ -164,7 +163,7 @@ module.exports = function (bot) {
                                     bot.sendChat('/me @' + data.currentDJ.username + ', skipping this video because it is not available or embeddable. Please update your playlist!');
                                     bot.moderateForceSkip();
                                 } else if (lowViewCount) {
-                                    var message = '[YOUTUBE] The current video played has very few views. You may want to check it for :trollface:... ' + data.media.name + ' (https://www.youtube.com/watch?v=' + data.media.cid + ') played by ' + data.currentDJ.username + ' (ID: ' + data.currentDJ.id + ')';
+                                    var message = '[YOUTUBE] The current video played has very few views. You may want to check it for :trollface:... ' + data.media.name + ' (' + song.permalink + ') played by ' + data.currentDJ.username + ' (ID: ' + data.currentDJ.id + ')';
                                     console.log(message);
                                     sendToSlack(message);
 
