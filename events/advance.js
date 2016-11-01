@@ -149,10 +149,9 @@ module.exports = function (bot) {
                                 }
 
                                 if (banned) {
-                                    models.Song.update({is_banned: 1}, {where: {host_id: data.media.cid}});
-                                    bot.moderateForceSkip();
                                     bot.moderateBanUser(data.currentDJ.id, 0, PlugAPI.BAN.PERMA);
-                                    bot.sendChat('NOOOOOOOOOPE.');
+                                    bot.sendChat('NOOOOOOOOOPE. https://media.giphy.com/media/9wBub5vhSsTDi/giphy.gif');
+                                    models.Song.update({is_banned: 1}, {where: {host_id: data.media.cid}});
                                     var message = '[SKIPBAN] Song ' + song.permalink + ' skipped and ' + data.currentDJ.username + '(ID: ' + data.currentDJ.id + ') banned because they used a song from a blacklisted channel.';
                                     console.log(message);
                                     sendToSlack(message);

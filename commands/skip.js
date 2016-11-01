@@ -101,10 +101,10 @@ exports.handler = function (data) {
             sendToSlack(message);
         }
 
-        bot.moderateForceSkip();
-
         if (banUser) {
             bot.moderateBanUser(dj.id, PlugAPI.BAN_REASON.OFFENSIVE_MEDIA, PlugAPI.BAN.PERMA);
+        } else {
+            bot.moderateForceSkip();
         }
 
         getDbUserFromSiteUser(dj, function (row) {
