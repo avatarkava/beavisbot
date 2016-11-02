@@ -2,9 +2,12 @@ module.exports = function () {
 
     chatResponse = function (data) {
 
-        var input = data.message.split('@');
+        var input = data.message.split('@', 1);
         var command = input[0].trim();
-        var target = input[1].trim();
+        var target = null;
+        if(input.length > 1) {
+            target = input[1].trim();
+        }
 
         models.EventResponse.find({
                 where: {event_type: 'chat', pattern: command, is_active: true},
@@ -14,7 +17,7 @@ module.exports = function () {
                 if (row === null) {
                     return;
                 }
-                else if (target != '') {
+                else if (target != null) {
                     var targetedResponse = row.response.replace('{sender}', data.from.username);
 
                     if (row.response.startsWith('/me')) {
