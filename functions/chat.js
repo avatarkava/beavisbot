@@ -18,7 +18,7 @@ module.exports = function () {
                     return;
                 }
                 else if (target != null) {
-                    if (S(row.response).startsWith('/me').s) {
+                    if (row.response.indexOf('/me') === 0) {
                         row.response = '/me @' + target + ' ' + S(row.response).chompLeft('/me').s;
                     }
                     else {
