@@ -12,7 +12,7 @@ exports.handler = function (data) {
     var api_key = "dc6zaTOxFJmzC"; // public beta key
     var rating = "pg"; // PG gifs
     var tags = null;
-    var limit = 5; // How many to randomly choose from
+    var limit = 20; // How many to randomly choose from
 
     if (params.length == 0) {
         //@TODO - Add usage

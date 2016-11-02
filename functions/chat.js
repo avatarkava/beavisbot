@@ -1,15 +1,22 @@
 module.exports = function () {
 
     chatResponse = function (data) {
+
+        var input = data.message.split('@');
+        var command = input[0].trim();
+        var target = input[1].trim();
+
         models.EventResponse.find({
-                where: {event_type: 'chat', pattern: data.message, is_active: true},
+                where: {event_type: 'chat', pattern: command, is_active: true},
                 order: 'RAND()'
             })
             .then(function (row) {
                 if (row === null) {
                     return;
                 }
-                else {
+                else if (target != '') {
+                    bot.sendChat('@' + target + ' ' + row.response.replace('{sender}', data.from.username));
+                } else {
                     bot.sendChat(row.response.replace('{sender}', data.from.username));
                 }
 
