@@ -2,7 +2,7 @@ module.exports = function () {
 
     chatResponse = function (data) {
 
-        var input = data.message.split('@', 1);
+        var input = data.message.split('@', 2);
         var command = input[0].trim();
         var target = null;
         if(input.length > 1) {
