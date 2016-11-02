@@ -168,4 +168,53 @@ module.exports = function () {
             }
         }
     };
+
+    getGiphy = function (type, api_key, rating, tags, limit, returnData) {
+        var reqparams = {format: 'json', api_key: api_key, "rating": rating, "limit": limit};
+        if (type == 'giphyt') {
+            endpoint = '/v1/gifs/translate';
+            search_param = 's';
+        } else if (type == 'giphys') {
+            endpoint = '/v1/stickers/random';
+            search_param = 'tag';
+            tags = tags.replace(/\+/g, "-");
+        } else {
+            endpoint = '/v1/gifs/search';
+            search_param = 'q';
+        }
+
+        if (tags !== undefined) {
+            reqparams[search_param] = tags;
+        }
+
+        request({
+            url: 'https://api.giphy.com' + endpoint + '?',
+            qs: reqparams,
+            method: 'GET'
+        }, function (error, response, body) {
+            if (error) {
+                console.log(error);
+                returnData(null);
+            } else {
+                try {
+                    var data = JSON.parse(body);
+
+                    if (config.verboseLogging) {
+                        data.calloutendpoint = endpoint;
+                        data.calloutqs = reqparams;
+                        console.log('[GIPHY] ', JSON.stringify(data, null, 2));
+                    }
+                    var randomNumber = _.random(0, data.data.length);
+                    if (type == 'giphys') {
+                        returnData(data.data[randomNumber].image_url);
+                    } else {
+                        returnData(data.data[randomNumber].images.fixed_height.url);
+                    }
+                }
+                catch (error) {
+                    returnData(null);
+                }
+            }
+        });
+    };
 }

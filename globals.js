@@ -7,12 +7,13 @@ module.exports = function (options) {
     fs = require('fs');
     moment = require('moment');
     dpath = require('path');
-    //PlugAPI = require('plugapi');
     Promise = require('bluebird');
+    reload = require('require-reload')(require);
     request = require('request');
     S = require('string');
     Sequelize = require('sequelize');
     YouTube = require('youtube-api');
+
 
     config = options.config;
     bot = options.bot;

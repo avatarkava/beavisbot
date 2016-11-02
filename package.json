@@ -26,16 +26,18 @@
     "plugapi": "git://github.com/plugCubed/plugAPI.git",
     "mariasql": "*",
     "moment": "*",
-    "node-datatable": "git://github.com/jpravetz/node-datatable.git",
+    "mysql": "*",
     "path": "*",
     "request": "*",
+    "require-reload": "*",
     "sequelize": "*",
-    "sqlite3": "*",
     "string": "*",
     "underscore": "git://github.com/jashkenas/underscore.git",
-    "youtube-node": "*"
+    "youtube-api": "*"
   },
   "devDependencies": {
+    "node-datatable": "git://github.com/jpravetz/node-datatable.git",
+    "sqlite3": "*"
   },
   "optionalDependencies": {}
 }

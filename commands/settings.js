@@ -9,14 +9,14 @@ exports.handler = function (data) {
 
     var input = data.message.split(' ');
     // Settings to support direct access to
-    supported = ['activeDJTimeoutMins',
-        'minActiveDJQueueLength',
+    supported = ['djIdleAfterMins',
+        'djIdleMinQueueLengthToEnforce',
+        'djCycleMaxQueueLength',
         'maxSongLengthSecs',
-        'chatRandomnessPercentage',
-        'quietMode',
-        'upvoteSongs',
-        'verboseLogging',
-        'welcomeUsers'
+        'minSongReleaseDate',
+        'maxSongReleaseDate',
+        'prohibitDownvoteInQueue',
+        'quietMode'
     ];
 
     var settings = [];
@@ -26,6 +26,11 @@ exports.handler = function (data) {
         for (var key in config) {
             if (config.hasOwnProperty(key) && _.contains(supported, key)) {
                 chatMessage += key + ': ' + config[key] + ', ';
+            }
+        }
+        for (var key in config.queue) {
+            if (config.queue.hasOwnProperty(key) && _.contains(supported, key)) {
+                chatMessage += key + ': ' + config.queue[key] + ', ';
             }
         }
         bot.sendChat('Current settings: ' + chatMessage);

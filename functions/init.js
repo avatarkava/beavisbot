@@ -4,12 +4,14 @@ module.exports = function (bot) {
 
     loadCommands = function (bot) {
 
+        commands.length = 0;
+
         // Load commands
         try {
             var dir = dpath.resolve(__dirname, '../commands') + '/';
             fs.readdirSync(dir).forEach(function (file) {
                 if (file.indexOf(".js") > -1) {
-                    var command = require(dir + file);
+                    var command = reload(dir + file);
 
                     command.lastRun = 0;
                     command.lastRunUsers = {};
@@ -31,7 +33,7 @@ module.exports = function (bot) {
             var dir = dpath.resolve(__dirname, '../events') + '/';
             fs.readdirSync(dir).forEach(function (file) {
                 if (file.indexOf(".js") > -1) {
-                    require(dir + file)(bot);
+                    reload(dir + file)(bot);
                 }
             });
             console.log("[INIT] Events loaded...");
@@ -45,7 +47,7 @@ module.exports = function (bot) {
             var dir = dpath.resolve(__dirname, '../extensions') + '/';
             fs.readdirSync(dir).forEach(function (file) {
                 if (file.indexOf(".js") > -1) {
-                    require(dir + file)(bot);
+                    reload(dir + file)(bot);
                 }
             });
             console.log("[INIT] Extensions loaded...");

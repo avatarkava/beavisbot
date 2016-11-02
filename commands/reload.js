@@ -7,10 +7,13 @@ exports.cdStaff = 60;
 exports.minRole = PERMISSIONS.MANAGER;
 exports.handler = function (data) {
 
-    config = require(dpath.resolve(__dirname, '../config.json'));
+    config = reload(dpath.resolve(__dirname, '../config.json'));
 
-    loadEvents(bot);
+    // @TODO - Find a way to reload the events (bot.on bindings need to be purged and reset)
+    // loadEvents(bot);
+
     loadCommands(bot);
     loadExtensions(bot);
+    bot.sendChat('/me :robot_face: Commands and config reloaded, @' + data.from.username + '!');
 };
 

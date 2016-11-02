@@ -3,7 +3,7 @@ exports.hidden = false;
 exports.enabled = true;
 exports.cdAll = 60;
 exports.cdUser = 60;
-exports.cdStaff = 30;
+exports.cdStaff = 10;
 exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
 
