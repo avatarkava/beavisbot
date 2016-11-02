@@ -5,7 +5,7 @@ module.exports = function () {
         var input = data.message.split('@', 2);
         var command = input[0].trim();
         var target = null;
-        if(input.length > 1) {
+        if (input.length > 1) {
             target = input[1].trim();
         }
 
@@ -18,17 +18,15 @@ module.exports = function () {
                     return;
                 }
                 else if (target != null) {
-                    var targetedResponse = row.response.replace('{sender}', data.from.username);
-
-                    if (row.response.startsWith('/me')) {
-                        targetedResponse = row.response.replace('/me', '/me @' + target + ' ' + targetedResponse);
-                    } else {
-                        targetedResponse = '@' + target + ' ' + targetedResponse;
+                    if (S(row.response).startsWith('/me').s) {
+                        row.response = '/me @' + target + ' ' + S(row.response).chompLeft('/me').s;
                     }
-                    bot.sendChat(targetedResponse);
-                } else {
-                    bot.sendChat(row.response.replace('{sender}', data.from.username));
+                    else {
+                        row.response = '@' + target + ' ' + row.response;
+                    }
                 }
+
+                bot.sendChat(row.response.replace('{sender}', data.from.username));
 
             });
     };
