@@ -15,7 +15,14 @@ module.exports = function () {
                     return;
                 }
                 else if (target != '') {
-                    bot.sendChat('@' + target + ' ' + row.response.replace('{sender}', data.from.username));
+                    var targetedResponse = row.response.replace('{sender}', data.from.username);
+
+                    if (row.response.startsWith('/me')) {
+                        targetedResponse = row.response.replace('/me', '/me @' + target + ' ' + targetedResponse);
+                    } else {
+                        targetedResponse = '@' + target + ' ' + targetedResponse;
+                    }
+                    bot.sendChat(targetedResponse);
                 } else {
                     bot.sendChat(row.response.replace('{sender}', data.from.username));
                 }
