@@ -7,7 +7,7 @@ exports.cdStaff = 30;
 exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
 
-    function getGifURL(api_key, func, tags) {
+    function getGifURL(api_key, rating, tags, func) {
         var reqparams = {format: 'json', api_key: api_key, "rating": rating, "limit": 1};
         if (command == 'giphyt') {
             endpoint = '/v1/gifs/translate';
@@ -68,7 +68,7 @@ exports.handler = function (data) {
 
     tag = params.join('-').trim().replace(/ /g, "+");
 
-    getGifURL(api_key, function (imageurl) {
+    getGifURL(api_key, rating, tag, function (imageurl) {
         if (typeof imageurl !== 'undefined') {
             bot.sendChat(imageurl);
         } else {
