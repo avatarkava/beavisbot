@@ -101,7 +101,7 @@ module.exports = function (bot) {
                         bot.moderateBanUser(data.currentDJ.id, PlugAPI.BAN_REASON.OFFENSIVE_MEDIA, PlugAPI.BAN.PERMA);
                         bot.sendChat('NOOOOOOOOOPE. https://media.giphy.com/media/9wBub5vhSsTDi/giphy.gif');
                         models.Song.update({is_banned: 1}, {where: {host_id: data.media.cid}});
-                        var message = '[SKIPBAN] Song ' + song.permalink + ' skipped and ' + data.currentDJ.username + '(ID: ' + data.currentDJ.id + ') banned because they used a song from a blacklisted channel.';
+                        var message = '[SKIPBAN] Song https://youtu.be/' + data.media.cid + ' skipped and ' + data.currentDJ.username + '(ID: ' + data.currentDJ.id + ') banned because they used a song from a blacklisted channel.';
                         console.log(message);
                         sendToSlack(message);
                     } else if (!available) {
@@ -111,7 +111,7 @@ module.exports = function (bot) {
                         bot.sendChat('/me @' + data.currentDJ.username + ', skipping this video because it is not available or embeddable. Please update your playlist!');
                         bot.moderateForceSkip();
                     } else if (lowViewCount) {
-                        var message = '[YOUTUBE] The current video played has very few views. You may want to check it for :trollface:... ' + data.media.name + ' (' + song.permalink + ') played by ' + data.currentDJ.username + ' (ID: ' + data.currentDJ.id + ')';
+                        var message = '[YOUTUBE] The current video played has very few views. You may want to check it for :trollface:... ' + data.media.name + ' (https://youtu.be/' + data.media.cid + ') played by ' + data.currentDJ.username + ' (ID: ' + data.currentDJ.id + ')';
                         console.log(message);
                         sendToSlack(message);
                     }
