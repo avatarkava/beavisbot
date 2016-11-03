@@ -54,7 +54,7 @@ exports.handler = function (data) {
             switch (command) {
                 case 'ban':
                     console.log('[BAN] ' + usernameFormatted + ' attempting ban for ' + duration + ' (' + apiDuration + ') by ' + data.from.username);
-                    bot.moderateBanUser(row.site_id, 0, apiDuration);
+                    bot.moderateBanUser(row.site_id, PlugAPI.BAN_REASON.OFFENSIVE_MEDIA, apiDuration);
                     break;
                 case 'unban':
                     bot.moderateUnbanUser(row.site_id, function () {
