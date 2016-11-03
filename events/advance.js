@@ -245,6 +245,8 @@ module.exports = function (bot) {
             }
         });
 
+        idleWaitListProcess();
+
 
     });
 };
