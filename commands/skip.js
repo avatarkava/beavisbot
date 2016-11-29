@@ -72,7 +72,7 @@ exports.handler = function (data) {
         // Blacklist this song
         if (addToBlacklist && params.length == 0) {
             models.Song.update({is_banned: 1, banned_reason: reason}, {where: {host_id: media.cid}});
-            bot.sendChat("The song \"" + media.name + "\" has been blacklisted.");
+            bot.sendChat("@" + dj.username + ", the song \"" + media.name + "\" has been blacklisted.");
             message = '[BLACKLIST] ' + data.from.username + ' blacklisted ' + media.name + ' (ID:' + media.cid + ')';
         } else if (addToBlacklist) {
             blacklistSongById(notes, data.from);
@@ -82,7 +82,7 @@ exports.handler = function (data) {
                 var releaseDate = notes + '-01-01';
                 models.Song.update({release_date: releaseDate}, {where: {host_id: media.cid}});
             }
-            bot.sendChat("The song \"" + media.name + "\" has been marked out of range (released in " + notes + ").");
+            bot.sendChat("@" + dj.username + ", the song \"" + media.name + "\" has been marked out of range (released in " + notes + ").");
             message = '[SKIP] ' + data.from.username + ' skipped a song.';
 
         } else {
