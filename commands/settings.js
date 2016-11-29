@@ -41,10 +41,10 @@ exports.handler = function (data) {
 
         if (_.contains(supported, key)) {
             config[key] = value;
-            bot.sendChat('/me set: ' + key + ' = ' + value + ' @djs');
+            bot.sendChat('set: ' + key + ' = ' + value + ' @djs');
         }
         else {
-            bot.sendChat('/me unknown setting: ' + key);
+            bot.sendChat('unknown setting: ' + key);
         }
     }
 

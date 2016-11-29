@@ -14,6 +14,6 @@ exports.handler = function (data) {
 
     loadCommands(bot);
     loadExtensions(bot);
-    bot.sendChat('/me :robot_face: Commands and config reloaded, @' + data.from.username + '!');
+    bot.sendChat(':robot_face: Commands and config reloaded, @' + data.from.username + '!');
 };
 

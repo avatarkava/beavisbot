@@ -19,7 +19,7 @@ exports.handler = function (data) {
         var newPosition = position + spots;
         bot.moderateMoveDJ(data.from.id, newPosition);
         console.log('[MOVE]', 'Moving ' + data.from.username + ' to position: ' + newPosition + ' (requested delay)');
-        bot.sendChat('/me Moved you down the wait list @' + data.from.username + '. You can request another delay after 30 minutes.');
+        bot.sendChat('Moved you down the wait list @' + data.from.username + '. You can request another delay after 30 minutes.');
     }
 
 }

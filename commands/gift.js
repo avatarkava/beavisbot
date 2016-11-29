@@ -13,7 +13,7 @@ exports.handler = function (data) {
     var amount = parseInt(_.last(params));
 
     if (!amount || isNaN(amount) || amount < 1 || !username) {
-        bot.sendChat('/me usage: .gift @username 50 (gifts 50 points)');
+        bot.sendChat('usage: .gift @username 50 (gifts 50 points)');
         return;
     }
 
@@ -21,7 +21,7 @@ exports.handler = function (data) {
     var user = findUserInList(bot.getUsers(), usernameFormatted);
 
     if (!user) {
-        bot.sendChat('/me user ' + username + ' was not found.');
+        bot.sendChat('user ' + username + ' was not found.');
     }
 
     getDbUserFromSiteUser(data.from, function (row) {

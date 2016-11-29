@@ -8,5 +8,5 @@ exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
     users = bot.getUsers();
     var randomNumber = _.random(1, users.length);
-    bot.sendChat("/me :bell: Now serving customer #" + randomNumber + " - hey there, " + users[(randomNumber - 1)].username + "!");
+    bot.sendChat(":bell: Now serving customer #" + randomNumber + " - hey there, " + users[(randomNumber - 1)].username + "!");
 };

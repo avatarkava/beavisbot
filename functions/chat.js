@@ -18,8 +18,9 @@ module.exports = function () {
                     return;
                 }
                 else if (target != null) {
+                    // Remove /me from the beginning of targeting since it won't alert someone
                     if (row.response.indexOf('/me') === 0) {
-                        row.response = '/me @' + target + ' ' + S(row.response).chompLeft('/me').s;
+                        row.response = '@' + target + ' ' + S(row.response).chompLeft('/me').s;
                     }
                     else {
                         row.response = '@' + target + ' ' + row.response;

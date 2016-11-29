@@ -49,7 +49,7 @@ exports.handler = function (data) {
 
     models.User.find({where: {username: usernameFormatted, site: config.site}}).then(function (row) {
         if (row === null) {
-            bot.sendChat('/me ' + usernameFormatted + ' was not found.');
+            bot.sendChat(usernameFormatted + ' was not found.');
         } else {
             switch (command) {
                 case 'ban':
@@ -58,7 +58,7 @@ exports.handler = function (data) {
                     break;
                 case 'unban':
                     bot.moderateUnbanUser(row.site_id, function () {
-                        bot.sendChat('/me unbanning ' + usernameFormatted + '. This can take a few moments...');
+                        bot.sendChat('unbanning ' + usernameFormatted + '. This can take a few moments...');
                     });
                     break;
             }

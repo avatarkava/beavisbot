@@ -101,7 +101,7 @@ module.exports = function (bot) {
                         models.Karma.create(userData);
 
                         setTimeout(function () {
-                            bot.sendChat('/me put @' + data.username + ' back in line (reconnected after ' + timeSince(dbUser.last_seen, true) + ') :thumbsup:')
+                            bot.sendChat('put @' + data.username + ' back in line (reconnected after ' + timeSince(dbUser.last_seen, true) + ') :thumbsup:')
                         }, 5000);
 
                     });

@@ -59,13 +59,13 @@ exports.handler = function (data) {
             debugData = bot.getWaitListPosition(parseInt(input[2]));
             break;
         default:
-            bot.sendChat('/me Command not supported.');
+            bot.sendChat('Command not supported.');
             return;
             break;
     }
 
     if (debugData !== null) {
-        bot.sendChat('/me Debugging data logged to the console, @' + data.from.username + '...');
+        bot.sendChat('Debugging data logged to the console, @' + data.from.username + '...');
         console.log('[DEBUG] ', data.message + ': ' + JSON.stringify(debugData, null, 2));
     } else {
         console.log('[DEBUG] ', data.message + ': null returned');

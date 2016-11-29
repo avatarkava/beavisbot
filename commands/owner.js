@@ -6,5 +6,5 @@ exports.cdUser = 30;
 exports.cdStaff = 10;
 exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
-    bot.sendChat('/me avatarkava is the author of beavisbot. Make bug reports and requests here, please: https://github.com/avatarkava/beavisbot/issues');
+    bot.sendChat('avatarkava is the author of beavisbot. Make bug reports and requests here, please: https://github.com/avatarkava/beavisbot/issues');
 };

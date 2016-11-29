@@ -21,7 +21,7 @@ exports.handler = function (data) {
             message = '[UNMUTE] ' + data.from.username + ' unmuted ' + usernameFormatted;
             console.log(message);
             sendToSlack(message);
-            bot.sendChat('/me ' + usernameFormatted + ' is now unmuted.');
+            bot.sendChat(usernameFormatted + ' is now unmuted.');
         } else {
             // @TODO - Make this variable
             var mute_duration = PlugAPI.MUTE.LONG;

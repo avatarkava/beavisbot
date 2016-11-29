@@ -13,7 +13,7 @@ exports.handler = function (data) {
     var user = findUserInList(bot.getUsers(), usernameFormatted);
     if (user) {
         if (user.songsInQueue == 0) {
-            bot.sendChat('/me ' + user.username + ' does not have any songs queued');
+            bot.sendChat(user.username + ' does not have any songs queued');
             return;
         }
         bot.moderateRemoveDJ(user.id);
@@ -37,7 +37,7 @@ exports.handler = function (data) {
 
     }
     else {
-        bot.sendChat('/me ' + usernameFormatted + ' not found in the room');
+        bot.sendChat(usernameFormatted + ' not found in the room');
     }
 
 };

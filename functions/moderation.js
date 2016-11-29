@@ -103,12 +103,12 @@ module.exports = function (bot) {
 
             if (moment.utc().isAfter(moment.utc(startupTimestamp).add(5, 'minutes'))) {
                 if (roomHasActiveStaff && (settings.rdjplus || settings.bouncerplus)) {
-                    bot.sendChat('/me Active @staff detected. Revoking temporary extra permissions @rdjs');
+                    bot.sendChat('Active @staff detected. Revoking temporary extra permissions @rdjs');
                     settings.rdjplus = false;
                     settings.bouncerplus = false;
                 }
                 else if (!roomHasActiveStaff && (!settings.rdjplus || !settings.bouncerplus)) {
-                    bot.sendChat('/me No active @staff detected. Granting Bouncers and @rdjs temporary extra permissions');
+                    bot.sendChat('No active @staff detected. Granting Bouncers and @rdjs temporary extra permissions');
                     settings.rdjplus = true;
                     settings.bouncerplus = true;
                 }
@@ -122,12 +122,12 @@ module.exports = function (bot) {
         if (waitListSize >= settings.djidleminqueue && settings.djidle == false) {
             config.queue.djIdleMinQueueLengthToEnforce = settings.djidleminqueue;
             settings.djidle = true;
-            bot.sendChat('/me Wait List at ' + waitListSize + ' @djs.  Idle timer enabled and cycle disabled');
+            bot.sendChat('Wait List at ' + waitListSize + ' @djs.  Idle timer enabled and cycle disabled');
             bot.changeDJCycle(false);
         } else if (waitListSize < settings.djidleminqueue && settings.djidle == true) {
             config.queue.djIdleMinQueueLengthToEnforce = 999;
             settings.djidle = false;
-            bot.sendChat('/me Wait List at ' + waitListSize + ' @djs.  Idle timer disabled and cycle enabled');
+            bot.sendChat('Wait List at ' + waitListSize + ' @djs.  Idle timer disabled and cycle enabled');
             bot.changeDJCycle(true);
         }
 

@@ -7,7 +7,7 @@ exports.cdStaff = 10;
 exports.minRole = PERMISSIONS.RDJ_PLUS;
 exports.handler = function (data) {
     var params = _.rest(data.message.split(' '), 1);
-    var ch = '/me ';
+    var ch = '';
     var lang = 'en';
 
     if (params.length >= 1) {

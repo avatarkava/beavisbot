@@ -40,7 +40,7 @@ exports.handler = function (data) {
 
     }
     else {
-        bot.sendChat('/me ' + usernameFormatted + ' not found in the room');
+        bot.sendChat(usernameFormatted + ' not found in the room');
     }
 
 };

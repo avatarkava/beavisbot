@@ -9,7 +9,7 @@ exports.handler = function (data) {
 
     var params = _.rest(data.message.split(' '), 1);
     if (params.length < 1) {
-        bot.sendChat('/me usage: ' + config.commandLiteral + 'lastseen username');
+        bot.sendChat('usage: ' + config.commandLiteral + 'lastseen username');
         return;
     }
 
@@ -22,10 +22,10 @@ exports.handler = function (data) {
         } else {
             var user = findUserInList(bot.getUsers(), usernameFormatted);
             if (user) {
-                bot.sendChat('/me ' + user.username + ' is in the room and was last active ' + timeSince(row.last_active));
+                bot.sendChat(user.username + ' is in the room and was last active ' + timeSince(row.last_active));
             }
             else {
-                bot.sendChat('/me ' + row.username + ' was last seen ' + timeSince(row.last_seen));
+                bot.sendChat(row.username + ' was last seen ' + timeSince(row.last_seen));
             }
         }
     });

@@ -41,11 +41,11 @@ module.exports = function (bot) {
             order: [['created_at', 'DESC']]
         }).then(function (row) {
             if (!row) {
-                bot.sendChat('/me This is the first time I have seen this video of "' + data.media.author + ' - ' + data.media.title + '"  played!');
+                bot.sendChat('This is the first time I have seen this video of "' + data.media.author + ' - ' + data.media.title + '"  played!');
             } else {
                 message = row.Song.name + ' • last played ' + timeSince(row.created_at) + ' by ' + row.User.username
                     + ' • ' + row.listeners + ' :ear: • ' + row.positive + ' :+1: • ' + row.grabs + ' :star: • ' + row.negative + ' :-1:';
-                bot.sendChat('/me ' + message);
+                bot.sendChat(message);
             }
         });
 
@@ -108,7 +108,7 @@ module.exports = function (bot) {
                         var message = '[SKIP] Song was skipped because it is not available or embeddable';
                         console.log(message);
                         sendToSlack(message);
-                        bot.sendChat('/me @' + data.currentDJ.username + ', skipping this video because it is not available or embeddable. Please update your playlist!');
+                        bot.sendChat('@' + data.currentDJ.username + ', skipping this video because it is not available or embeddable. Please update your playlist!');
                         bot.moderateForceSkip();
                     } else if (lowViewCount) {
                         var message = '[YOUTUBE] The current video played has very few views. You may want to check it for :trollface:... ' + data.media.name + ' (https://youtu.be/' + data.media.cid + ') played by ' + data.currentDJ.username + ' (ID: ' + data.currentDJ.id + ')';
@@ -200,7 +200,7 @@ module.exports = function (bot) {
                     });
                 } else if (data.media.duration == 0) {
                     console.log('[ZEROLENGTH] Song was advanced by the site because it reported a duration of 0');
-                    bot.sendChat('/me @' + data.currentDJ.username + ', this song was reported as 0:00 long. Please check your playlist or try .zerolength for more info.');
+                    bot.sendChat('@' + data.currentDJ.username + ', this song was reported as 0:00 long. Please check your playlist or try .zerolength for more info.');
                 } else if (data.media.format == 1) {
                     song.permalink = 'https://youtu.be/' + data.media.cid;
                 } else if (data.media.format == 2) {
@@ -209,7 +209,7 @@ module.exports = function (bot) {
 
                         if (!json_data.streamable) {
                             console.log('[SKIP] Song was skipped because it is not available or embeddable');
-                            bot.sendChat('/me Skipping this video because it is not available or embeddable.');
+                            bot.sendChat('Skipping this video because it is not available or embeddable.');
                             bot.moderateForceSkip();
                         }
                     });
