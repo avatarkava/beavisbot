@@ -3,49 +3,63 @@ exports.hidden = true;
 exports.enabled = true;
 exports.cdAll = 10;
 exports.cdUser = 10;
-exports.cdStaff = 10;
+exports.cdStaff = 5;
 exports.minRole = PERMISSIONS.BOUNCER_PLUS;
 exports.handler = function (data) {
 
     var input = data.message.split(' ');
-    // Settings to support direct access to
-    supported = ['djIdleAfterMins',
-        'djIdleMinQueueLengthToEnforce',
-        'djCycleMaxQueueLength',
-        'maxSongLengthSecs',
-        'minSongReleaseDate',
-        'maxSongReleaseDate',
-        'prohibitDownvoteInQueue',
-        'quietMode'
+    var chatMessage = '';
+    var result;
+
+    var translation = [
+        {configName: 'djIdleAfterMins', chatName: 'djidle', english: 'DJ Idle Seconds'},
+        {configName: 'djIdleMinQueueLengthToEnforce', chatName: 'minidlequeue', english: 'Min Idle Queue'},
+        {configName: 'djCycleMaxQueueLength', chatName: 'maxcyclequeue', english: 'Max Cycle Queue'},
+        {configName: 'maxSongLengthSecs', chatName: 'maxsonglength', english: 'Max Song Seconds'},
+        {configName: 'minSongReleaseDate', chatName: 'minreleasedate', english: 'Min Release Date '},
+        {configName: 'maxSongReleaseDate', chatName: 'maxreleasedate', english: 'Max Release Date'},
+        {configName: 'prohibitDownvoteInQueue', chatName: 'nomehsinqueue', english: 'No Mehs in Queue'},
+        {configName: 'quietMode', chatName: 'quietmode', english: 'Quiet Mode'},
+        {configName: 'verboseLogging', chatName: 'verboselogging', english: 'Verbose Logging'}
     ];
 
-    var settings = [];
-    var chatMessage = "";
-
     if (input.length < 3) {
-        for (var key in config) {
-            if (config.hasOwnProperty(key) && _.contains(supported, key)) {
-                chatMessage += key + ': ' + config[key] + ', ';
-            }
-        }
         for (var key in config.queue) {
-            if (config.queue.hasOwnProperty(key) && _.contains(supported, key)) {
-                chatMessage += key + ': ' + config.queue[key] + ', ';
+            result = _.findWhere(translation, {configName: key});
+            if (config.queue.hasOwnProperty(key) && result) {
+                chatMessage += result.chatName + ': ' + config.queue[key] + ', ';
             }
         }
-        bot.sendChat('Current settings: ' + chatMessage);
+        for (var key in config) {
+            result = _.findWhere(translation, {configName: key});
+            if (config.hasOwnProperty(key) && result) {
+                chatMessage += result.chatName + ': ' + config[key] + ', ';
+            }
+        }
+        if(chatMessage != '') {
+            bot.sendChat('Settings: ' + trimCommas(chatMessage));
+        }
     }
     else {
-        var key = input[1];
+        var setting = input[1];
         var value = _.rest(input, 2).join(' ');
+        var result = _.findWhere(translation, {chatName: setting});
 
-        if (_.contains(supported, key)) {
-            config[key] = value;
-            bot.sendChat('set: ' + key + ' = ' + value + ' @djs');
+        if (result !== undefined) {
+            if (config.queue.hasOwnProperty(result.configName)) {
+                config[result.configName] = value;
+            }
+            if (config.hasOwnProperty(result.configName)) {
+                config[result.configName] = value;
+            }
+            bot.sendChat(result.english + ' now set to: ' + value + ' @djs');
+            console.log('[CONFIG]', data.from + ' set ' + result.configName + ' to ' + value);
         }
         else {
-            bot.sendChat('unknown setting: ' + key);
+            bot.sendChat('unknown setting: ' + setting);
         }
+
+        writeConfigState();
     }
 
 };

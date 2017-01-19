@@ -1,7 +1,15 @@
 dpath = require('path');
 fs = require('fs');
-config = require(dpath.resolve(__dirname, 'config.json'));
 PlugAPI = require('plugapi');
+
+// Reload the last existing state of the config file, otherwise revert to the default
+if (fs.existsSync(dpath.resolve(__dirname, 'configState.json'))) {
+    config = require(dpath.resolve(__dirname, 'configState.json'));
+    console.log('Loaded config file from ' + dpath.resolve(__dirname, 'configState.json'));
+} else {
+    config = require(dpath.resolve(__dirname, 'config.json'));
+    console.log('Loaded config file from ' + dpath.resolve(__dirname, 'config.json'));
+}
 
 new PlugAPI({
     email: config.auth.username,

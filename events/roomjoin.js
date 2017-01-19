@@ -11,6 +11,8 @@ module.exports = function (bot) {
             botUser.db = row;
         });
 
+        writeConfigState();
+
         if (config.verboseLogging) {
             console.log('[INIT] Data loaded for ' + botUser.username + '\n ' + JSON.stringify(botUser, null, 2));
         }
