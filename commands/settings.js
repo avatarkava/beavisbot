@@ -59,6 +59,12 @@ exports.handler = function (data) {
             bot.sendChat('unknown setting: ' + setting);
         }
 
+        // @TODO - need to merge down configState and settings{}
+        settings.maxsonglength = config.queue.maxSongLengthSecs;
+        settings.maxdjidletime = config.queue.djIdleAfterMins * 60;
+        settings.djidleminqueue = config.queue.djIdleMinQueueLengthToEnforce;
+        settings.djcyclemaxqueue = config.queue.djCycleMaxQueueLength;
+
         writeConfigState();
     }
 
