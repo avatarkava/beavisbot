@@ -2,7 +2,7 @@ module.exports = function (bot) {
 
     writeConfigState = function () {
         fs.writeFile(
-            'configState.json',
+            dpath.resolve(__dirname, '../configState.json'),
             CircularJSON.stringify(config, function (key, value) {
                 if (key == 'parent') {
                     return value.id;
