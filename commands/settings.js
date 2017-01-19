@@ -47,7 +47,7 @@ exports.handler = function (data) {
 
         if (result !== undefined) {
             if (config.queue.hasOwnProperty(result.configName)) {
-                config[result.configName] = value;
+                config.queue[result.configName] = value;
             }
             if (config.hasOwnProperty(result.configName)) {
                 config[result.configName] = value;
