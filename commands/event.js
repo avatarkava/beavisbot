@@ -22,9 +22,8 @@ exports.handler = function (data) {
                 if (row.details !== null) {
                     message += ' - ' + row.details;
                 }
-
                 if (row.starts_at > moment.utc().toDate()) {
-                    message += ' ' + timeUntil(row.starts_at, 'starting');
+                    message = timeUntil(row.starts_at, 'starting') + ' ' + message;
                 }
                 else if (row.starts_at <= moment.utc().toDate()) {
                     message += ' ' + timeUntil(row.ends_at, 'ending');
