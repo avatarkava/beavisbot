@@ -1,21 +1,21 @@
 module.exports = function (bot) {
 
-    attemptPurchase = function (user, points) {
+    attemptPurchase = function (user, points, callback) {
 
         getDbUserFromSiteUser(user, function (row) {
             if (!row || row.custom_points < points) {
                 console.log('[POINTS] Purchase failed: ' + row.username + ' only has ' + row.custom_points + ' points (' + points + ' needed)');
                 bot.sendChat('Sorry @' + row.username + ', you need ' + points + config.customPointName + ' for that.');
-                return false;
+                callback(false);
+                return;
             }
 
             // Deduct the points from the sender's balance and add to the recipient
             models.User.update({custom_points: Sequelize.literal('(custom_points - ' + points + ')')}, {where: {site_id: row.site_id}});
-
-            console.log('[POINTS] ' + row.username + '  spent ' + points + ' points');
-            return true;
+            console.log('[POINTS] ' + row.username + ' spent ' + points + ' points');
+            callback(true);
         });
-
+        return;
     }
 
     transferCustomPoints = function (fromUser, toUser, points) {
