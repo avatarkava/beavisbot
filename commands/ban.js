@@ -14,11 +14,11 @@ exports.handler = function (data) {
     var duration = 'PERMA';
     var message = '';
 
-    if (params.length >= 2) {
-        username = _.initial(params).join(' ').trim();
-        duration = _.last(params).toUpperCase();
-    }
-    else if (params.length == 1) {
+    // if (params.length >= 2) {
+    //     username = _.initial(params).join(' ').trim();
+    //     duration = _.last(params).toUpperCase();
+    // }
+    if (params.length >= 1) {
         username = params.join(' ').trim();
     }
     else {
@@ -29,9 +29,9 @@ exports.handler = function (data) {
     var usernameFormatted = S(username).chompLeft('@').s;
 
     // Don't let bouncers get too feisty (API should prohibit this, but just making sure!
-    if (!settings.bouncerplus && data.from.role < 3) {
-        duration = 'HOUR';
-    }
+    // if (!settings.bouncerplus && data.from.role < 3) {
+    //     duration = 'HOUR';
+    // }
 
     switch (duration) {
         case 'DAY':
@@ -47,7 +47,7 @@ exports.handler = function (data) {
 
     }
 
-    models.User.find({where: {username: usernameFormatted, site: config.site}}).then(function (row) {
+    models.User.find({where: {username: usernameFormatted, site: config.site}, order: 'id DESC'}).then(function (row) {
         if (row === null) {
             bot.sendChat(usernameFormatted + ' was not found.');
         } else {

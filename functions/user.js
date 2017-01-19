@@ -18,7 +18,8 @@ module.exports = function (bot) {
 
     getDbUserFromUsername = function (siteUsername, callback) {
         models.User.find({
-            where: {username: siteUsername, site: config.site}
+            where: {username: siteUsername, site: config.site},
+            order: 'id ASC'
         }).then(function (row) {
             callback(row);
         });

@@ -18,15 +18,17 @@ exports.handler = function (data) {
         //@TODO - Add usage
         return;
     }
+    else if (attemptPurchase(data.from, 5)) {
 
-    tags = params.join('+').trim().replace(/ /g, "+");
+        tags = params.join('+').trim().replace(/ /g, "+");
 
-    getGiphy(command, api_key, rating, tags, limit, function (imageurl) {
-        if (typeof imageurl !== 'undefined') {
-            bot.sendChat(imageurl);
-        } else {
-            bot.sendChat('Could not find any gif tag(s): ' + tags);
-        }
-    }, tags != null ? tags : null);
+        getGiphy(command, api_key, rating, tags, limit, function (imageurl) {
+            if (typeof imageurl !== 'undefined') {
+                bot.sendChat(imageurl);
+            } else {
+                bot.sendChat('Could not find any gif tag(s): ' + tags);
+            }
+        }, tags != null ? tags : null);
+    }
 
 };
