@@ -2,6 +2,10 @@ module.exports = function () {
 
     chatResponse = function (data) {
 
+        if (data.from === undefined) {
+            return;
+        }
+
         var input = data.message.split('@', 2);
         var command = input[0].trim();
         var target = null;
@@ -10,9 +14,9 @@ module.exports = function () {
         }
 
         models.EventResponse.find({
-                where: {event_type: 'chat', pattern: command, is_active: true},
-                order: 'RAND()'
-            })
+            where: {event_type: 'chat', pattern: command, is_active: true},
+            order: 'RAND()'
+        })
             .then(function (row) {
                 if (row === null) {
                     return;
@@ -36,6 +40,9 @@ module.exports = function () {
 
         // Only listen to the superAdmin when in development mode
         if (config.developmentMode && data.from.username !== config.superAdmin) {
+            return;
+        }
+        if (data.from === undefined) {
             return;
         }
 
@@ -127,6 +134,10 @@ module.exports = function () {
 
     mentionResponse = function (data) {
 
+        if (data.from === undefined) {
+            return;
+        }
+
         // Antispam
         var cooldown_all = 10;
         var cooldown_user = 30;
@@ -169,9 +180,9 @@ module.exports = function () {
             }
             else {
                 models.EventResponse.find({
-                        where: {event_type: 'mention', is_active: true},
-                        order: 'RAND()'
-                    })
+                    where: {event_type: 'mention', is_active: true},
+                    order: 'RAND()'
+                })
                     .then(function (row) {
                         if (row === null) {
                             return;
@@ -234,7 +245,7 @@ module.exports = function () {
         });
     };
 
-    trimCommas = function(str) {
+    trimCommas = function (str) {
         return str.replace(/(^\s*,)|(,\s*$)/g, '');
     }
 }
