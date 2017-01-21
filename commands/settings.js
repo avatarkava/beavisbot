@@ -8,6 +8,7 @@ exports.minRole = PERMISSIONS.BOUNCER_PLUS;
 exports.handler = function (data) {
 
     var input = data.message.split(' ');
+    var logMessage = '';
     var chatMessage = '';
     var result;
 
@@ -43,7 +44,7 @@ exports.handler = function (data) {
     else {
         var setting = input[1];
         var value = _.rest(input, 2).join(' ');
-        var result = _.findWhere(translation, {chatName: setting});
+        result = _.findWhere(translation, {chatName: setting});
 
         if (result !== undefined) {
             if (config.queue.hasOwnProperty(result.configName)) {
@@ -53,7 +54,9 @@ exports.handler = function (data) {
                 config[result.configName] = value;
             }
             bot.sendChat(result.english + ' now set to: ' + value + ' @djs');
-            console.log('[CONFIG]', data.from + ' set ' + result.configName + ' to ' + value);
+            logMessage = '[CONFIG]', data.from + ' set ' + result.configName + ' to ' + value;
+            console.log(logMessage);
+            sendToSlack(logMessage);
         }
         else {
             bot.sendChat('unknown setting: ' + setting);
