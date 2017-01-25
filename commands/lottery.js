@@ -23,7 +23,7 @@ exports.handler = function (data) {
         mins = 5;
     }
 
-    if (input[0] === 'roulette') {
+    if (input[0].toLowerCase() === 'roulette') {
         bot.sendChat('Wait list roulette in ' + mins + ' minutes! Chat and be in line within ' + mins + ' minutes to enter.  Winner gets moved up a random number of spots! @djs');
     }
     else {
