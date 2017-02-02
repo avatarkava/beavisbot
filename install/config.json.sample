@@ -70,7 +70,7 @@
           "youtube": [
           ]
         }
-  }
+  },
   "autoSuggestCorrections": false,
   "chatRandomnessPercentage": 5,
   "commandLiteral": ".",
