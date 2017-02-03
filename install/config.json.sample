@@ -58,7 +58,7 @@
     "prohibitDownvoteInQueue": false,
     "skipStuckSongs": true,
     "upvoteSongs": "ALL"
-  }
+  },
   "autoSuggestCorrections": false,
   "chatRandomnessPercentage": 5,
   "commandLiteral": ".",
