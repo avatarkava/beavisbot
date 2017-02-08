@@ -48,20 +48,20 @@ exports.handler = function (data) {
     }
     else {
         var setting = input[1];
-        var value = _.rest(input, 2).join(' ');
+        var newValue = _.rest(input, 2).join(' ');
         result = _.findWhere(translation, {chatName: setting});
 
         if (result !== undefined) {
             if (config.queue.hasOwnProperty(result.configName)) {
-                config.queue[result.configName] = value;
+                config.queue[result.configName] = newValue;
             }
             if (config.hasOwnProperty(result.configName)) {
-                config[result.configName] = value;
+                config[result.configName] = newValue;
             }
             if (result.notify) {
-                bot.sendChat(result.english + ' now set to: ' + value + ' @djs');
+                bot.sendChat(result.english + ' now set to: ' + newValue + ' @djs');
             }
-            logMessage = '[CONFIG]', data.from.username + ' set `' + result.configName + '` to `' + value + '`';
+            logMessage = '[CONFIG] ' + data.from.username + ' set `' + result.configName + '` to `' + newValue + '`';
             console.log(logMessage);
             sendToSlack(logMessage);
         }
