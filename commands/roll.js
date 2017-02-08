@@ -15,7 +15,7 @@ exports.handler = function (data) {
         maxValue = parseInt(input.replace(/\D/g, ""));
     }
 
-    if (maxValue > 0 && maxValue < 99999) {
+    if (maxValue > 0 && maxValue < 7) //fixing 99999 thing bug {
         var roll = _.random(1, maxValue);
         bot.sendChat('@' + data.from.username + ', you rolled a ' + roll + '!');
     }
