@@ -13,15 +13,20 @@ exports.handler = function (data) {
     var result;
 
     var translation = [
-        {configName: 'djIdleAfterMins', chatName: 'djidle', english: 'DJ Idle Seconds'},
-        {configName: 'djIdleMinQueueLengthToEnforce', chatName: 'minidlequeue', english: 'Min Idle Queue'},
-        {configName: 'djCycleMaxQueueLength', chatName: 'maxcyclequeue', english: 'Max Cycle Queue'},
-        {configName: 'maxSongLengthSecs', chatName: 'maxsonglength', english: 'Max Song Seconds'},
-        {configName: 'minSongReleaseDate', chatName: 'minreleasedate', english: 'Min Release Date '},
-        {configName: 'maxSongReleaseDate', chatName: 'maxreleasedate', english: 'Max Release Date'},
-        {configName: 'prohibitDownvoteInQueue', chatName: 'nomehsinqueue', english: 'No Mehs in Queue'},
-        {configName: 'quietMode', chatName: 'quietmode', english: 'Quiet Mode'},
-        {configName: 'verboseLogging', chatName: 'verboselogging', english: 'Verbose Logging'}
+        {configName: 'djIdleAfterMins', chatName: 'djidle', english: 'DJ Idle Seconds', notify: true},
+        {
+            configName: 'djIdleMinQueueLengthToEnforce',
+            chatName: 'minidlequeue',
+            english: 'Min Idle Queue',
+            notify: false
+        },
+        {configName: 'djCycleMaxQueueLength', chatName: 'maxcyclequeue', english: 'Max Cycle Queue', notify: false},
+        {configName: 'maxSongLengthSecs', chatName: 'maxsonglength', english: 'Max Song Seconds', notify: true},
+        {configName: 'minSongReleaseDate', chatName: 'minreleasedate', english: 'Min Release Date ', notify: true},
+        {configName: 'maxSongReleaseDate', chatName: 'maxreleasedate', english: 'Max Release Date', notify: true},
+        {configName: 'prohibitDownvoteInQueue', chatName: 'nomehsinqueue', english: 'No Mehs in Queue', notify: false},
+        {configName: 'quietMode', chatName: 'quietmode', english: 'Quiet Mode', notify: false},
+        {configName: 'verboseLogging', chatName: 'verboselogging', english: 'Verbose Logging', notify: false}
     ];
 
     if (input.length < 3) {
@@ -37,24 +42,26 @@ exports.handler = function (data) {
                 chatMessage += result.chatName + ': ' + config[key] + ', ';
             }
         }
-        if(chatMessage != '') {
+        if (chatMessage != '') {
             bot.sendChat('Settings: ' + trimCommas(chatMessage));
         }
     }
     else {
         var setting = input[1];
-        var value = _.rest(input, 2).join(' ');
+        var newValue = _.rest(input, 2).join(' ');
         result = _.findWhere(translation, {chatName: setting});
 
         if (result !== undefined) {
             if (config.queue.hasOwnProperty(result.configName)) {
-                config.queue[result.configName] = value;
+                config.queue[result.configName] = newValue;
             }
             if (config.hasOwnProperty(result.configName)) {
-                config[result.configName] = value;
+                config[result.configName] = newValue;
             }
-            bot.sendChat(result.english + ' now set to: ' + value + ' @djs');
-            logMessage = '[CONFIG]', data.from + ' set ' + result.configName + ' to ' + value;
+            if (result.notify) {
+                bot.sendChat(result.english + ' now set to: ' + newValue + ' @djs');
+            }
+            logMessage = '[CONFIG] ' + data.from.username + ' set `' + result.configName + '` to `' + newValue + '`';
             console.log(logMessage);
             sendToSlack(logMessage);
         }

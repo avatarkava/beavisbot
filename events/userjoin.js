@@ -36,7 +36,7 @@ module.exports = function (bot) {
                         }
 
                         console.log('[JOIN]', data.username + ' is a first-time visitor to the room!');
-                        if ((config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
+                        if (config.welcomeUsersMinLevel <= data.level && (config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
                             setTimeout(function () {
                                 bot.sendChat(message)
                             }, 5000);
@@ -72,7 +72,7 @@ module.exports = function (bot) {
                                 }
                             }
 
-                            if (message && config.welcomeUsers == "ALL" && secondsSince(dbUser.last_active) >= 900 && secondsSince(dbUser.last_seen) >= 900) {
+                            if (message && config.welcomeUsersMinLevel <= data.level && config.welcomeUsers == "ALL" && secondsSince(dbUser.last_active) >= 900 && secondsSince(dbUser.last_seen) >= 900) {
                                 setTimeout(function () {
                                     bot.sendChat(message)
                                 }, 5000);

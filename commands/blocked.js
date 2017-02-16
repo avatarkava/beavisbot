@@ -28,6 +28,8 @@ exports.handler = function (data) {
                     }
                     copy = copy.split("<tr>");
 
+                    var status = '';
+                    var allowed = [];
                     var blocked = [];
                     var htmltagregex = /(<([^>]+)>)/ig
                     for (var i = 0; i < copy.length; i++) {
