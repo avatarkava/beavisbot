@@ -169,14 +169,16 @@ module.exports = function () {
 
             if (_.random(1, 100) > chatRandomnessPercentage) {
                 var cleverMessage = data.message.replace('@' + botUser.username, '').trim();
-                Cleverbot.prepare(function () {
-                    cleverbot.write(cleverMessage, function (response) {
-                        if (config.verboseLogging) {
-                            console.log('[CLEVERBOT]', JSON.stringify(response, null, 2));
-                        }
+                cleverbot.write(cleverMessage, function (response) {
+                    if (config.verboseLogging) {
+                        console.log('[CLEVERBOT]', JSON.stringify(response, null, 2));
+                    }
+
+                    if (response != null) {
                         bot.sendChat('@' + data.from.username + ', ' + response.message);
-                    });
+                    }
                 });
+
             }
             else {
                 models.EventResponse.find({

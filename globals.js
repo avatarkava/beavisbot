@@ -39,6 +39,7 @@ module.exports = function (options) {
     }
 
     cleverbot = new Cleverbot;
+    cleverbot.configure({botapi: config.apiKeys.cleverbot})
 
     PERMISSIONS = {
         NONE: 0,

@@ -17,6 +17,7 @@
     "forceSequelizeSync": false
   },
   "apiKeys": {
+    "cleverbot": "cleverbotApiKey",
     "echoNest": "###",
     "lastFm": "lastFmApiKey",
     "lastFm_secret": "lastfmSecretKey",
