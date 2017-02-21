@@ -8,9 +8,9 @@ This bot uses https://github.com/anjanms/DubAPI as its API dependency and is des
 Quick Installation
 -----------------------
 1. Run `npm install` in the root folder of the checkout
-2. Copy the config.sample.json from /install to the root folder and rename it config.json
+2. Copy the config.sample.json from /documentation to the root folder and rename it config.json
 3. Edit config.json to suit your needs
-4a. If you are using MySQL, run the install/tables.sql file against the database to create all the necessary tables
+4a. If you are using MySQL, run the documentation/tables.sql file against the database to create all the necessary tables
 4b. If you are using SQLite, copy the supplied sample.sqlite to the root folder and rename it to align with your settings in config.json
 
 Known issues are located at https://github.com/AvatarKava/beavisbot/issues - please submit any bug reports or feature requests there!

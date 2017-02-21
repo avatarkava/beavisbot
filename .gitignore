@@ -14,12 +14,15 @@ results
 npm-debug.log
 node_modules
 
+extensions/*
+!extensions/README.md
+
 config.json
 configState.json
 roomState.json
 
 *.sqlite
-
 !sample.sqlite
+
 test.js
 .idea
