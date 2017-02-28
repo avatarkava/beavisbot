@@ -8,10 +8,6 @@ module.exports = function (bot) {
             console.log('[EVENT] advance');
         }
 
-        bot.getHistory(function (history) {
-            bot.mediaHistory = history;
-        });
-
         // Save the last song's data to the DB
         saveLastSong(data.lastPlay);
 
@@ -243,6 +239,10 @@ module.exports = function (bot) {
                     bot.meh();
                 }
             }
+        });
+
+        bot.getHistory(function (history) {
+            bot.mediaHistory = history;
         });
 
         idleWaitListProcess();

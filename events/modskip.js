@@ -13,7 +13,7 @@ module.exports = function (bot) {
         }
 
         // Data from last song played
-        var skippedSong = bot.mediaHistory[1];
+        var skippedSong = bot.mediaHistory[0];
         message = '[SKIP] Skipped song: ' + skippedSong.media.name + ' (https://www.youtube.com/watch?v=' + skippedSong.media.cid + ') played by ' + skippedSong.user.username + ' (ID: ' + skippedSong.user.id + ')';
         console.log('[SKIP] ' + JSON.stringify(skippedSong, null, 2));
         sendToSlack(message);
