@@ -1,4 +1,3 @@
-"use strict";
 module.exports = function (sequelize, DataTypes) {
     var Game = sequelize.define('Game', {
         id: {type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true},

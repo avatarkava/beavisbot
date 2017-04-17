@@ -1,4 +1,3 @@
-"use strict";
 module.exports = function (sequelize, DataTypes) {
     return sequelize.define('EventResponse', {
         id: {type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true},

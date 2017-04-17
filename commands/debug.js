@@ -28,6 +28,9 @@ exports.handler = function (data) {
         case 'djs':
             debugData = bot.getDJs();
             break;
+        case 'history':
+            debugData = bot.getHistory();
+            break;
         case 'host':
             debugData = bot.getHost();
             break;

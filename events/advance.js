@@ -2,7 +2,7 @@ module.exports = function (bot) {
 
     bot.on('advance', function (data) {
 
-        if (config.verboseLogging) {
+        if (true || config.verboseLogging) {
             console.log('[EVENT] advance', JSON.stringify(data, null, 2));
         } else {
             console.log('[EVENT] advance');
@@ -10,6 +10,10 @@ module.exports = function (bot) {
 
         // Save the last song's data to the DB
         saveLastSong(data.lastPlay);
+
+        // the history endpoint from plug doesn't have the last song played, so we will need to get it another way
+        bot.lastPlay = data.lastPlay;
+        bot.mediaHistory = bot.getHistory();
 
         if (data.media == undefined) {
             return;
@@ -239,10 +243,6 @@ module.exports = function (bot) {
                     bot.meh();
                 }
             }
-        });
-
-        bot.getHistory(function (history) {
-            bot.mediaHistory = history;
         });
 
         idleWaitListProcess();

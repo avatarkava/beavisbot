@@ -1,8 +1,7 @@
-"use strict";
 module.exports = function (sequelize, DataTypes) {
     var User = sequelize.define('User', {
         id: {type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true},
-        site: {type: DataTypes.STRING, allowNull: false, defaultValue: 'dubtrack', unique: 'site_id'},
+        site: {type: DataTypes.STRING, allowNull: false, defaultValue: 'plug', unique: 'site_id'},
         site_id: {type: DataTypes.STRING, allowNull: false, unique: 'site_id'},
         username: {type: DataTypes.STRING, allowNull: false},
         slug: {type: DataTypes.STRING, allowNull: false},

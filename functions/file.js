@@ -33,6 +33,7 @@ module.exports = function (bot) {
             JSONstats.roomQueue = bot.getWaitList();
             JSONstats.users = bot.getUsers();
             JSONstats.staff = bot.getStaff();
+            JSONstats.lastPlay = bot.lastPlay;
             JSONstats.mediaHistory = bot.mediaHistory;
 
             fs.writeFile(

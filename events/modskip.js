@@ -13,8 +13,8 @@ module.exports = function (bot) {
         }
 
         // Data from last song played
-        var skippedSong = bot.mediaHistory[0];
-        message = '[SKIP] Skipped song: ' + skippedSong.media.name + ' (https://www.youtube.com/watch?v=' + skippedSong.media.cid + ') played by ' + skippedSong.user.username + ' (ID: ' + skippedSong.user.id + ')';
+        var skippedSong = bot.lastPlay;
+        message = '[SKIP] Skipped song: ' + skippedSong.media.name + ' (https://www.youtube.com/watch?v=' + skippedSong.media.cid + ') played by ' + skippedSong.dj.username + ' (ID: ' + skippedSong.dj.id + ')';
         console.log('[SKIP] ' + JSON.stringify(skippedSong, null, 2));
         sendToSlack(message);
     });

@@ -1,4 +1,3 @@
-"use strict";
 module.exports = function (sequelize, DataTypes) {
     var Song = sequelize.define('Song', {
         id: {type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true},
