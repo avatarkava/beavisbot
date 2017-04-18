@@ -100,9 +100,9 @@ module.exports = function (bot) {
                             }
 
                             if (banned) {
-                                //bot.moderateBanUser(data.currentDJ.id, PlugAPI.BAN_REASON.OFFENSIVE_MEDIA, PlugAPI.BAN.PERMA);
+                                bot.moderateBanUser(data.currentDJ.id, PlugAPI.BAN_REASON.OFFENSIVE_MEDIA, PlugAPI.BAN.PERMA);
                                 bot.sendChat('NOOOOOOOOOPE. https://media.giphy.com/media/9wBub5vhSsTDi/giphy.gif');
-                                //models.Song.update({is_banned: 1}, {where: {host_id: data.media.cid}});
+                                models.Song.update({is_banned: 1}, {where: {host_id: data.media.cid}});
                                 var message = '[SKIPBAN] Song https://youtu.be/' + data.media.cid + ' skipped and ' + data.currentDJ.username + '(ID: ' + data.currentDJ.id + ') banned because they used a song from a blacklisted channel.';
                                 console.log(message);
                                 sendToSlack(message);
