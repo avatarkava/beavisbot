@@ -17,7 +17,8 @@ module.exports = function (sequelize, DataTypes) {
         queue_position: {type: DataTypes.INTEGER, defaultValue: -1},
         last_seen: {type: DataTypes.DATE, defaultValue: DataTypes.NOW},
         last_active: {type: DataTypes.DATE, defaultValue: DataTypes.NOW},
-        last_leave: {type: DataTypes.DATE, defaultValue: DataTypes.NOW}
+        last_leave: {type: DataTypes.DATE, defaultValue: DataTypes.NOW},
+        dj_timeout_until: {type: DataTypes.DATE, allowNull: true}
     }, {
         underscored: true,
         tableName: 'users',

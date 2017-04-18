@@ -91,29 +91,33 @@ module.exports = function (bot) {
                             lowViewCount = true;
                         }
 
-                        //@FIXME - Move this to a databased instance
-                        if (_.contains(config.queue.bannedChannels.youtube, item.snippet.channelId)) {
-                            banned = true;
-                        }
-                    }
+                        // See if this channel is blacklisted
+                        models.Blacklist.find(
+                            {where: {$and: [{type: 'channel'}, {is_active: true}, {pattern: item.snippet.channelId}]}}
+                        ).then(function (row) {
+                            if (row) {
+                                banned = true;
+                            }
 
-                    if (banned) {
-                        bot.moderateBanUser(data.currentDJ.id, PlugAPI.BAN_REASON.OFFENSIVE_MEDIA, PlugAPI.BAN.PERMA);
-                        bot.sendChat('NOOOOOOOOOPE. https://media.giphy.com/media/9wBub5vhSsTDi/giphy.gif');
-                        models.Song.update({is_banned: 1}, {where: {host_id: data.media.cid}});
-                        var message = '[SKIPBAN] Song https://youtu.be/' + data.media.cid + ' skipped and ' + data.currentDJ.username + '(ID: ' + data.currentDJ.id + ') banned because they used a song from a blacklisted channel.';
-                        console.log(message);
-                        sendToSlack(message);
-                    } else if (!available) {
-                        var message = '[SKIP] Song was skipped because it is not available or embeddable';
-                        console.log(message);
-                        sendToSlack(message);
-                        bot.sendChat('@' + data.currentDJ.username + ', skipping this video because it is not available or embeddable. Please update your playlist!');
-                        bot.moderateForceSkip();
-                    } else if (lowViewCount) {
-                        var message = '[YOUTUBE] The current video played has very few views. You may want to check it for :trollface:... ' + data.media.name + ' (https://youtu.be/' + data.media.cid + ') played by ' + data.currentDJ.username + ' (ID: ' + data.currentDJ.id + ')';
-                        console.log(message);
-                        sendToSlack(message);
+                            if (banned) {
+                                //bot.moderateBanUser(data.currentDJ.id, PlugAPI.BAN_REASON.OFFENSIVE_MEDIA, PlugAPI.BAN.PERMA);
+                                bot.sendChat('NOOOOOOOOOPE. https://media.giphy.com/media/9wBub5vhSsTDi/giphy.gif');
+                                //models.Song.update({is_banned: 1}, {where: {host_id: data.media.cid}});
+                                var message = '[SKIPBAN] Song https://youtu.be/' + data.media.cid + ' skipped and ' + data.currentDJ.username + '(ID: ' + data.currentDJ.id + ') banned because they used a song from a blacklisted channel.';
+                                console.log(message);
+                                sendToSlack(message);
+                            } else if (!available) {
+                                var message = '[SKIP] Song was skipped because it is not available or embeddable';
+                                console.log(message);
+                                sendToSlack(message);
+                                bot.sendChat('@' + data.currentDJ.username + ', skipping this video because it is not available or embeddable. Please update your playlist!');
+                                bot.moderateForceSkip();
+                            } else if (lowViewCount) {
+                                var message = '[YOUTUBE] The current video played has very few views. You may want to check it for :trollface:... ' + data.media.name + ' (https://youtu.be/' + data.media.cid + ') played by ' + data.currentDJ.username + ' (ID: ' + data.currentDJ.id + ')';
+                                console.log(message);
+                                sendToSlack(message);
+                            }
+                        });
                     }
                 } else {
                     console.log(err);
