@@ -2,7 +2,7 @@ module.exports = function (bot) {
 
     bot.on('advance', function (data) {
 
-        if (true || config.verboseLogging) {
+        if (config.verboseLogging) {
             console.log('[EVENT] advance', JSON.stringify(data, null, 2));
         } else {
             console.log('[EVENT] advance');
