@@ -47,7 +47,7 @@ module.exports = function (bot) {
                 }
                 else {
                     models.EventResponse.find({
-                        where: {event_type: 'userJoin', pattern: dbUser.username, is_active: true},
+                        where: {event_type: 'userJoin', pattern: data.id, is_active: true},
                         order: 'RAND()'
                     }).then(function (eventResponse) {
                         if (eventResponse == null) {
