@@ -116,7 +116,7 @@ module.exports = function (bot) {
 
         });
         saveWaitList(true);
-        
+
         var waitListSize = bot.getWaitList().length;
 
         if (waitListSize >= settings.djidleminqueue && settings.djidle == false) {
@@ -157,5 +157,29 @@ module.exports = function (bot) {
                 models.Karma.create(userData);
             });
         }
+    };
+
+    addKarma = function (data) {
+        var userData = {
+            type: data.type,
+            details: data.details,
+            user_id: data.user_id,
+            mod_user_id: data.mod_user_id
+        };
+        models.Karma.create(userData).then(function () {
+            models.Karma.findAndCount({
+                where: {
+                    user_id: data.user_id,
+                    created_at: {gte: moment.utc().subtract(1, 'hours').toDate()},
+                }
+            }).then(function (results) {
+                if (results.count > 2) {
+                    bot.moderateBanUser(data.site_id, PlugAPI.BAN_REASON.SPAMMING_TROLLING, PlugAPI.BAN.DAY);
+                }
+            });
+        });
+        console.log(data.message);
+        sendToSlack(data.message);
+
     };
 };
