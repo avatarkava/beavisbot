@@ -70,10 +70,10 @@ exports.handler = function (data) {
         }
 
         // @TODO - need to merge down configState and settings{}
-        settings.maxsonglength = config.queue.maxSongLengthSecs;
-        settings.maxdjidletime = config.queue.djIdleAfterMins * 60;
-        settings.djidleminqueue = config.queue.djIdleMinQueueLengthToEnforce;
-        settings.djcyclemaxqueue = config.queue.djCycleMaxQueueLength;
+        settings.maxsonglength = parseInt(config.queue.maxSongLengthSecs);
+        settings.maxdjidletime = parseInt(config.queue.djIdleAfterMins) * 60;
+        settings.djidleminqueue = parseInt(config.queue.djIdleMinQueueLengthToEnforce);
+        settings.djcyclemaxqueue = parseInt(config.queue.djCycleMaxQueueLength);
 
         writeConfigState();
     }

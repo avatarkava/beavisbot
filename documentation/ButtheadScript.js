@@ -4,7 +4,7 @@
  * This work is under CreativeCommons BY-NC-SA 3.0
  * http://creativecommons.org/licenses/by-nc-sa/3.0/legalcode*/
 // "use strict";
-var nxVersion = "2.1.1";
+var nxVersion = "2.2";
 var notice = "ButtheadScript v" + nxVersion + " by AvatarKava!\n - Options in the plug menu (top left)";
 var forceReload = true;
 var AFKArray = [];
@@ -21,7 +21,8 @@ var nx = {
     },
     OnAdvance: function (a) {
         null !== a && (1 == AutoWoot && nx.Woot(), 1 == AutoList && 2 == ListSort ? nx.ListSortUpdate(3) : 1 == AutoList && 1 == ListPos && nx.ListPosUpdate(3), nx.DoMeh())
-        $('#discogs a').attr('href', 'https://www.discogs.com/search/?&sort=year%2Casc&type=release&q=' + encodeURI(a.media.author + ' - ' + a.media.title));
+        // $('#discogs a').attr('href', 'https://www.discogs.com/search/?&sort=year%2Casc&type=release&q=' + encodeURI(a.media.author + ' - ' + a.media.title));
+        $('#discogs a').attr('href', 'https://www.discogs.com/search/?&type=release&q=' + encodeURI(a.media.author + ' - ' + a.media.title));
     },
     OnWlUpdate: function (a) {
         1 == AutoList && 2 == ListSort ? nx.ListSortUpdate(3) : 1 == AutoList && 1 == ListPos && nx.ListPosUpdate(3)
