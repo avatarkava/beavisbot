@@ -6,7 +6,7 @@ module.exports = function (bot) {
         saveWaitList(false);
 
         data.forEach(function (listUser) {
-            if (listUser['level'] < config.queue.djMinLevel) {
+            if (listUser['role'] == 0 && listUser['gRole'] == 0 && listUser['level'] < config.queue.djMinLevel) {
                 logMessage = '[REMOVE] Removed ' + listUser.username + ' joining the wait list below minimum level ' + config.queue.djMinLevel;
                 message = 'Sorry @' + listUser.username + ', this community does not allow joining the wait list until you reach level ' + config.queue.djMinLevel + '.';
                 console.log(logMessage);
