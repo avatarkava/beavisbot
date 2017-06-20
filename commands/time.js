@@ -6,5 +6,5 @@ exports.cdUser = 30;
 exports.cdStaff = 10;
 exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
-    bot.sendChat('checks the clock: ' + moment.utc().format('HH:mm:ss') + ' UTC' + moment.utc().format('dddd MMMM Do, YYYY'));
+    bot.sendChat('checks the clock: ' + moment.utc().format('HH:mm:ss') + ' UTC on ' + moment.utc().format('dddd MMMM Do, YYYY'));
 };
