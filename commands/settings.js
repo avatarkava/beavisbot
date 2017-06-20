@@ -52,6 +52,15 @@ exports.handler = function (data) {
         result = _.findWhere(translation, {chatName: setting});
 
         if (result !== undefined) {
+
+            if (newValue == 'false') {
+                newValue = new Boolean(false);
+            } else if (newValue == 'true') {
+                newValue = new Boolean(true);
+            } else if (!isNaN(parseInt(newValue))) {
+                newValue = parseInt(newValue);
+            }
+
             if (config.queue.hasOwnProperty(result.configName)) {
                 config.queue[result.configName] = newValue;
             }

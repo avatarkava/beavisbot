@@ -120,7 +120,7 @@ module.exports = function (bot) {
         var waitListSize = bot.getWaitList().length;
 
         if (waitListSize >= settings.djidleminqueue && settings.djidle == false) {
-            config.queue.djIdleMinQueueLengthToEnforce = settings.djidleminqueue;
+            config.queue.djIdleMinQueueLengthToEnforce = parseInt(settings.djidleminqueue);
             settings.djidle = true;
             bot.sendChat('Wait List at ' + waitListSize + ' @djs.  Idle timer enabled and cycle disabled');
             bot.changeDJCycle(false);

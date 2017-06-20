@@ -27,4 +27,10 @@ module.exports = function (bot) {
         return now.diff(timestamp, 'seconds');
     };
 
+    secondsUntil = function (timestamp) {
+        var now = moment.utc();
+        timestamp = moment.utc(timestamp);
+        return timestamp.diff(now, 'seconds');
+    };
+
 };
