@@ -28,6 +28,8 @@ else if (config.db.dialect === 'mariadb' || config.db.dialect === 'mysql') {
     });
 }
 
+console.log('Sher2e...');
+
 fs.readdirSync(__dirname)
     .filter(function (file) {
         return (file.indexOf('.') !== 0) && (file !== basename);

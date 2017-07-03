@@ -23,7 +23,7 @@ new PlugAPI({
         bot.multiLineLimit = 5;
 
         //@TODO - Stop using globals
-        require('./globals')({ bot: bot, config: config });
+        require('./globals.js')({ bot: bot, config: config });        
 
         initializeModules(bot);
 

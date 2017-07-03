@@ -4,20 +4,25 @@ module.exports = function (options) {
     _ = require('underscore');
     CircularJSON = require('circular-json');
     Cleverbot = require('cleverbot-node');
-    fs = require('fs');
+    fs = require('fs');    
     moment = require('moment');
-    dpath = require('path');
-    Promise = require('bluebird');
-    reload = require('require-reload')(require);
-    request = require('request');
+    dpath = require('path');    
+    Promise = require('bluebird');    
+    reload = require('require-reload')(require);    
+    request = require('request');    
     S = require('string');
     Sequelize = require('sequelize');
     YouTube = require('youtube-api');
 
 
     config = options.config;
-    bot = options.bot;
+    bot = options.bot;    
+
+    console.log('Here....');
+
     models = require(dpath.resolve(__dirname, 'models/index'));
+
+console.log('Here2....');
 
     mentions = {
         lastRunAll: 0,
