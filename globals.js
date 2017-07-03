@@ -18,11 +18,7 @@ module.exports = function (options) {
     config = options.config;
     bot = options.bot;    
 
-    console.log('Here....');
-
     models = require(dpath.resolve(__dirname, 'models/index'));
-
-console.log('Here2....');
 
     mentions = {
         lastRunAll: 0,
