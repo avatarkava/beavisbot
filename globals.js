@@ -25,7 +25,7 @@ module.exports = function (options) {
     };
     botUser = bot.getSelf();
 
-    models.sequelize.sync({force: config.db.forceSequelizeSync}).then(function () {
+    models.sequelize.sync({ force: config.db.forceSequelizeSync }).then(function () {
         console.log('Connected to ' + config.db.dialect + ' database: ' + config.db.database);
     });
 
@@ -39,7 +39,7 @@ module.exports = function (options) {
     }
 
     cleverbot = new Cleverbot;
-    cleverbot.configure({botapi: config.apiKeys.cleverbot})
+    cleverbot.configure({ botapi: config.apiKeys.cleverbot })
 
     PERMISSIONS = {
         NONE: 0,
@@ -170,7 +170,7 @@ module.exports = function (options) {
         }
 
         Promise.map(_.rest(bot.getDJs(), startPosition), function (dj) {
-            return models.User.find({where: {site_id: dj.id, site: config.site}}).then(function (dbUser) {
+            return models.User.find({ where: { site_id: dj.id, site: config.site } }).then(function (dbUser) {
                 if (dbUser !== null && dbUser.site_id !== bot.getSelf().id) {
                     if (secondsSince(dbUser.last_active) <= (maxIdleMins * 60)) {
                         activeUsers.push(dbUser);
