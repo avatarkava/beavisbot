@@ -4,7 +4,7 @@ module.exports = function (bot) {
         models.Play.findOne({
             include: [{
                 model: models.Song,
-                where: {$and: [{site: config.site}, {host_id: songid}]}
+                where: { $and: [{ site: config.site }, { host_id: songid }] }
             }, models.User],
             order: [['created_at', 'DESC']]
         }).then(function (row) {
@@ -18,7 +18,7 @@ module.exports = function (bot) {
                     mod_user_id: from.db.id
                 };
                 models.Karma.create(userData);
-                models.Song.update({is_banned: 1}, {where: {host_id: songid}});
+                models.Song.update({ is_banned: 1 }, { where: { host_id: songid } });
                 bot.sendChat("The song \"" + row.Song.name + "\" has been blacklisted.");
                 message = '[BLACKLIST] ' + from.username + ' blacklisted ' + row.Song.name + ' (ID:' + row.Song.host_id + ')';
                 console.log(message);
@@ -40,13 +40,13 @@ module.exports = function (bot) {
         Promise.map(bot.getUsers(), function (dj) {
             if (dj.id) {
                 return models.User.find({
-                    where: {site_id: dj.id, site: config.site},
+                    where: { site_id: dj.id, site: config.site },
                     include: {
                         model: models.Karma,
                         required: false,
                         where: {
                             type: 'warn',
-                            created_at: {gte: moment.utc().subtract(config.queue.djIdleAfterMins, 'minutes').toDate()}
+                            created_at: { gte: moment.utc().subtract(config.queue.djIdleAfterMins, 'minutes').toDate() }
                         },
                         limit: 1,
                         order: [['created_at', 'DESC']]
@@ -120,15 +120,13 @@ module.exports = function (bot) {
         var waitListSize = bot.getWaitList().length;
 
         if (waitListSize >= settings.djidleminqueue && settings.djidle == false) {
-            config.queue.djIdleMinQueueLengthToEnforce = parseInt(settings.djidleminqueue);
             settings.djidle = true;
-            bot.sendChat('Wait List at ' + waitListSize + ' @djs.  Idle timer enabled and cycle disabled');
             bot.changeDJCycle(false);
+            bot.sendChat('Wait List at ' + waitListSize + ' @djs.  Idle timer enabled and cycle disabled');
         } else if (waitListSize < settings.djidleminqueue && settings.djidle == true) {
-            config.queue.djIdleMinQueueLengthToEnforce = 999;
             settings.djidle = false;
-            bot.sendChat('Wait List at ' + waitListSize + ' @djs.  Idle timer disabled and cycle enabled');
             bot.changeDJCycle(true);
+            bot.sendChat('Wait List at ' + waitListSize + ' @djs.  Idle timer disabled and cycle enabled');
         }
 
     };
@@ -170,7 +168,7 @@ module.exports = function (bot) {
             models.Karma.findAndCount({
                 where: {
                     user_id: data.user_id,
-                    created_at: {gte: moment.utc().subtract(1, 'hours').toDate()},
+                    created_at: { gte: moment.utc().subtract(1, 'hours').toDate() },
                 }
             }).then(function (results) {
                 if (results.count > 2) {

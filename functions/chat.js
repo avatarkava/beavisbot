@@ -14,7 +14,7 @@ module.exports = function () {
         }
 
         models.EventResponse.find({
-            where: {event_type: 'chat', pattern: command, is_active: true},
+            where: { event_type: 'chat', pattern: command, is_active: true },
             order: 'RAND()'
         })
             .then(function (row) {
@@ -72,6 +72,8 @@ module.exports = function () {
                 }
                 return found;
             })[0];
+
+            console.log(command);
 
             if (command && command.enabled) {
 
@@ -182,7 +184,7 @@ module.exports = function () {
             }
             else {
                 models.EventResponse.find({
-                    where: {event_type: 'mention', is_active: true},
+                    where: { event_type: 'mention', is_active: true },
                     order: 'RAND()'
                 })
                     .then(function (row) {
@@ -199,7 +201,7 @@ module.exports = function () {
     };
 
     getGiphy = function (type, api_key, rating, tags, limit, returnData) {
-        var reqparams = {format: 'json', api_key: api_key, "rating": rating, "limit": limit};
+        var reqparams = { format: 'json', api_key: api_key, "rating": rating, "limit": limit };
         if (type == 'giphyt') {
             endpoint = '/v1/gifs/translate';
             search_param = 's';

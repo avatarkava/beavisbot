@@ -13,31 +13,31 @@ exports.handler = function (data) {
     var result;
 
     var translation = [
-        {configName: 'djIdleAfterMins', chatName: 'djidle', english: 'DJ Idle Seconds', notify: true},
+        { configName: 'djIdleAfterMins', chatName: 'djidle', english: 'DJ Idle Seconds', notify: true },
         {
             configName: 'djIdleMinQueueLengthToEnforce',
             chatName: 'minidlequeue',
             english: 'Min Idle Queue',
             notify: false
         },
-        {configName: 'djCycleMaxQueueLength', chatName: 'maxcyclequeue', english: 'Max Cycle Queue', notify: false},
-        {configName: 'maxSongLengthSecs', chatName: 'maxsonglength', english: 'Max Song Seconds', notify: true},
-        {configName: 'minSongReleaseDate', chatName: 'minreleasedate', english: 'Min Release Date ', notify: true},
-        {configName: 'maxSongReleaseDate', chatName: 'maxreleasedate', english: 'Max Release Date', notify: true},
-        {configName: 'prohibitDownvoteInQueue', chatName: 'nomehsinqueue', english: 'No Mehs in Queue', notify: false},
-        {configName: 'quietMode', chatName: 'quietmode', english: 'Quiet Mode', notify: false},
-        {configName: 'verboseLogging', chatName: 'verboselogging', english: 'Verbose Logging', notify: false}
+        { configName: 'djCycleMaxQueueLength', chatName: 'maxcyclequeue', english: 'Max Cycle Queue', notify: false },
+        { configName: 'maxSongLengthSecs', chatName: 'maxsonglength', english: 'Max Song Seconds', notify: true },
+        { configName: 'minSongReleaseDate', chatName: 'minreleasedate', english: 'Min Release Date ', notify: true },
+        { configName: 'maxSongReleaseDate', chatName: 'maxreleasedate', english: 'Max Release Date', notify: true },
+        { configName: 'prohibitDownvoteInQueue', chatName: 'nomehsinqueue', english: 'No Mehs in Queue', notify: false },
+        { configName: 'quietMode', chatName: 'quietmode', english: 'Quiet Mode', notify: false },
+        { configName: 'verboseLogging', chatName: 'verboselogging', english: 'Verbose Logging', notify: false }
     ];
 
     if (input.length < 3) {
         for (var key in config.queue) {
-            result = _.findWhere(translation, {configName: key});
+            result = _.findWhere(translation, { configName: key });
             if (config.queue.hasOwnProperty(key) && result) {
                 chatMessage += result.chatName + ': ' + config.queue[key] + ', ';
             }
         }
         for (var key in config) {
-            result = _.findWhere(translation, {configName: key});
+            result = _.findWhere(translation, { configName: key });
             if (config.hasOwnProperty(key) && result) {
                 chatMessage += result.chatName + ': ' + config[key] + ', ';
             }
@@ -49,13 +49,13 @@ exports.handler = function (data) {
     else {
         var setting = input[1];
         var newValue = _.rest(input, 2).join(' ');
-        result = _.findWhere(translation, {chatName: setting});
+        result = _.findWhere(translation, { chatName: setting });
 
         if (result !== undefined) {
 
-            if (newValue == 'false') {
+            if (newValue === 'false') {
                 newValue = new Boolean(false);
-            } else if (newValue == 'true') {
+            } else if (newValue === 'true') {
                 newValue = new Boolean(true);
             } else if (!isNaN(parseInt(newValue))) {
                 newValue = parseInt(newValue);
