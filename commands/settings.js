@@ -48,7 +48,7 @@ exports.handler = function (data) {
     }
     else {
         var setting = input[1];
-        var newValue = _.rest(input, 2).join(' ');
+        var newValue = _.rest(input, 2).join(' ').trim();
         result = _.findWhere(translation, { chatName: setting });
 
         if (result !== undefined) {
@@ -57,7 +57,7 @@ exports.handler = function (data) {
                 newValue = new Boolean(false);
             } else if (newValue === 'true') {
                 newValue = new Boolean(true);
-            } else if (!isNaN(parseInt(newValue))) {
+            } else if (newValue.match(/[^0-9+$]/)) {
                 newValue = parseInt(newValue);
             }
 
