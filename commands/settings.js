@@ -57,7 +57,7 @@ exports.handler = function (data) {
                 newValue = new Boolean(false);
             } else if (newValue === 'true') {
                 newValue = new Boolean(true);
-            } else if (newValue.match(/[^0-9+$]/)) {
+            } else if (newValue.match(/^\d+$/)) {
                 newValue = parseInt(newValue);
             }
 
