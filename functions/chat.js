@@ -237,9 +237,9 @@ module.exports = function () {
                     }
                     var randomNumber = _.random(0, data.data.length);
                     if (type == 'giphys') {
-                        returnData(data.data[randomNumber].image_url);
+                        returnData(data.data[randomNumber].image_url.split(/[?#]/)[0]);
                     } else {
-                        returnData(data.data[randomNumber].images.fixed_height.url);
+                        returnData(data.data[randomNumber].images.fixed_height.url.split(/[?#]/)[0]);
                     }
                 }
                 catch (error) {
