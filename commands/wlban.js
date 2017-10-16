@@ -11,7 +11,7 @@ exports.handler = function (data) {
     var command = _.first(input);
     var params = _.rest(input);
     var username = '';
-    var duration = 'PERMA';
+    var duration = 'HOUR';
     var message = '';
 
     if (params.length >= 2) {
@@ -30,17 +30,16 @@ exports.handler = function (data) {
         case '15':
             apiDuration = bot.WLBAN.SHORT;
             break;
-        case 'HOUR':
-            apiDuration = bot.WLBAN.MEDIUM;
+        case 'DAY':
+            apiDuration = bot.WLBAN.LONG;
             break;
         case 'PERMA':
             apiDuration = bot.WLBAN.PERMA;
             break;
-        case 'DAY':
+        case 'HOUR':
         default:
-            apiDuration = bot.WLBAN.LONG;
+            apiDuration = bot.WLBAN.MEDIUM;
             break;
-
     }
 
     models.User.find({

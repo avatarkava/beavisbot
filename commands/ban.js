@@ -11,7 +11,7 @@ exports.handler = function (data) {
     var command = _.first(input);
     var params = _.rest(input);
     var username = '';
-    var duration = 'PERMA';
+    var duration = 'HOUR';
     var message = '';
 
     if (params.length >= 2) {
@@ -19,7 +19,6 @@ exports.handler = function (data) {
         duration = _.last(params).toUpperCase();
     } else if (params.length >= 1) {
         username = params.join(' ').trim();
-        duration = 'PERMA';
     } else {
         bot.sendChat('Usage: .[ban|unban|kick] username [PERMA|DAY|HOUR]');
         return;
