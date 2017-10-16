@@ -14,35 +14,29 @@ exports.handler = function (data) {
     var duration = 'PERMA';
     var message = '';
 
-    // if (params.length >= 2) {
-    //     username = _.initial(params).join(' ').trim();
-    //     duration = _.last(params).toUpperCase();
-    // }
-    if (params.length >= 1) {
+    if (params.length >= 2) {
+        username = _.initial(params).join(' ').trim();
+        duration = _.last(params).toUpperCase();
+    } else if (params.length >= 1) {
         username = params.join(' ').trim();
     } else {
-        bot.sendChat('Usage: .[wlban|wlunban] username [15|30|45|PERMA]');
+        bot.sendChat('Usage: .[wlban|wlunban] username [15|HOUR|DAY|PERMA]');
         return;
     }
 
     var usernameFormatted = S(username).chompLeft('@').s;
 
-    // Don't let bouncers get too feisty (API should prohibit this, but just making sure!
-    // if (!settings.bouncerplus && data.from.role < 3) {
-    //     duration = 'HOUR';
-    // }
-
     switch (duration) {
-        case 'SHORT':
+        case '15':
             apiDuration = bot.WLBAN.SHORT;
             break;
-        case 'MEDIUM':
+        case 'HOUR':
             apiDuration = bot.WLBAN.MEDIUM;
             break;
         case 'PERMA':
             apiDuration = bot.WLBAN.PERMA;
             break;
-        case 'LONG':
+        case 'DAY':
         default:
             apiDuration = bot.WLBAN.LONG;
             break;
@@ -60,11 +54,11 @@ exports.handler = function (data) {
             bot.sendChat(usernameFormatted + ' was not found.');
         } else {
             switch (command) {
-                case 'ban':
-                    console.log('[WLBAN] ' + usernameFormatted + ' attempting waitlist ban for ' + duration + ' (' + apiDuration + ') by ' + data.from.username);
+                case 'wlban':
+                    console.log('[WLBAN] ' + data.from.username + ' attempting to ban ' + usernameFormatted + ' for ' + duration + ' (' + apiDuration + ')');
                     bot.moderateWaitListBan(row.site_id, bot.WLBAN_REASON.INAPPROPRIATE_GENRE, apiDuration);
                     break;
-                case 'unban':
+                case 'wlunban':
                     bot.moderateWaitListUnbanUser(row.site_id, function () {
                         bot.sendChat('unbanning ' + usernameFormatted + '. This can take a few moments...');
                     });
@@ -72,6 +66,4 @@ exports.handler = function (data) {
             }
         }
     });
-
-
 };
