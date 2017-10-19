@@ -29,8 +29,8 @@ module.exports = function (bot) {
             } else {
                 message = '[MUTE] ' + data.t + ' (ID:' + data.i + ', LVL:' + dbUser.site_points + ') was muted for ' + duration + ' minutes by ' + data.m;
             }
-            console.log(message);
-            sendToSlack(message);
+            console.log(message + JSON.stringify(data, null, 2));
+            sendToSlack(message + JSON.stringify(data, null, 2));
         });
     });
 };

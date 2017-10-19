@@ -13,7 +13,7 @@ module.exports = function (bot) {
                 if (listUser['role'] == 0 && listUser['gRole'] == 0 && listUser['level'] < config.queue.djMinLevel) {
                     logMessage = '[REMOVE] Removed ' + listUser.username + ' joining the wait list below minimum level ' + config.queue.djMinLevel;
                     message = 'Sorry @' + listUser.username + ', this community does not allow joining the wait list until you reach level ' + config.queue.djMinLevel + '. Enjoy listening until then!';
-                    banLength = bot.WLBAN.LONG;
+                    banLength = bot.WLBAN.SHORT;
                     remove = true;
                 } else {
                     // @TODO - This is not really needed thanks to the waitlist ban function on plug
@@ -46,7 +46,7 @@ module.exports = function (bot) {
                         site_id: listUser.id,
                         user_id: row.id,
                         mod_user_id: botUser.db.id,
-                        message: '[WLBAN] Banned ' + row.username + ' from the wait list for ' + banLength
+                        message: '[WLBAN] Banned ' + row.username + ' from the wait list for 15 minutes (' + banLength + ')'
                     }
                     addKarma(data);
                 }
