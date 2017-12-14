@@ -5,14 +5,14 @@ module.exports = function (bot) {
         }
 
         var duration = 'unknown';
-        switch (data.d) {
-            case 's':
+        switch (data.duration) {
+            case 'Short':
                 duration = '15';
                 break;
-            case 'm':
+            case 'Medium':
                 duration = '30';
                 break;
-            case 'l':
+            case 'Long':
                 duration = '45';
                 break;
             default:
@@ -20,17 +20,17 @@ module.exports = function (bot) {
                 break;
         }
 
-        getDbUserFromUsername(data.t, function (dbUser) {
+        getDbUserFromUsername(data.user.username, function (dbUser) {
             var message;
             if (duration == 'unknown') {
-                message = '[UNMUTE] ' + data.t + ' (ID:' + data.i + ') was unmuted by ' + data.m;
+                message = '[UNMUTE] ' + data.user.username + ' (ID: ' + data.user.id + ') was unmuted by ' + data.moderator.username;
             } else if (dbUser == null) {
-                message = '[MUTE] ' + data.t + ' (ID:' + data.i + ') was muted for ' + duration + ' minutes by ' + data.m;
+                message = '[MUTE] ' + data.user.username + ' (ID: ' + data.user.id + ') was muted for ' + duration + ' minutes by ' + data.moderator.username;
             } else {
-                message = '[MUTE] ' + data.t + ' (ID:' + data.i + ', LVL:' + dbUser.site_points + ') was muted for ' + duration + ' minutes by ' + data.m;
+                message = '[MUTE] ' + data.user.username + ' (ID: ' + data.user.id + ', LVL: ' + dbUser.site_points + ') was muted for ' + duration + ' minutes by ' + data.moderator.username;
             }
-            console.log(message + JSON.stringify(data, null, 2));
-            sendToSlack(message + JSON.stringify(data, null, 2));
+            console.log(message);
+            sendToSlack(message);
         });
     });
 };
