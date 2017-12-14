@@ -1,4 +1,4 @@
-module.exports = function () {
+module.exports = function (bot) {
 
     chatResponse = function (data) {
 
@@ -71,9 +71,7 @@ module.exports = function () {
                     }
                 }
                 return found;
-            })[0];
-
-            console.log(command);
+            })[0];            
 
             if (command && command.enabled) {
 
