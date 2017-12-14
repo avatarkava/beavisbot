@@ -1,5 +1,6 @@
 module.exports = function (bot) {
-    bot.on('djListUpdate', function (data) {
+
+    bot.on(PlugAPI.events.DJ_LIST_UPDATE, function (data) {
         if (config.verboseLogging) {
             console.log('[EVENT] djListUpdate ', JSON.stringify(data, null, 2));
         }
@@ -54,4 +55,5 @@ module.exports = function (bot) {
         });
 
     });
+    
 }

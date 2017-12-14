@@ -1,6 +1,6 @@
 module.exports = function (bot) {
 
-    bot.on('modSkip', function (data) {
+    bot.on(PlugAPI.events.MODERATE_SKIP, function (data) {
         if (config.verboseLogging) {
             console.log('[EVENT] modSkip ', JSON.stringify(data, null, 2));
         }

@@ -1,7 +1,9 @@
 module.exports = function (bot) {
-    bot.on('userUpdate', function (data) {
+
+    bot.on(PlugAPI.events.USER_UPDATE, function (data) {
         if (config.verboseLogging) {
-            console.log('[EVENT] USER_UPDATE', data);
+            console.log('[EVENT] userUpdate', data);
         }
     });
+
 };

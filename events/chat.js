@@ -1,5 +1,6 @@
 module.exports = function (bot) {
-    bot.on('chat', function (data) {
+
+    bot.on(PlugAPI.events.CHAT, function (data) {
 
         if (config.verboseLogging) {
             console.log('[CHAT]', JSON.stringify(data, null, 2));
@@ -18,4 +19,5 @@ module.exports = function (bot) {
             }, {where: {site_id: data.from.id.toString(), site: config.site}});
         }
     });
+    
 };

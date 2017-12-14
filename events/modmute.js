@@ -1,5 +1,6 @@
 module.exports = function (bot) {
-    bot.on('modMute', function (data) {
+
+    bot.on(PlugAPI.events.MODERATE_MUTE, function (data) {
         if (config.verboseLogging) {
             console.log('[EVENT] modMute ', JSON.stringify(data, null, 2));
         }

@@ -1,6 +1,6 @@
 module.exports = function (bot) {
-    bot.on('userJoin', function (data) {
 
+    bot.on(PlugAPI.events.USER_JOIN, function (data) {
         if (config.verboseLogging) {
             console.log('[JOIN]', JSON.stringify(data, null, 2));
         } else if (data.username === undefined) {

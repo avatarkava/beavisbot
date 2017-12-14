@@ -1,6 +1,6 @@
 module.exports = function (bot) {
 
-    bot.on('advance', function (data) {
+    bot.on(bot.events.ADVANCE, function (data) {
 
         if (config.verboseLogging) {
             console.log('[EVENT] advance', JSON.stringify(data, null, 2));
