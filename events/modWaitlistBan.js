@@ -28,11 +28,11 @@ module.exports = function (bot) {
         getDbUserFromUsername(data.user.username, function (dbUser) {
             var message;
             if (duration == 'unknown') {
-                message = '[UNMUTE] ' + data.user.username + ' (ID: ' + data.user.id + ') was unbanned from the waitlist by ' + data.moderator.username;
+                message = '[WLUNBAN] ' + data.user.username + ' (ID: ' + data.user.id + ') was unbanned from the waitlist by ' + data.moderator.username;
             } else if (dbUser == null) {
-                message = '[MUTE] ' + data.user.username + ' (ID: ' + data.user.id + ') was banned from the waitlist for ' + duration + ' by ' + data.moderator.username;
+                message = '[WLBAN] ' + data.user.username + ' (ID: ' + data.user.id + ') was banned from the waitlist for ' + duration + ' by ' + data.moderator.username;
             } else {
-                message = '[MUTE] ' + data.user.username + ' (ID: ' + data.user.id + ', LVL: ' + dbUser.site_points + ') was banned from the waitlist for ' + duration + ' by ' + data.moderator.username;
+                message = '[WLBAN] ' + data.user.username + ' (ID: ' + data.user.id + ', LVL: ' + dbUser.site_points + ') was banned from the waitlist for ' + duration + ' by ' + data.moderator.username;
             }
             console.log(message);
             sendToSlack(message);
