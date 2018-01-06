@@ -30,7 +30,7 @@
     "path": "*",
     "request": "*",
     "require-reload": "*",
-    "sequelize": "~3.30",
+    "sequelize": "~3",
     "string": "*",
     "underscore": "git://github.com/jashkenas/underscore.git",
     "youtube-api": "*"
