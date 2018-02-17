@@ -35,7 +35,7 @@ module.exports = function (bot) {
                 message = '[WLBAN] ' + data.user.username + ' (ID: ' + data.user.id + ', LVL: ' + dbUser.site_points + ') was banned from the waitlist for ' + duration + ' by ' + data.moderator.username;
             }
             console.log(message);
-            sendToSlack(message);
+            sendToWebhooks(message);
         });
     });
 

@@ -29,17 +29,26 @@
     }
 
   },
-  "slack": {
-    "webhook_url": "https://xxxxxx.slack.com/services/hooks/incoming-webhook?token=xxxxxxxxxxx",
-    "default": {
-      "channel": "#general",
-      "iconUrl": ""
+  "webhooks": {
+    "discord": {
+      "webhookUrl": "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.token}",
+      "default": {
+        "username": "",
+        "avatarUrl": ""
+      }      
     },
-    "pm2": {
-      "instance_name": "beavisbot",
-      "token": "xxx",
-      "team_id": "xxx"
+    "slack": {
+      "webhookUrl": "https://xxxxxx.slack.com/services/hooks/incoming-webhook?token=xxxxxxxxxxx",
+      "default": {
+        "channel": "#general",
+        "iconUrl": ""
+      }      
     }
+  },
+  "pm2": {
+    "instance_name": "beavisbot",
+    "token": "xxx",
+    "team_id": "xxx"
   },
   "responses": {
     "botConnect": "",

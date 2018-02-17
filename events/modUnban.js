@@ -6,6 +6,6 @@ module.exports = function (bot) {
         }
         var message = '[UNBAN] ' + data.username + ' was unbanned by ' + data.moderator;
         console.log(message);
-        sendToSlack(message);
+        sendToWebhooks(message);
     });
 };

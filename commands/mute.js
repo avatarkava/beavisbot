@@ -20,7 +20,7 @@ exports.handler = function (data) {
             bot.moderateUnmuteUser(user.id);
             message = '[UNMUTE] ' + data.from.username + ' unmuted ' + usernameFormatted;
             console.log(message);
-            sendToSlack(message);
+            sendToWebhooks(message);
             bot.sendChat(usernameFormatted + ' is now unmuted.');
         } else {
             // @TODO - Make this variable

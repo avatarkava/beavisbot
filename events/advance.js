@@ -59,7 +59,7 @@ module.exports = function (bot) {
                 if (bot.getMedia() && bot.getMedia().id == data.media.id) {
                     var message = '[SKIP] Skipping ' + data.media.name + ' because it appears to be stuck...';
                     console.log(message);
-                    sendToSlack(message);
+                    sendToWebhooks(message);
                     bot.sendChat('Skipping ' + data.media.name + ' because it appears to be stuck...');
                     bot.moderateForceSkip();
                 }
@@ -105,17 +105,17 @@ module.exports = function (bot) {
                                 models.Song.update({is_banned: 1}, {where: {host_id: data.media.cid}});
                                 var message = '[SKIPBAN] Song https://youtu.be/' + data.media.cid + ' skipped and ' + data.currentDJ.username + '(ID: ' + data.currentDJ.id + ') banned because they used a song from a blacklisted channel.';
                                 console.log(message);
-                                sendToSlack(message);
+                                sendToWebhooks(message);
                             } else if (!available) {
                                 var message = '[SKIP] Song was skipped because it is not available or embeddable';
                                 console.log(message);
-                                sendToSlack(message);
+                                sendToWebhooks(message);
                                 bot.sendChat('@' + data.currentDJ.username + ', skipping this video because it is not available or embeddable. Please update your playlist!');
                                 bot.moderateForceSkip();
                             } else if (lowViewCount) {
                                 var message = '[YOUTUBE] The current video played has very few views. You may want to check it for :trollface:... ' + data.media.name + ' (https://youtu.be/' + data.media.cid + ') played by ' + data.currentDJ.username + ' (ID: ' + data.currentDJ.id + ')';
                                 console.log(message);
-                                sendToSlack(message);
+                                sendToWebhooks(message);
                             }
                         });
                     }
@@ -150,7 +150,7 @@ module.exports = function (bot) {
                         logMessage += ' (' + song.banned_reason + ')';
                     }
                     console.log(logMessage);
-                    sendToSlack(logMessage);
+                    sendToWebhooks(logMessage);
                     bot.sendChat(message);
                     bot.moderateForceSkip();
                     getDbUserFromSiteUser(data.currentDJ, function (dbuser) {
@@ -168,7 +168,7 @@ module.exports = function (bot) {
                         logMessage = '[SKIP] Skipped ' + data.currentDJ.username + ' spinning an out-of-range song from ' + releaseYear + ': ' + data.media.name + ' (id: ' + data.media.id + ')'
                         message = 'Sorry @' + data.currentDJ.username + ', this song is out of range for the current theme (' + releaseYear + ').';
                         console.log(logMessage);
-                        sendToSlack(logMessage);
+                        sendToWebhooks(logMessage);
                         bot.sendChat(message);
                         bot.moderateForceSkip();
                         getDbUserFromSiteUser(data.currentDJ, function (dbuser) {
@@ -185,7 +185,7 @@ module.exports = function (bot) {
                     // Check if the song is too long for room settings.  Then check to see if it's blacklisted
                     logMessage = '[SKIP] Skipped ' + data.currentDJ.username + ' spinning a song of ' + data.media.duration + ' seconds';
                     console.log(logMessage);
-                    sendToSlack(logMessage);
+                    sendToWebhooks(logMessage);
                     var maxLengthMins = Math.floor(config.queue.maxSongLengthSecs / 60);
                     var maxLengthSecs = config.queue.maxSongLengthSecs % 60;
                     if (maxLengthSecs < 10) {

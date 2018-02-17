@@ -72,7 +72,7 @@ exports.handler = function (data) {
             }
             logMessage = '[CONFIG] ' + data.from.username + ' set `' + result.configName + '` to `' + newValue + '`';
             console.log(logMessage);
-            sendToSlack(logMessage);
+            sendToWebhooks(logMessage);
         }
         else {
             bot.sendChat('unknown setting: ' + setting);

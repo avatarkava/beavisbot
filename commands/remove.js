@@ -31,7 +31,7 @@ exports.handler = function (data) {
             models.Karma.create(userData);
             var message = '[REMOVE] ' + data.from.username + ' removed ' + user.username + ' from the wait list';
             console.log(message);
-            sendToSlack(message);
+            sendToWebhooks(message);
             models.User.update({queue_position: -1}, {where: {id: row.id}});
         });
 

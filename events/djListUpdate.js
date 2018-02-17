@@ -29,7 +29,7 @@ module.exports = function (bot) {
 
                 if (remove) {
                     console.log(logMessage);
-                    sendToSlack(logMessage);
+                    sendToWebhooks(logMessage);
                     bot.sendChat(message);
                     bot.moderateWaitListBan(row.site_id, bot.WLBAN_REASON.INAPPROPRIATE_GENRE, banLength);
                     models.User.update({

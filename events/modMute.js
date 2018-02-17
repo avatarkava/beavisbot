@@ -31,7 +31,7 @@ module.exports = function (bot) {
                 message = '[MUTE] ' + data.user.username + ' (ID: ' + data.user.id + ', LVL: ' + dbUser.site_points + ') was muted for ' + duration + ' minutes by ' + data.moderator.username;
             }
             console.log(message);
-            sendToSlack(message);
+            sendToWebhooks(message);
         });
     });
 };

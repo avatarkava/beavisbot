@@ -22,7 +22,7 @@ module.exports = function (bot) {
                 bot.sendChat("The song \"" + row.Song.name + "\" has been blacklisted.");
                 message = '[BLACKLIST] ' + from.username + ' blacklisted ' + row.Song.name + ' (ID:' + row.Song.host_id + ')';
                 console.log(message);
-                sendToSlack(message);
+                sendToWebhooks(message);
             }
         });
     };
@@ -177,7 +177,7 @@ module.exports = function (bot) {
             });
         });
         console.log(data.message);
-        sendToSlack(data.message);
+        sendToWebhooks(data.message);
 
     };
 };

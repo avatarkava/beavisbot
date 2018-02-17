@@ -9,7 +9,7 @@ module.exports = function (bot) {
         if (data.user.id != botUser.db.site_id) {
             message = '[SKIP] ' + data.user.username + ' skipped a song.';
             console.log(message);
-            sendToSlack(message);
+            sendToWebhooks(message);
         }
 
         // Data from last song played
@@ -21,6 +21,6 @@ module.exports = function (bot) {
         } else {
             console.log('[SKIP] ' + message);
         }
-        sendToSlack(message);
+        sendToWebhooks(message);
     });
 };

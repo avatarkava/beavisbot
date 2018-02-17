@@ -27,7 +27,7 @@ module.exports = function(bot) {
                 message = '[BAN] ' + data.user + ' (ID: ' + dbUser.site_id + ', LVL: ' + dbUser.site_points + ') was banned for ' + duration + ' by ' + data.moderator.username;
             }
             console.log(message);
-            sendToSlack(message);
+            sendToWebhooks(message);
 
             getDbUserFromUsername(data.moderator.username, function (modUser) {
                 var userData = {
