@@ -183,10 +183,6 @@ module.exports = function (options) {
         }).then(function () {
             callback(activeUsers);
         });
-    };
-
-    chat = function (msg) {
-        bot.sendChat(entities.encode(msg));
-    };
+    };    
 
 };

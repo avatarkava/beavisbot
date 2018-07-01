@@ -41,11 +41,11 @@ module.exports = function (bot) {
             order: [['created_at', 'DESC']]
         }).then(function (row) {
             if (!row) {
-                chat('This is the first time I have seen this video of "' + data.media.author + ' - ' + data.media.title + '"  played!');
+                bot.sendChat('This is the first time I have seen this video of "' + data.media.author + ' - ' + data.media.title + '"  played!');
             } else {
-                message = row.Song.name + ' • last played ' + timeSince(row.created_at) + ' by ' + row.User.username
-                    + ' • ' + row.listeners + ' :ear: • ' + row.positive + ' :+1: • ' + row.grabs + ' :star: • ' + row.negative + ' :-1:';
-                chat(message);
+                message = row.Song.name + ' • last played ' + timeSince(row.created_at) + ' by ' + row.User.username;
+                //    + ' • ' + row.listeners + ' :ear: • ' + row.positive + ' :+1: • ' + row.grabs + ' :star: • ' + row.negative + ' :-1:';
+                bot.sendChat(message);
             }
         });
 
@@ -60,7 +60,7 @@ module.exports = function (bot) {
                     var message = '[SKIP] Skipping ' + data.media.name + ' because it appears to be stuck...';
                     console.log(message);
                     sendToWebhooks(message);
-                    chat('Skipping ' + data.media.name + ' because it appears to be stuck...');
+                    bot.sendChat('Skipping ' + data.media.name + ' because it appears to be stuck...');
                     bot.moderateForceSkip();
                 }
             }, (nextTimerDelay));
@@ -101,7 +101,7 @@ module.exports = function (bot) {
 
                             if (banned) {
                                 bot.moderateBanUser(data.currentDJ.id, PlugAPI.BAN_REASON.OFFENSIVE_MEDIA, PlugAPI.BAN.PERMA);
-                                chat('NOOOOOOOOOPE. https://media.giphy.com/media/9wBub5vhSsTDi/giphy.gif');
+                                bot.sendChat('NOOOOOOOOOPE. https://media.giphy.com/media/9wBub5vhSsTDi/giphy.gif');
                                 models.Song.update({is_banned: 1}, {where: {host_id: data.media.cid}});
                                 var message = '[SKIPBAN] Song https://youtu.be/' + data.media.cid + ' skipped and ' + data.currentDJ.username + '(ID: ' + data.currentDJ.id + ') banned because they used a song from a blacklisted channel.';
                                 console.log(message);
@@ -110,7 +110,7 @@ module.exports = function (bot) {
                                 var message = '[SKIP] Song was skipped because it is not available or embeddable';
                                 console.log(message);
                                 sendToWebhooks(message);
-                                chat('@' + data.currentDJ.username + ', skipping this video because it is not available or embeddable. Please update your playlist!');
+                                bot.sendChat('@' + data.currentDJ.username + ', skipping this video because it is not available or embeddable. Please update your playlist!');
                                 bot.moderateForceSkip();
                             } else if (lowViewCount) {
                                 var message = '[YOUTUBE] The current video played has very few views. You may want to check it for :trollface:... ' + data.media.name + ' (https://youtu.be/' + data.media.cid + ') played by ' + data.currentDJ.username + ' (ID: ' + data.currentDJ.id + ')';
@@ -151,7 +151,7 @@ module.exports = function (bot) {
                     }
                     console.log(logMessage);
                     sendToWebhooks(logMessage);
-                    chat(message);
+                    bot.sendChat(message);
                     bot.moderateForceSkip();
                     getDbUserFromSiteUser(data.currentDJ, function (dbuser) {
                         var userData = {
@@ -169,7 +169,7 @@ module.exports = function (bot) {
                         message = 'Sorry @' + data.currentDJ.username + ', this song is out of range for the current theme (' + releaseYear + ').';
                         console.log(logMessage);
                         sendToWebhooks(logMessage);
-                        chat(message);
+                        bot.sendChat(message);
                         bot.moderateForceSkip();
                         getDbUserFromSiteUser(data.currentDJ, function (dbuser) {
                             var userData = {
@@ -191,7 +191,7 @@ module.exports = function (bot) {
                     if (maxLengthSecs < 10) {
                         maxLengthSecs = "0" + maxLengthSecs;
                     }
-                    chat('Sorry @' + data.currentDJ.username + ', this song is over our maximum room length of ' + maxLengthMins + ':' + maxLengthSecs + '.');
+                    bot.sendChat('Sorry @' + data.currentDJ.username + ', this song is over our maximum room length of ' + maxLengthMins + ':' + maxLengthSecs + '.');
                     bot.moderateForceSkip();
                     getDbUserFromSiteUser(data.currentDJ, function (dbuser) {
                         var userData = {
@@ -204,7 +204,7 @@ module.exports = function (bot) {
                     });
                 } else if (data.media.duration == 0) {
                     console.log('[ZEROLENGTH] Song was advanced by the site because it reported a duration of 0');
-                    chat('@' + data.currentDJ.username + ', this song was reported as 0:00 long. Please check your playlist or try .zerolength for more info.');
+                    bot.sendChat('@' + data.currentDJ.username + ', this song was reported as 0:00 long. Please check your playlist or try .zerolength for more info.');
                 } else if (data.media.format == 1) {
                     song.permalink = 'https://youtu.be/' + data.media.cid;
                 } else if (data.media.format == 2) {
@@ -213,7 +213,7 @@ module.exports = function (bot) {
 
                         if (!json_data.streamable) {
                             console.log('[SKIP] Song was skipped because it is not available or embeddable');
-                            chat('Skipping this video because it is not available or embeddable.');
+                            bot.sendChat('Skipping this video because it is not available or embeddable.');
                             bot.moderateForceSkip();
                         }
                     });
@@ -238,7 +238,7 @@ module.exports = function (bot) {
         }).then(function (songresponse) {
             if (songresponse !== null) {
                 if (songresponse.response != '') {
-                    chat(songresponse.response);
+                    bot.sendChat(songresponse.response);
                 }
                 if (songresponse.rate === 1) {
                     bot.woot();
