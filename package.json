@@ -23,6 +23,7 @@
     "bluebird": "*",
     "circular-json": "*",
     "cleverbot-node": "git://github.com/fojas/cleverbot-node.git",
+    "html-entities": "*",
     "plugapi": "git://github.com/plugCubed/plugAPI.git",
     "mariasql": "*",
     "moment": "*",

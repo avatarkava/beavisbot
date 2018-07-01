@@ -4,7 +4,8 @@ module.exports = function (options) {
     _ = require('underscore');
     CircularJSON = require('circular-json');
     Cleverbot = require('cleverbot-node');
-    fs = require('fs');    
+    Entities = require('html-entities').AllHtmlEntities;
+    fs = require('fs');        
     moment = require('moment');
     dpath = require('path');    
     Promise = require('bluebird');    
@@ -12,8 +13,7 @@ module.exports = function (options) {
     request = require('request');    
     S = require('string');
     Sequelize = require('sequelize');
-    YouTube = require('youtube-api');
-
+    YouTube = require('youtube-api');    
 
     config = options.config;
     bot = options.bot;    
@@ -40,7 +40,9 @@ module.exports = function (options) {
     }
 
     cleverbot = new Cleverbot;
-    cleverbot.configure({ botapi: config.apiKeys.cleverbot })
+    cleverbot.configure({ botapi: config.apiKeys.cleverbot });
+
+    entities = new Entities();
 
     PERMISSIONS = {
         NONE: 0,
@@ -181,6 +183,10 @@ module.exports = function (options) {
         }).then(function () {
             callback(activeUsers);
         });
+    };
+
+    chat = function (msg) {
+        bot.sendChat(entities.encode(msg));
     };
 
 };
