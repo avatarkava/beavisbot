@@ -43,8 +43,7 @@ module.exports = function (bot) {
             if (!row) {
                 bot.sendChat('This is the first time I have seen this video of "' + data.media.author + ' - ' + data.media.title + '"  played!');
             } else {
-                message = row.Song.name + ' • last played ' + timeSince(row.created_at) + ' by ' + row.User.username;
-                //    + ' • ' + row.listeners + ' :ear: • ' + row.positive + ' :+1: • ' + row.grabs + ' :star: • ' + row.negative + ' :-1:';
+                message = row.Song.name + ' • last played ' + timeSince(row.created_at) + ' by ' + row.User.username + ' • ' + row.listeners + ' :ear: • ' + row.positive + ' :+1: • ' + row.grabs + ' :star: • ' + row.negative + ' :-1:';
                 bot.sendChat(message);
             }
         });

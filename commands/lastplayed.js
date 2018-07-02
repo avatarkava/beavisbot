@@ -31,8 +31,7 @@ exports.handler = function (data) {
                 } else if (!row) {
                     bot.sendChat('I have not seen a song with id `' + songid + '` played.');
                 } else {
-                    message = row.Song.name + ' • last played ' + timeSince(row.created_at) + ' by ' + row.User.username;
-                    //    + ' • ' + row.listeners + ' :ear: • ' + row.positive + ' :+1: • ' + row.grabs + ' :star: • ' + row.negative + ' :-1:';
+                    message = row.Song.name + ' • last played ' + timeSince(row.created_at) + ' by ' + row.User.username + ' • ' + row.listeners + ' :ear: • ' + row.positive + ' :+1: • ' + row.grabs + ' :star: • ' + row.negative + ' :-1:';
                     bot.sendChat(message);
                 }
             });
