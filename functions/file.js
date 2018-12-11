@@ -3,7 +3,7 @@ module.exports = function (bot) {
     writeConfigState = function () {
         fs.writeFile(
             dpath.resolve(__dirname, '../configState.json'),
-            CircularJSON.stringify(config, function (key, value) {
+            Flatted.stringify(config, function (key, value) {
                 if (key == 'parent') {
                     return value.id;
                 }
@@ -38,7 +38,7 @@ module.exports = function (bot) {
 
             fs.writeFile(
                 config.roomStateFile,
-                CircularJSON.stringify(JSONstats, function (key, value) {
+                Flatted.stringify(JSONstats, function (key, value) {
                     if (key == 'parent') {
                         return value.id;
                     }

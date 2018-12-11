@@ -2,9 +2,9 @@
 module.exports = function (options) {
 
     _ = require('underscore');
-    CircularJSON = require('circular-json');
     Cleverbot = require('cleverbot-node');
     Entities = require('html-entities').AllHtmlEntities;
+    Flatted = require('flatted');
     fs = require('fs');        
     moment = require('moment');
     dpath = require('path');    

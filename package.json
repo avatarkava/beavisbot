@@ -20,16 +20,16 @@
     "node": ">= 0.6.0"
   },
   "dependencies": {
-    "bluebird": "*",
-    "circular-json": "*",
+    "bluebird": "^3.5.3",
     "cleverbot-node": "git://github.com/fojas/cleverbot-node.git",
+    "flatted": "*",
     "html-entities": "*",
-    "plugapi": "git://github.com/plugCubed/plugAPI.git",
     "mariasql": "*",
     "moment": "*",
-    "mysql": "*",
+    "mysql": "^2.16.0",
     "path": "*",
-    "request": "*",
+    "plugapi": "git://github.com/plugCubed/plugAPI.git",
+    "request": "^2.88.0",
     "require-reload": "*",
     "sequelize": "~3",
     "string": "*",
@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "node-datatable": "git://github.com/jpravetz/node-datatable.git",
-    "sqlite3": "*"
+    "sqlite3": "^4.0.4"
   },
   "optionalDependencies": {}
 }
