@@ -2,9 +2,6 @@ module.exports = function (bot) {
 
     writeConfigState = function () {
 
-        console.log('Current config...');
-        console.log(config);        
-
         fs.writeFile(
             dpath.resolve(__dirname, '../configState.json'),    
             JSON.stringify(config, function (key, value) {
