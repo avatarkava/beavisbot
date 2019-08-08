@@ -5,7 +5,7 @@ module.exports = function (bot) {
             return false;
         }
         
-        if(config.webhooks.slack.webhookUrl != null) {
+        if(config.webhooks.discord.webhookUrl != null) {
             sendToDiscord(message);    
         }
         
