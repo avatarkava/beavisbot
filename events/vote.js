@@ -1,5 +1,5 @@
 module.exports = function (bot) {
-    bot.on('vote', function (data) {
+    bot.on(PlugAPI.events.VOTE, function (data) {
 
         user = bot.getUser(data.i);
 

@@ -2,21 +2,22 @@
 module.exports = function (options) {
 
     _ = require('underscore');
-    CircularJSON = require('circular-json');
     Cleverbot = require('cleverbot-node');
-    fs = require('fs');
+    Entities = require('html-entities').AllHtmlEntities;
+    //Flatted = require('flatted');
+    fs = require('fs');        
     moment = require('moment');
-    dpath = require('path');
-    Promise = require('bluebird');
-    reload = require('require-reload')(require);
-    request = require('request');
+    dpath = require('path');    
+    Promise = require('bluebird');    
+    reload = require('require-reload')(require);    
+    request = require('request');    
     S = require('string');
     Sequelize = require('sequelize');
-    YouTube = require('youtube-api');
-
+    YouTube = require('youtube-api');    
 
     config = options.config;
-    bot = options.bot;
+    bot = options.bot;    
+
     models = require(dpath.resolve(__dirname, 'models/index'));
 
     mentions = {
@@ -25,7 +26,7 @@ module.exports = function (options) {
     };
     botUser = bot.getSelf();
 
-    models.sequelize.sync({force: config.db.forceSequelizeSync}).then(function () {
+    models.sequelize.sync({ force: config.db.forceSequelizeSync }).then(function () {
         console.log('Connected to ' + config.db.dialect + ' database: ' + config.db.database);
     });
 
@@ -39,7 +40,9 @@ module.exports = function (options) {
     }
 
     cleverbot = new Cleverbot;
-    cleverbot.configure({botapi: config.apiKeys.cleverbot})
+    cleverbot.configure({ botapi: config.apiKeys.cleverbot });
+
+    entities = new Entities();
 
     PERMISSIONS = {
         NONE: 0,
@@ -170,7 +173,7 @@ module.exports = function (options) {
         }
 
         Promise.map(_.rest(bot.getDJs(), startPosition), function (dj) {
-            return models.User.find({where: {site_id: dj.id, site: config.site}}).then(function (dbUser) {
+            return models.User.find({ where: { site_id: dj.id, site: config.site } }).then(function (dbUser) {
                 if (dbUser !== null && dbUser.site_id !== bot.getSelf().id) {
                     if (secondsSince(dbUser.last_active) <= (maxIdleMins * 60)) {
                         activeUsers.push(dbUser);
@@ -180,6 +183,6 @@ module.exports = function (options) {
         }).then(function () {
             callback(activeUsers);
         });
-    };
+    };    
 
 };

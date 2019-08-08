@@ -16,7 +16,7 @@ exports.handler = function (data) {
         bot.sendChat('Need help? Type ' + config.commandLiteral + 'callmod with the nature of your request - for example `' + config.commandLiteral + 'callmod Someone is spamming the chat!` You can also use /sos to contact a Plug Brand Ambassador. Please only use this for emergencies.');
     }
     else {
-        if (sendToSlack('@channel - ' + data.from.username + ' requested help in https://plug.dj/' + config.roomName + " \n`" + message + "`")) {
+        if (sendToWebhooks('@channel - ' + data.from.username + ' requested help in https://plug.dj/' + config.roomName + " \n`" + message + "`")) {
             bot.sendChat('A mod has been contacted and will be on the way if available, @' + data.from.username + '. @staff');
         }
     }

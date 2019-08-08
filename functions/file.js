@@ -1,16 +1,17 @@
 module.exports = function (bot) {
 
     writeConfigState = function () {
+
         fs.writeFile(
-            dpath.resolve(__dirname, '../configState.json'),
-            CircularJSON.stringify(config, function (key, value) {
+            dpath.resolve(__dirname, '../configState.json'),    
+            JSON.stringify(config, function (key, value) {
                 if (key == 'parent') {
                     return value.id;
                 }
                 else {
                     return value;
                 }
-            }, 2),
+            }, 2),                       
 
             function (err) {
                 if (err) {
@@ -25,7 +26,7 @@ module.exports = function (bot) {
         // Writes current room state to outfile so it can be used for the web
         if (config.roomStateFile) {
 
-            var JSONstats = {}
+            var JSONstats = {};
 
             JSONstats.media = bot.getMedia();
             JSONstats.permalink = permalink;
@@ -33,11 +34,12 @@ module.exports = function (bot) {
             JSONstats.roomQueue = bot.getWaitList();
             JSONstats.users = bot.getUsers();
             JSONstats.staff = bot.getStaff();
-            JSONstats.mediaHistory = bot.mediaHistory;
+            JSONstats.lastPlay = bot.lastPlay;
+            JSONstats.mediaHistory = bot.mediaHistory;            
 
             fs.writeFile(
                 config.roomStateFile,
-                CircularJSON.stringify(JSONstats, function (key, value) {
+                JSON.stringify(JSONstats, function (key, value) {
                     if (key == 'parent') {
                         return value.id;
                     }

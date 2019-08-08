@@ -11,27 +11,20 @@ exports.handler = function (data) {
     var command = _.first(input);
     var params = _.rest(input);
     var username = '';
-    var duration = 'PERMA';
+    var duration = 'HOUR';
     var message = '';
 
-    // if (params.length >= 2) {
-    //     username = _.initial(params).join(' ').trim();
-    //     duration = _.last(params).toUpperCase();
-    // }
-    if (params.length >= 1) {
+    if (params.length >= 2) {
+        username = _.initial(params).join(' ').trim();
+        duration = _.last(params).toUpperCase();
+    } else if (params.length >= 1) {
         username = params.join(' ').trim();
-    }
-    else {
+    } else {
         bot.sendChat('Usage: .[ban|unban|kick] username [PERMA|DAY|HOUR]');
         return;
     }
 
     var usernameFormatted = S(username).chompLeft('@').s;
-
-    // Don't let bouncers get too feisty (API should prohibit this, but just making sure!
-    // if (!settings.bouncerplus && data.from.role < 3) {
-    //     duration = 'HOUR';
-    // }
 
     switch (duration) {
         case 'DAY':
@@ -47,13 +40,19 @@ exports.handler = function (data) {
 
     }
 
-    models.User.find({where: {username: usernameFormatted, site: config.site}, order: 'id DESC'}).then(function (row) {
+    models.User.find({
+        where: {
+            username: usernameFormatted,
+            site: config.site
+        },
+        order: 'id DESC'
+    }).then(function (row) {
         if (row === null) {
             bot.sendChat(usernameFormatted + ' was not found.');
         } else {
             switch (command) {
                 case 'ban':
-                    console.log('[BAN] ' + usernameFormatted + ' attempting ban for ' + duration + ' (' + apiDuration + ') by ' + data.from.username);
+                    console.log('[BAN] ' + data.from.username + ' attempting to ban ' + usernameFormatted + ' for ' + duration + ' (' + apiDuration + ')');
                     bot.moderateBanUser(row.site_id, PlugAPI.BAN_REASON.OFFENSIVE_MEDIA, apiDuration);
                     break;
                 case 'unban':

@@ -98,12 +98,29 @@ module.exports = function (bot) {
                 userData.joined = new Date();
             }
 
+            // Save the alias if the user has changed username
+            if (userData.username != dbUser.username) {
+                console.log('[USER]', userData.username + ' has changed their username from ' + dbUser.username + '. Saving alias...');
+                addAlias(dbUser);
+            }
+
             // Reset the user's AFK timer if they've been gone for long enough (so we don't reset on disconnects)
             if (secondsSince(dbUser.last_seen) >= 900) {
                 userData.last_active = new Date();
                 userData.queue_position = bot.getWaitListPosition(user.id);
             }
             dbUser.updateAttributes(userData);
+        }).catch(function (err) {
+            console.log('[ERROR]', err);
+        });
+
+    };
+
+    addAlias = function (user) {
+
+        models.UserAlias.create({
+            username: user.username,
+            user_id: user.id
         }).catch(function (err) {
             console.log('[ERROR]', err);
         });

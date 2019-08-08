@@ -1,4 +1,4 @@
-module.exports = function () {
+module.exports = function (bot) {
 
     chatResponse = function (data) {
 
@@ -14,7 +14,7 @@ module.exports = function () {
         }
 
         models.EventResponse.find({
-            where: {event_type: 'chat', pattern: command, is_active: true},
+            where: { event_type: 'chat', pattern: command, is_active: true },
             order: 'RAND()'
         })
             .then(function (row) {
@@ -71,7 +71,7 @@ module.exports = function () {
                     }
                 }
                 return found;
-            })[0];
+            })[0];            
 
             if (command && command.enabled) {
 
@@ -182,7 +182,7 @@ module.exports = function () {
             }
             else {
                 models.EventResponse.find({
-                    where: {event_type: 'mention', is_active: true},
+                    where: { event_type: 'mention', is_active: true },
                     order: 'RAND()'
                 })
                     .then(function (row) {
@@ -199,7 +199,7 @@ module.exports = function () {
     };
 
     getGiphy = function (type, api_key, rating, tags, limit, returnData) {
-        var reqparams = {format: 'json', api_key: api_key, "rating": rating, "limit": limit};
+        var reqparams = { format: 'json', api_key: api_key, "rating": rating, "limit": limit };
         if (type == 'giphyt') {
             endpoint = '/v1/gifs/translate';
             search_param = 's';
@@ -235,9 +235,9 @@ module.exports = function () {
                     }
                     var randomNumber = _.random(0, data.data.length);
                     if (type == 'giphys') {
-                        returnData(data.data[randomNumber].image_url);
+                        returnData(data.data[randomNumber].image_url.split(/[?#]/)[0]);
                     } else {
-                        returnData(data.data[randomNumber].images.fixed_height.url);
+                        returnData(data.data[randomNumber].images.fixed_height.url.split(/[?#]/)[0]);
                     }
                 }
                 catch (error) {

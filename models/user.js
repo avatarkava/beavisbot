@@ -1,8 +1,7 @@
-"use strict";
 module.exports = function (sequelize, DataTypes) {
     var User = sequelize.define('User', {
         id: {type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true},
-        site: {type: DataTypes.STRING, allowNull: false, defaultValue: 'dubtrack', unique: 'site_id'},
+        site: {type: DataTypes.STRING, allowNull: false, defaultValue: 'plug', unique: 'site_id'},
         site_id: {type: DataTypes.STRING, allowNull: false, unique: 'site_id'},
         username: {type: DataTypes.STRING, allowNull: false},
         slug: {type: DataTypes.STRING, allowNull: false},
@@ -18,7 +17,8 @@ module.exports = function (sequelize, DataTypes) {
         queue_position: {type: DataTypes.INTEGER, defaultValue: -1},
         last_seen: {type: DataTypes.DATE, defaultValue: DataTypes.NOW},
         last_active: {type: DataTypes.DATE, defaultValue: DataTypes.NOW},
-        last_leave: {type: DataTypes.DATE, defaultValue: DataTypes.NOW}
+        last_leave: {type: DataTypes.DATE, defaultValue: DataTypes.NOW},
+        dj_timeout_until: {type: DataTypes.DATE, allowNull: true}
     }, {
         underscored: true,
         tableName: 'users',

@@ -1,5 +1,5 @@
 module.exports = function (bot) {
-    bot.on('roomJoin', function (data) {
+    bot.on(PlugAPI.events.ROOM_JOIN, function (data) {
         console.log('[EVENT] Ready - joined room: ' + config.roomName);
         if (config.verboseLogging) {
             console.log('[INIT] Room data: ' + JSON.stringify(data, null, 2));

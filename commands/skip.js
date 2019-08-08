@@ -98,7 +98,7 @@ exports.handler = function (data) {
 
         if (message != '') {
             console.log(message + ' ' + JSON.stringify(data, null, 2));
-            sendToSlack(message);
+            sendToWebhooks(message);
         }
 
         if (banUser) {

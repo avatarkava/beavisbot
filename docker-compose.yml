@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+
+    mariadb:
+        image: mariadb:latest
+        ports:
+            - 3306:3306
+        volumes:
+            - data:/var/lib/mysql
+        networks:
+            - database
+        environment:
+            MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
+            MYSQL_DATABASE: "${DB_NAME}"
+            MYSQL_USER: "${DB_USERNAME}"
+            MYSQL_PASSWORD: "${DB_PASSWORD}"
+            TZ: "${TZ}"
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        ports:
+            - 8080:80
+        networks:
+            - database
+        depends_on:
+            - mariadb
+        environment:
+            PMA_HOST: mysql
+            TZ: "${TZ}"
+
+volumes:
+    data:
+
+networks:
+    database:
+    server:

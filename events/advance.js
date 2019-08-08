@@ -1,6 +1,6 @@
 module.exports = function (bot) {
 
-    bot.on('advance', function (data) {
+    bot.on(bot.events.ADVANCE, function (data) {
 
         if (config.verboseLogging) {
             console.log('[EVENT] advance', JSON.stringify(data, null, 2));
@@ -8,12 +8,12 @@ module.exports = function (bot) {
             console.log('[EVENT] advance');
         }
 
-        bot.getHistory(function (history) {
-            bot.mediaHistory = history;
-        });
-
         // Save the last song's data to the DB
         saveLastSong(data.lastPlay);
+
+        // the history endpoint from plug doesn't have the last song played, so we will need to get it another way
+        bot.lastPlay = data.lastPlay;
+        bot.mediaHistory = bot.getHistory();
 
         if (data.media == undefined) {
             return;
@@ -43,8 +43,7 @@ module.exports = function (bot) {
             if (!row) {
                 bot.sendChat('This is the first time I have seen this video of "' + data.media.author + ' - ' + data.media.title + '"  played!');
             } else {
-                message = row.Song.name + ' • last played ' + timeSince(row.created_at) + ' by ' + row.User.username
-                    + ' • ' + row.listeners + ' :ear: • ' + row.positive + ' :+1: • ' + row.grabs + ' :star: • ' + row.negative + ' :-1:';
+                message = row.Song.name + ' • last played ' + timeSince(row.created_at) + ' by ' + row.User.username + ' • ' + row.listeners + ' :ear: • ' + row.positive + ' :+1: • ' + row.grabs + ' :star: • ' + row.negative + ' :-1:';
                 bot.sendChat(message);
             }
         });
@@ -59,7 +58,7 @@ module.exports = function (bot) {
                 if (bot.getMedia() && bot.getMedia().id == data.media.id) {
                     var message = '[SKIP] Skipping ' + data.media.name + ' because it appears to be stuck...';
                     console.log(message);
-                    sendToSlack(message);
+                    sendToWebhooks(message);
                     bot.sendChat('Skipping ' + data.media.name + ' because it appears to be stuck...');
                     bot.moderateForceSkip();
                 }
@@ -91,29 +90,33 @@ module.exports = function (bot) {
                             lowViewCount = true;
                         }
 
-                        //@FIXME - Move this to a databased instance
-                        if (_.contains(config.queue.bannedChannels.youtube, item.snippet.channelId)) {
-                            banned = true;
-                        }
-                    }
+                        // See if this channel is blacklisted
+                        models.Blacklist.find(
+                            {where: {$and: [{type: 'channel'}, {is_active: true}, {pattern: item.snippet.channelId}]}}
+                        ).then(function (row) {
+                            if (row) {
+                                banned = true;
+                            }
 
-                    if (banned) {
-                        bot.moderateBanUser(data.currentDJ.id, PlugAPI.BAN_REASON.OFFENSIVE_MEDIA, PlugAPI.BAN.PERMA);
-                        bot.sendChat('NOOOOOOOOOPE. https://media.giphy.com/media/9wBub5vhSsTDi/giphy.gif');
-                        models.Song.update({is_banned: 1}, {where: {host_id: data.media.cid}});
-                        var message = '[SKIPBAN] Song https://youtu.be/' + data.media.cid + ' skipped and ' + data.currentDJ.username + '(ID: ' + data.currentDJ.id + ') banned because they used a song from a blacklisted channel.';
-                        console.log(message);
-                        sendToSlack(message);
-                    } else if (!available) {
-                        var message = '[SKIP] Song was skipped because it is not available or embeddable';
-                        console.log(message);
-                        sendToSlack(message);
-                        bot.sendChat('@' + data.currentDJ.username + ', skipping this video because it is not available or embeddable. Please update your playlist!');
-                        bot.moderateForceSkip();
-                    } else if (lowViewCount) {
-                        var message = '[YOUTUBE] The current video played has very few views. You may want to check it for :trollface:... ' + data.media.name + ' (https://youtu.be/' + data.media.cid + ') played by ' + data.currentDJ.username + ' (ID: ' + data.currentDJ.id + ')';
-                        console.log(message);
-                        sendToSlack(message);
+                            if (banned) {
+                                bot.moderateBanUser(data.currentDJ.id, PlugAPI.BAN_REASON.OFFENSIVE_MEDIA, PlugAPI.BAN.PERMA);
+                                bot.sendChat('NOOOOOOOOOPE. https://media.giphy.com/media/9wBub5vhSsTDi/giphy.gif');
+                                models.Song.update({is_banned: 1}, {where: {host_id: data.media.cid}});
+                                var message = '[SKIPBAN] Song https://youtu.be/' + data.media.cid + ' skipped and ' + data.currentDJ.username + '(ID: ' + data.currentDJ.id + ') banned because they used a song from a blacklisted channel.';
+                                console.log(message);
+                                sendToWebhooks(message);
+                            } else if (!available) {
+                                var message = '[SKIP] Song was skipped because it is not available or embeddable';
+                                console.log(message);
+                                sendToWebhooks(message);
+                                bot.sendChat('@' + data.currentDJ.username + ', skipping this video because it is not available or embeddable. Please update your playlist!');
+                                bot.moderateForceSkip();
+                            } else if (lowViewCount) {
+                                var message = '[YOUTUBE] The current video played has very few views. You may want to check it for :trollface:... ' + data.media.name + ' (https://youtu.be/' + data.media.cid + ') played by ' + data.currentDJ.username + ' (ID: ' + data.currentDJ.id + ')';
+                                console.log(message);
+                                sendToWebhooks(message);
+                            }
+                        });
                     }
                 } else {
                     console.log(err);
@@ -146,7 +149,7 @@ module.exports = function (bot) {
                         logMessage += ' (' + song.banned_reason + ')';
                     }
                     console.log(logMessage);
-                    sendToSlack(logMessage);
+                    sendToWebhooks(logMessage);
                     bot.sendChat(message);
                     bot.moderateForceSkip();
                     getDbUserFromSiteUser(data.currentDJ, function (dbuser) {
@@ -164,7 +167,7 @@ module.exports = function (bot) {
                         logMessage = '[SKIP] Skipped ' + data.currentDJ.username + ' spinning an out-of-range song from ' + releaseYear + ': ' + data.media.name + ' (id: ' + data.media.id + ')'
                         message = 'Sorry @' + data.currentDJ.username + ', this song is out of range for the current theme (' + releaseYear + ').';
                         console.log(logMessage);
-                        sendToSlack(logMessage);
+                        sendToWebhooks(logMessage);
                         bot.sendChat(message);
                         bot.moderateForceSkip();
                         getDbUserFromSiteUser(data.currentDJ, function (dbuser) {
@@ -181,7 +184,7 @@ module.exports = function (bot) {
                     // Check if the song is too long for room settings.  Then check to see if it's blacklisted
                     logMessage = '[SKIP] Skipped ' + data.currentDJ.username + ' spinning a song of ' + data.media.duration + ' seconds';
                     console.log(logMessage);
-                    sendToSlack(logMessage);
+                    sendToWebhooks(logMessage);
                     var maxLengthMins = Math.floor(config.queue.maxSongLengthSecs / 60);
                     var maxLengthSecs = config.queue.maxSongLengthSecs % 60;
                     if (maxLengthSecs < 10) {

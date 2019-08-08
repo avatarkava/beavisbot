@@ -1,5 +1,3 @@
-'use strict';
-
 var fs = require('fs');
 var path = require('path');
 var Sequelize = require('sequelize');
@@ -29,6 +27,8 @@ else if (config.db.dialect === 'mariadb' || config.db.dialect === 'mysql') {
         retry: {match: 'ER_LOCK_DEADLOCK: Deadlock found when trying to get lock; try restarting transaction', max: 3}
     });
 }
+
+console.log('Sher2e...');
 
 fs.readdirSync(__dirname)
     .filter(function (file) {
