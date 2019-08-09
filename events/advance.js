@@ -16,7 +16,7 @@ module.exports = function (bot) {
         bot.mediaHistory = bot.getHistory();
 
         if (data.media == undefined || data.currentDJ == undefined) {
-            console.log('[WARNING] Data or currentDJ was undefined in advance.js');
+            console.log('[WARNING] Data or currentDJ was undefined in advance event');
             return;
         }
 
