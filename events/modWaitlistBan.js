@@ -8,6 +8,7 @@ module.exports = function (bot) {
 
         if (data.user == undefined) {
             console.log('[WARNING] data.user was undefined in modWaitlistBan event');
+            return;
         }
 
         var duration = 'unknown';
