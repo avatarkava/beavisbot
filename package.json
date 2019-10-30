@@ -31,7 +31,7 @@
     "plugapi": "git://github.com/plugCubed/plugAPI.git",
     "request": "^2.88.0",
     "require-reload": "*",
-    "sequelize": "~3",
+    "sequelize": "~5",
     "string": "*",
     "underscore": "git://github.com/jashkenas/underscore.git",
     "youtube-api": "*"
