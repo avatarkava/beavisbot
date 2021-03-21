@@ -1,58 +1,54 @@
-module.exports = function (bot) {
+const { readdirSync } = require("fs");
+const reload = require('require-reload')(require);   
 
-    commands = [];
+module.exports = function () {  
 
-    loadCommands = function (bot) {
+  loadCommands = function () {    
 
-        commands.length = 0;
-
-        // Load commands
-        try {
-            var dir = dpath.resolve(__dirname, '../commands') + '/';
-            fs.readdirSync(dir).forEach(function (file) {
-                if (file.indexOf(".js") > -1) {
-                    var command = reload(dir + file);
-
-                    command.lastRun = 0;
-                    command.lastRunUsers = {};
-
-                    if (command.minRole === undefined) {
-                        command.minRole = PERMISSIONS.NONE;
-                    }
-                    commands.push(command);
-                }
-            });
-            console.log("[INIT] Commands loaded...");
-        } catch (e) {
-            console.error('Unable to load command: ', e.stack);
+    // Load commands
+    try {
+      readdirSync("./commands/").forEach(function (file) {
+        if (file.indexOf(".js") > -1) {          
+          var command = reload(`../commands/${file}`);
+          command.lastRun = 0;
+          command.lastRunUsers = {};
+          if (command.minRole === undefined) {
+            command.minRole = PERMISSIONS.NONE;
+          }
+          bot.commands.push(command);
         }
-    };
+      });
+      console.log("[INIT] Commands loaded...");      
+    } catch (e) {
+      console.error("Unable to load command: ", e.stack);
+    }
+  };
 
-    loadEvents = function (bot) {
-        try {
-            var dir = dpath.resolve(__dirname, '../events') + '/';
-            fs.readdirSync(dir).forEach(function (file) {
-                if (file.indexOf(".js") > -1) {
-                    reload(dir + file)(bot);
-                }
-            });
-            console.log("[INIT] Events loaded...");
-        } catch (e) {
-            console.error('Unable to load event: ', e.stack);
-        }
-    };
+  // @TODO Change events to work the same as commands (exports without a constructor?)
+  loadEvents = function () {
 
-    loadExtensions = function (bot) {
-        try {
-            var dir = dpath.resolve(__dirname, '../extensions') + '/';
-            fs.readdirSync(dir).forEach(function (file) {
-                if (file.indexOf(".js") > -1) {
-                    reload(dir + file)(bot);
-                }
-            });
-            console.log("[INIT] Extensions loaded...");
-        } catch (e) {
-            console.error('Unable to load extension: ', e.stack);
+    try {
+      readdirSync("./events/").forEach(function (file) {        
+        if (file.indexOf(".js") > -1) {          
+          reload(`../events/${file}`)();
         }
-    };
+      });
+      console.log("[INIT] Events loaded...");
+    } catch (e) {
+      console.error("Unable to load event: ", e.stack);
+    }
+  };
+
+  loadExtensions = function () {
+    try {
+      readdirSync("./extensions").forEach(function (file) {
+        if (file.indexOf(".js") > -1) {
+          reload(`../extensions/${file}`)();
+        }
+      });
+      console.log("[INIT] Extensions loaded...");
+    } catch (e) {
+      console.error("Unable to load extension: ", e.stack);
+    }
+  };
 };

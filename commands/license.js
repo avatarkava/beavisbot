@@ -6,5 +6,5 @@ exports.cdUser = 30;
 exports.cdStaff = 10;
 exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
-    bot.sendChat('MIT License - Full license available at https://github.com/avatarkava/beavisbot/blob/master/LICENSE');
+    bot.speak('MIT License - Full license available at https://github.com/avatarkava/beavisbot/blob/master/LICENSE');
 };

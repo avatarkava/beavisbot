@@ -12,5 +12,5 @@ exports.handler = function (data) {
         message = input + ' ';
     }
     message += config.responses.downvoteReminder;
-    bot.sendChat(message);
+    bot.speak(message);
 };

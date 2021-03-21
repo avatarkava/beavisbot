@@ -6,6 +6,11 @@ module.exports = function (bot) {
             console.log('[EVENT] modWaitlistBan ', JSON.stringify(data, null, 2));
         }
 
+        if (data.user == undefined) {
+            console.log('[WARNING] data.user was undefined in modWaitlistBan event');
+            return;
+        }
+
         var duration = 'unknown';
         switch (data.duration) {
             case 'Short':
