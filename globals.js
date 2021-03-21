@@ -112,14 +112,12 @@ module.exports = function () {
  * Set default time thresholds for moment
  * (round up a little less aggressively)
  */
-/*
-moment.relativeTimeThreshold("s", 55);
-moment.relativeTimeThreshold("m", 90);
-moment.relativeTimeThreshold("h", 24);
-moment.relativeTimeThreshold("d", 30);
-moment.relativeTimeThreshold("M", 12);
+  moment.relativeTimeThreshold("s", 55);
+  moment.relativeTimeThreshold("m", 90);
+  moment.relativeTimeThreshold("h", 24);
+  moment.relativeTimeThreshold("d", 30);
+  moment.relativeTimeThreshold("M", 12);
 
-startupTimestamp = moment.utc().toDate();
-*/
+  startupTimestamp = moment.utc().toDate();
 
 };

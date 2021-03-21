@@ -21,9 +21,9 @@
   },
   "dependencies": {
     "cleverbot-node": "*",
-    "date-fns": "*",
     "html-entities": "*",
     "mariadb": "*",
+    "moment": "*",
     "node-fetch": "*",
     "popyt": "*",
     "require-reload": "*",

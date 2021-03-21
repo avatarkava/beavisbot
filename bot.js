@@ -1,4 +1,5 @@
 global._ = require("underscore");
+global.moment = require("moment");
 const { existsSync, readFileSync, readdirSync } = require("fs");
 require("popyt");
 //import { decode, encode } from "html-entities";

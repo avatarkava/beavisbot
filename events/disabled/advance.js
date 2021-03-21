@@ -8,22 +8,7 @@ module.exports = function (bot) {
             console.log('[EVENT] advance');
         }
 
-        // Save the last song's data to the DB
-        saveLastSong(data.lastPlay);
 
-        // the history endpoint from plug doesn't have the last song played, so we will need to get it another way
-        bot.lastPlay = data.lastPlay;
-        bot.mediaHistory = bot.getHistory();
-
-        if (data.media == undefined || data.currentDJ == undefined) {
-            console.log('[WARNING] Data or currentDJ was undefined in advance event');
-            return;
-        }
-
-        data.media.name = data.media.author + ' - ' + data.media.title;
-        console.log('********************************************************************');
-        console.log('[UPTIME]', 'Bot online ' + timeSince(startupTimestamp, true));
-        console.log('[SONG]', data.currentDJ.username + ' played: ' + data.media.name + ' (' + data.media.id + ')');
 
         // Perform automatic song metadata correction
         if (config.autoSuggestCorrections) {
