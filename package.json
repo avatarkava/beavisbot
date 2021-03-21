@@ -3,42 +3,36 @@
   "description": "A customizable social music room bot",
   "version": "2.1.0",
   "keywords": [
-    "dubtrack",
-    "dubtrack.fm"
+    "turntable",
+    "turntable.fm"
   ],
   "repository": {
     "type": "git",
     "url": "git://github.com/AvatarKava/beavisbot.git"
   },
-  "author": "Mike Burke <mburke@phpmonkeys.com>",
+  "author": "Mike Burke <mburke@dmwtechnology.com>",
   "license": "MIT",
   "main": "bot.js",
   "directories": {
     "commands": "commands"
   },
   "engines": {
-    "node": ">= 0.6.0"
+    "node": ">= 14.0.0"
   },
   "dependencies": {
-    "bluebird": "^3.5.3",
-    "cleverbot-node": "git://github.com/fojas/cleverbot-node.git",
-    "flatted": "*",
+    "cleverbot-node": "*",
+    "date-fns": "*",
     "html-entities": "*",
-    "mariasql": "*",
-    "moment": "*",
-    "mysql": "^2.16.0",
-    "path": "*",
-    "plugapi": "git://github.com/plugCubed/plugAPI.git",
-    "request": "^2.88.0",
+    "mariadb": "*",
+    "node-fetch": "*",
+    "popyt": "*",
     "require-reload": "*",
-    "sequelize": "~3",
-    "string": "*",
-    "underscore": "git://github.com/jashkenas/underscore.git",
-    "youtube-api": "*"
+    "sequelize": "~6",
+    "ttapi": "git+https://github.com/alaingilbert/Turntable-API.git",
+    "underscore": "*"
   },
   "devDependencies": {
-    "node-datatable": "git://github.com/jpravetz/node-datatable.git",
-    "sqlite3": "^4.0.4"
+    "sqlite3": "*"
   },
   "optionalDependencies": {}
 }

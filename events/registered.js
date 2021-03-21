@@ -1,18 +1,20 @@
-module.exports = function (bot) {
+module.exports = function () {
+  bot.on("registered", function (data) {
+    if (config.verboseLogging) {
+      console.log("[JOIN]", JSON.stringify(data, null, 2));
+    }
 
-    bot.on(PlugAPI.events.USER_JOIN, function (data) {
-        if (config.verboseLogging) {
-            console.log('[JOIN]', JSON.stringify(data, null, 2));
-        } else if (data.username === undefined) {
-            console.log('[JOIN] Guest joined');
-        } else {
-            console.log('[JOIN] ' + data.username + ' joined');
-        }
+    data.user.forEach(function (user) {
+      if (user.name === undefined) {
+        console.log(`[JOIN] Guest joined`);
+      }
+
+      if (user.name && user.name !== bot.user.name) {
+        console.log(`[JOIN] ${user.name} joined`);
 
         var newUser = false;
         var message = "";
-
-        if (data.username !== undefined && data.username !== botUser.username) {
+        /*
             getDbUserFromSiteUser(data, function (dbUser) {
                 if (dbUser == null) {
                     newUser = true;
@@ -38,7 +40,7 @@ module.exports = function (bot) {
                         console.log('[JOIN]', data.username + ' is a first-time visitor to the room!');
                         if (config.welcomeUsersMinLevel <= data.level && (config.welcomeUsers == "NEW" || config.welcomeUsers == "ALL")) {
                             setTimeout(function () {
-                                bot.sendChat(message)
+                                bot.sendChat(message);
                             }, 5000);
                         }
                     });
@@ -74,7 +76,7 @@ module.exports = function (bot) {
 
                             if (message && config.welcomeUsersMinLevel <= data.level && config.welcomeUsers == "ALL" && secondsSince(dbUser.last_active) >= 900 && secondsSince(dbUser.last_seen) >= 900) {
                                 setTimeout(function () {
-                                    bot.sendChat(message)
+                                    bot.sendChat(message);
                                 }, 5000);
                             }
 
@@ -101,13 +103,15 @@ module.exports = function (bot) {
                         models.Karma.create(userData);
 
                         setTimeout(function () {
-                            bot.sendChat('put @' + data.username + ' back in line (reconnected after ' + timeSince(dbUser.last_seen, true) + ') :thumbsup:')
+                            bot.sendChat('put @' + data.username + ' back in line (reconnected after ' + timeSince(dbUser.last_seen, true) + ') :thumbsup:');
                         }, 5000);
 
                     });
                 }
             });
             updateDbUser(data);
-        }
+            */
+      }
     });
+  });
 };

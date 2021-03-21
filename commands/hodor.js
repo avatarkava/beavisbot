@@ -6,5 +6,5 @@ exports.cdUser = 30;
 exports.cdStaff = 10;
 exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
-    bot.sendChat('Hodor!');
+    bot.speak('Hodor!');
 };

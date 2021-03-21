@@ -1,6 +1,6 @@
 module.exports = function (bot) {
 
-    bot.on(bot.events.ADVANCE, function (data) {
+    bot.on(PlugAPI.events.ADVANCE, function (data) {
 
         if (config.verboseLogging) {
             console.log('[EVENT] advance', JSON.stringify(data, null, 2));
@@ -165,7 +165,7 @@ module.exports = function (bot) {
                 } else if (song.release_date != null && config.queue.minSongReleaseDate != null && config.queue.maxSongReleaseDate != null) {
                     if (moment(song.release_date).isBefore(config.queue.minSongReleaseDate) || moment(song.release_date).isAfter(config.queue.maxSongReleaseDate)) {
                         var releaseYear = moment(song.release_date).format("Y");
-                        logMessage = '[SKIP] Skipped ' + data.currentDJ.username + ' spinning an out-of-range song from ' + releaseYear + ': ' + data.media.name + ' (id: ' + data.media.id + ')'
+                        logMessage = '[SKIP] Skipped ' + data.currentDJ.username + ' spinning an out-of-range song from ' + releaseYear + ': ' + data.media.name + ' (id: ' + data.media.id + ')';
                         message = 'Sorry @' + data.currentDJ.username + ', this song is out of range for the current theme (' + releaseYear + ').';
                         console.log(logMessage);
                         sendToWebhooks(logMessage);
