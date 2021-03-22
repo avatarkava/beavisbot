@@ -38,6 +38,10 @@ module.exports = function () {
     */
   };
 
+  getUsers = function() {
+    return [];
+  };
+
   getWaitListPosition = function (userId) {
     return -1;
   };

@@ -6,5 +6,5 @@ exports.cdUser = 30;
 exports.cdStaff = 10;
 exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
-    bot.speak(`online ${ timeSince(uptime.getTime(), true) } (since ${ moment.utc(uptime.getTime()).calendar() })`);
+    bot.speak(`online ${ timeSince(uptime.getTime(), true) } (since ${ moment.utc(uptime.getTime()).calendar() } UTC)`);
 };

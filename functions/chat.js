@@ -15,25 +15,23 @@ module.exports = function () {
       target = input[1].trim();
     }
 
-    /*
-  models.EventResponse.find({
-    where: { event_type: "chat", pattern: command, is_active: true },
-    order: "RAND()",
-  }).then(function (row) {
-    if (row === null) {
-      return;
-    } else if (target != null) {
-      // Remove /me from the beginning of targeting since it won't alert someone
-      if (row.response.indexOf("/me") === 0) {
-        row.response = "@" + target + " " + S(row.response).chompLeft("/me").s;
-      } else {
-        row.response = "@" + target + " " + row.response;a;
+    models.EventResponse.findOne({
+      where: { event_type: "chat", pattern: command, is_active: true },
+      order: models.sequelize.random()
+    }).then(function (row) {
+      if (row === null) {
+        return;
+      } else if (target != null) {
+        // Remove /me from the beginning of targeting since it won't alert someone
+        if (row.response.indexOf("/me") === 0) {
+          row.response = "@" + target + " " + S(row.response).chompLeft("/me").s;
+        } else {
+          row.response = "@" + target + " " + row.response;        
+        }
       }
-    }
 
-    bot.sendChat(row.response.replace("{sender}", data.name));
-  });
-  */
+      bot.speak(row.response.replace("{sender}", data.name));
+    });
   };
 
   handleChat = function (data) {

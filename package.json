@@ -28,9 +28,9 @@
     "popyt": "*",
     "require-reload": "*",
     "sequelize": "~6",
-    "slugify": "*",
     "ttapi": "git+https://github.com/alaingilbert/Turntable-API.git",
-    "underscore": "*"
+    "underscore": "*",
+    "underscore.string": "*"
   },
   "devDependencies": {
     "sqlite3": "*"

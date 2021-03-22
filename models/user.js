@@ -27,11 +27,11 @@ module.exports = function (sequelize, DataTypes) {
       tableName: "users",
       setterMethods: {
         username: function (v) {
-          this.setDataValue("slug", slugify(v, {lower: true}));
+          this.setDataValue("slug", S.slugify(v));
           return this.setDataValue("username", v);
         },
         slug: function (v) {
-          return this.setDataValue("slug", slugify(v, {lower: true}));
+          return this.setDataValue("slug", S.slugify(v));
         },
       },
     }

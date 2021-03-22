@@ -15,11 +15,11 @@ module.exports = function (sequelize, DataTypes) {
       tableName: "room_events",
       setterMethods: {
         title: function (v) {
-          this.setDataValue("slug", S(v).slugify().s);
+          this.setDataValue("slug", S.slugify(v));
           return this.setDataValue("title", v);
         },
         slug: function (v) {
-          return this.setDataValue("slug", S(v).slugify().s);
+          return this.setDataValue("slug", S.slugify(v));
         },
       },
     }

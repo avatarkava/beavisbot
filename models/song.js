@@ -26,12 +26,12 @@ module.exports = function (sequelize, DataTypes) {
       ],
       setterMethods: {
         name: function (v) {
-          var formattedSlug = slugify(v, {lower: true});
+          var formattedSlug = S.slugify(v);
           this.setDataValue("slug", formattedSlug);
           return this.setDataValue("name", v);
         },
         slug: function (v) {
-          return this.setDataValue("slug", slugify(v, {lower: true}));
+          return this.setDataValue("slug", S.slugify(v));
         },
       },
     }

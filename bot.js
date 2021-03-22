@@ -1,7 +1,8 @@
 // Utility libraries used throughout the app
 global._ = require("underscore");
+global.S = require("underscore.string");
 global.moment = require("moment");
-global.slugify = require("slugify");
+
 
 const { existsSync, readFileSync, readdirSync } = require("fs");
 require("popyt");
