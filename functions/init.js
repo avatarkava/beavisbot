@@ -7,6 +7,7 @@ module.exports = function () {
 
     // Load commands
     try {
+      bot.commands = [];
       readdirSync("./commands/").forEach(function (file) {
         if (file.indexOf(".js") > -1) {          
           var command = reload(`../commands/${file}`);

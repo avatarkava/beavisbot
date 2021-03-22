@@ -7,5 +7,5 @@ exports.cdUser = 30;
 exports.cdStaff = 10;
 exports.minRole = PERMISSIONS.RDJ_PLUS;
 exports.handler = function (data) {
-    bot.meh();
+    bot.vote('down');
 };

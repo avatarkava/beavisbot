@@ -13,32 +13,21 @@ module.exports = function () {
       bot.speak(config.responses.botConnect);
     }
 
-    data.users.forEach(function (user) {
-      console.log(`Update db for user: ${user.name}`);
-
+    data.users.forEach(function (user) {    
       if (user.userid == config.auth.userId) {
         bot.user = user;
-        /*
-                getDbUserFromSiteUser(botUser, function (row) {
-                    botUser.db = row;
-                });    
-                */
         if (config.verboseLogging) {
           console.log("[INIT] Data loaded for " + bot.user.name + "\n " + JSON.stringify(bot.user, null, 2));
         }
       }
 
-      //updateDbUser(user);
+      // @TODO bulkify this using bulkCreate()
+      updateDbUser(user);      
     });
 
     if (config.queue.upvoteSongs == "ALL" && data.room.metadata.current_song) {
       bot.bop();
     }
-
-    /*
-        if (config.queue.djIdleAfterMins > 0) {
-            setInterval(monitorDJList, 5000);
-        }
-        */
+    
   });
 };

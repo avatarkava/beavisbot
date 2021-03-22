@@ -20,8 +20,7 @@ exports.handler = function (data) {
   }
 
   // @TODO - Find a way to reload the events (bot.on bindings need to be purged and reset)
-  // loadEvents(bot);
-
+  // loadEvents(bot);  
   loadCommands();
   loadExtensions();
   bot.speak(`Commands and config reloaded, @${data.name}!`);

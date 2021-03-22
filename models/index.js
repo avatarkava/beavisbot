@@ -1,49 +1,58 @@
-var fs = require('fs');
-var path = require('path');
-var Sequelize = require('sequelize');
-var basename = path.basename(module.filename);
-var config = require(__dirname + '/../config.json');
-var db = {};
-var logLevel = false;
+let Sequelize = require("sequelize");
+const { readdirSync } = require("fs");
+let db = {};
 
+let logLevel = false;
 if (config.verboseLogging) {
-    var logLevel = console.log;
+  logLevel = console.log;
 }
 
-if (config.db.dialect === 'sqlite') {
-    var sequelize = new Sequelize(null, null, null, {
-        dialect: config.db.dialect,
-        storage: config.db.storage,
-        logging: logLevel
-    });
-}
-else if (config.db.dialect === 'mariadb' || config.db.dialect === 'mysql') {
-    var sequelize = new Sequelize(config.db.database, config.db.username, config.db.password, {
-        host: config.db.host,
-        dialect: config.db.dialect,
-        port: config.db.port,
-        logging: logLevel,
-        charset: 'utf8',
-        retry: {match: 'ER_LOCK_DEADLOCK: Deadlock found when trying to get lock; try restarting transaction', max: 3}
-    });
+let sequelize = undefined;
+if (config.db.dialect === "sqlite") {
+  sequelize = new Sequelize(null, null, null, {
+    dialect: config.db.dialect,
+    storage: config.db.storage,
+    logging: logLevel,
+  });
+} else if (config.db.dialect === "mariadb" || config.db.dialect === "mysql") {
+  sequelize = new Sequelize(config.db.database, config.db.username, config.db.password, {
+    host: config.db.host,
+    dialect: config.db.dialect,
+    port: config.db.port,
+    logging: logLevel,
+    charset: "utf8",
+    retry: { match: "ER_LOCK_DEADLOCK: Deadlock found when trying to get lock; try restarting transaction", max: 3 },
+  });
 }
 
-console.log('Sher2e...');
+try {
+  sequelize.authenticate().then(function () {
+    console.log("Connected to " + config.db.dialect + " database: " + config.db.database);
+  });
+} catch (error) {
+  console.error("Unable to connect to the database:", error);
+}
 
-fs.readdirSync(__dirname)
-    .filter(function (file) {
-        return (file.indexOf('.') !== 0) && (file !== basename);
-    })
-    .forEach(function (file) {
-        if (file.slice(-3) !== '.js') return;
-        var model = sequelize['import'](path.join(__dirname, file));
-        db[model.name] = model;
-    });
+// @TODO Do we do a sequelize sync here?
+try {
+  sequelize.sync({ alter: config.db.forceSequelizeSync }).then(function () {
+    console.log("Synced sequelize to database: " + config.db.database);
+  });
+} catch (error) {
+  console.error("Unable to sync the database:", error);
+}
+
+readdirSync("./models").forEach(function (file) {
+  if (file.indexOf(".js") > -1 && file !== "index.js") {
+    let model = require("./" + file)(sequelize, Sequelize);
+    db[model.name] = model;
+  }
+});
 
 Object.keys(db).forEach(function (modelName) {
-    if (db[modelName].associate) {
-        db[modelName].associate(db);
-    }
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
+  }
 });
 
 db.sequelize = sequelize;

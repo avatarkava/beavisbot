@@ -12,6 +12,6 @@ exports.handler = function (data) {
             "can be gifted by users or earned from " + bot.user.name + " by DJing or winning games. " +
             "Use .gift to give or .info to check your balance! Info on what " + config.customPointName +
             " can buy will be available soon!";
-        bot.sendChat(message);
+        bot.speak(message);
     }
 };

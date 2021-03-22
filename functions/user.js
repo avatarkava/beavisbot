@@ -1,5 +1,4 @@
-module.exports = function () {  
-
+module.exports = function () {
   // Case-insensitive search for user
   findUserInList = function (list, username) {
     var lowerUser = username.toLowerCase();
@@ -8,16 +7,16 @@ module.exports = function () {
     });
   };
 
-  getDbUserFromSiteUser = function (siteUser, callback) {
-    models.User.find({
-      where: { site_id: siteUser.id.toString(), site: config.site },
+  getDbUserFromUserId = function (siteUserId, callback) {    
+    models.User.findOne({
+      where: { site_id: siteUserId, site: config.site },
     }).then(function (row) {
       callback(row);
     });
   };
 
   getDbUserFromUsername = function (siteUsername, callback) {
-    models.User.find({
+    models.User.findOne({
       where: { username: siteUsername, site: config.site },
       order: "id ASC",
     }).then(function (row) {
@@ -28,19 +27,19 @@ module.exports = function () {
   hasPermission = function (user, minRole) {
     // @FIXME We aren't checking anything yet!!!
     return true;
+    /*
     if (user.role == PlugAPI.ROOM_ROLE.RESIDENTDJ) {
-      return (
-        user.role >= minRole ||
-        (minRole == PERMISSIONS.RDJ_PLUS && settings["rdjplus"])
-      );
+      return user.role >= minRole || (minRole == PERMISSIONS.RDJ_PLUS && settings["rdjplus"]);
     } else if (user.role == PlugAPI.ROOM_ROLE.BOUNCER) {
-      return (
-        user.role >= minRole ||
-        (minRole == PERMISSIONS.BOUNCER_PLUS && settings["bouncerplus"])
-      );
+      return user.role >= minRole || (minRole == PERMISSIONS.BOUNCER_PLUS && settings["bouncerplus"]);
     }
 
     return user.role >= minRole;
+    */
+  };
+
+  getWaitListPosition = function (userId) {
+    return -1;
   };
 
   saveWaitList = function (wholeRoom) {
@@ -61,10 +60,7 @@ module.exports = function () {
           { where: { site: config.site, site_id: user.id.toString() } }
         );
       } else {
-        models.User.update(
-          { queue_position: -1 },
-          { where: { site: config.site, site_id: user.id.toString() } }
-        );
+        models.User.update({ queue_position: -1 }, { where: { site: config.site, site_id: user.id.toString() } });
       }
 
       if (config.verboseLogging) {
@@ -83,51 +79,39 @@ module.exports = function () {
     );
   };
 
-  updateDbUser = function (user) {
-    var userData = {
+  updateDbUser = function (user) {        
+    
+    const userData = {
       site: config.site,
-      site_id: user.id,
-      username: user.username,
-      slug: user.slug,
-      language: user.language,
-      avatar: user.avatarID,
-      badge: user.badge,
-      bio: user.blurb,
-      role: user.role,
-      site_points: user.level,
+      site_id: user.userid,
+      username: user.name,
+      avatar: user.avatarid,
+      role: user.acl,
+      site_points: user.points,
       last_seen: new Date(),
     };
 
     models.User.findOrCreate({
-      where: { site_id: user.id, site: config.site },
+      where: { site_id: user.userid, site: config.site },
       defaults: userData,
     })
-      .spread(function (dbUser) {
-        // Set join date to be the first time we see the user in our room
-        if (dbUser.joined === undefined) {
-          userData.joined = new Date();
-        }
-
+      .then(([dbUser, created]) => {
         // Save the alias if the user has changed username
-        if (userData.username != dbUser.username) {
-          console.log(
-            "[USER]",
-            userData.username +
-              " has changed their username from " +
-              dbUser.username +
-              ". Saving alias..."
-          );
+        if (dbUser.username && userData.username != dbUser.username) {
+          console.log("[USER]", userData.username + " has changed their username from " + dbUser.username + ". Saving alias...");
           addAlias(dbUser);
         }
 
         // Reset the user's AFK timer if they've been gone for long enough (so we don't reset on disconnects)
-        if (secondsSince(dbUser.last_seen) >= 900) {
-          userData.last_active = new Date();
-          userData.queue_position = bot.getWaitListPosition(user.id);
-        }
-        dbUser.updateAttributes(userData);
+        if (secondsSince(dbUser.last_seen) >= 900) {                                
+            dbUser.last_active = new Date();
+            dbUser.queue_position = getWaitListPosition(user.userid);                
+        }      
+        
+        dbUser.last_seen = new Date();
+        return dbUser.save();                
       })
-      .catch(function (err) {
+      .catch((err) => {
         console.log("[ERROR]", err);
       });
   };
@@ -140,5 +124,4 @@ module.exports = function () {
       console.log("[ERROR]", err);
     });
   };
-  
 };

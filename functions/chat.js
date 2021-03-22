@@ -1,5 +1,4 @@
 module.exports = function () {
-    
   const Cleverbot = require("cleverbot-node");
   let cleverbot = new Cleverbot();
   cleverbot.configure({ botapi: config.apiKeys.cleverbot });
@@ -14,7 +13,7 @@ module.exports = function () {
     let target = null;
     if (input.length > 1) {
       target = input[1].trim();
-    }    
+    }
 
     /*
   models.EventResponse.find({
@@ -100,7 +99,7 @@ module.exports = function () {
           console.log("[COMMAND]", JSON.stringify(data, null, 2));
         }
 
-        if (can_run_command && hasPermission(data.userid, command.minRole)) {                    
+        if (can_run_command && hasPermission(data.userid, command.minRole)) {
           const r = command.handler(data);
           if (typeof r === "object" && "cdAll" in r && "cdUser" in r) {
             command.lastRun = cur_time - command.cdAll + r.cdAll;
@@ -108,7 +107,7 @@ module.exports = function () {
           } else if (r !== false) {
             command.lastRun = cur_time;
             command.lastRunUsers[data.userid] = cur_time;
-          }        
+          }
         }
       } else if (!config.quietMode) {
         // @TODO - Build the list of possible commands on init() instead of querying every time

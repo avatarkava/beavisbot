@@ -9,6 +9,6 @@ exports.handler = function (data) {
   bot.speak("https://media.tenor.com/images/2ff5166ebf3686f71eb681d887540aaa/tenor.gif");
   setTimeout(function () {
     bot.speak("YEAAAAAHHHHHHHHHHHHHHHHHHHHHHH");
-  }, 5000);
+  }, 8000);
 };
 1;

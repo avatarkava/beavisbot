@@ -1,7 +1,6 @@
 const { writeFile } = require("fs");
 
 module.exports = function () {
-
   writeConfigState = function () {
     writeFile(
       "../configState.json",
@@ -63,5 +62,4 @@ module.exports = function () {
       );
     }
   };
-
 };

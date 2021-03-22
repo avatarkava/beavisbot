@@ -1,16 +1,52 @@
 module.exports = function () {
   bot.on("endsong", function (data) {
-    if (config.verboseLogging) {
-      console.log("[SONG END]", JSON.stringify(data, null, 2));
-    } else if (data.userid && data.name) {
-      console.log("[SONG END]", data.name + ": " + data.text);
+    const song = data.room.metadata.current_song;
+    if (song.source == "yt") {
+      song.source = "youtube";
     }
 
-    // Save the last song's data to the DB
-    // saveLastSong(data.lastPlay);
+    if (config.verboseLogging) {
+      console.log("[SONG END]", JSON.stringify(data, null, 2));
+    } else {
+      console.log(`[SONG END] ${song.djname} (${song.djid}) played: ${song.metadata.artist} - ${song.metadata.song} (${song.source}: ${song.sourceid})`);
+    }
 
-    // the history endpoint from plug doesn't have the last song played, so we will need to get it another way
-    //bot.lastPlay = data.lastPlay;
-    //bot.mediaHistory = bot.getHistory();
+    // Write current song data to DB
+    const songData = {
+      author: song.metadata.artist,
+      title: song.metadata.song,
+      name: song.metadata.artist + " - " + song.metadata.song,
+      host: song.source,
+      host_id: song.sourceid,
+      duration: song.metadata.length,
+      image: song.metadata.coverart,
+    };
+
+    models.Song.upsert(songData, { returning: true })
+    .then(() => {
+      let userRecord = models.User.findOne({ where: { site: config.site, site_id: song.djid } });
+      let songRecord = models.Song.findOne({ where: { host: song.source, host_id: song.sourceid } });
+      return Promise.all( [userRecord, songRecord]);
+    }).then(([userRecord, songRecord]) => {
+      
+        if (!userRecord) throw new Error('No user found to associate on song insertion');
+        if (!songRecord) throw new Error('No song found - maybe the insert failed?');        
+        
+        return songRecord.createPlay({
+          UserId: userRecord.dataValues.id,
+          site: config.site,
+          positive: data.room.metadata.upvotes,
+          negative: data.room.metadata.downvotes,
+          grabs: 0, // @FIXME need to count these!
+          listeners: data.room.metadata.listeners,
+          skipped: false, // @FIXME any way to detect this?
+        });
+      })
+      .then((playRecord) => {
+        //console.log(playRecord);
+        //transferCustomPoints(null, data.dj, data.score.grabs);
+        //writeRoomState();
+      })
+      .catch((err) => console.log("[ERROR]", err));
   });
 };

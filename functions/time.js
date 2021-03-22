@@ -1,5 +1,4 @@
 module.exports = function () {
-
   timeSince = function (timestamp, suppressAgo) {
     ago = typeof suppressAgo !== "undefined" ? suppressAgo : false;
     var message = moment.utc(timestamp).fromNow(suppressAgo);
@@ -30,5 +29,5 @@ module.exports = function () {
     var now = moment.utc();
     timestamp = moment.utc(timestamp);
     return timestamp.diff(now, "seconds");
-  };  
+  };
 };

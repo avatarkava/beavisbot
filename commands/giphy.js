@@ -7,8 +7,8 @@ exports.cdStaff = 10;
 exports.minRole = PERMISSIONS.NONE;
 exports.handler = function (data) {
 
-    var command = _.first(data.message.split(' '));
-    var params = _.rest(data.message.split(' '), 1);
+    var command = _.first(data.text.split(' '));
+    var params = _.rest(data.text.split(' '), 1);
     var api_key = "dc6zaTOxFJmzC"; // public beta key
     var rating = "pg"; // PG gifs
     var tags = null;
@@ -19,7 +19,8 @@ exports.handler = function (data) {
         //@TODO - Add usage
         return;
     }
-
+    
+    /*
     attemptPurchase(data.from, pointCost, function(success) {
         if (success == true) {
             tags = params.join('+').trim().replace(/ /g, "+");
@@ -33,5 +34,6 @@ exports.handler = function (data) {
             }, tags != null ? tags : null);
         }
     });
+    */
 
 };
