@@ -1,5 +1,4 @@
 module.exports = function () {
-
   sendToWebhooks = function (message) {
     if (message == "") {
       return false;
@@ -23,22 +22,18 @@ module.exports = function () {
 
     formPayload = JSON.stringify(formPayload);
 
-    request.post(
-      config.webhooks.discord.webhookUrl,
-      { form: { payload_json: formPayload } },
-      function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-          if (body == "ok") {
-            return true;
-          } else {
-            return false;
-          }
+    request.post(config.webhooks.discord.webhookUrl, { form: { payload_json: formPayload } }, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        if (body == "ok") {
+          return true;
         } else {
-          console.log(error);
           return false;
         }
+      } else {
+        console.log(error);
+        return false;
       }
-    );
+    });
   };
 
   sendToSlack = function (message) {
@@ -52,22 +47,18 @@ module.exports = function () {
 
     formPayload = JSON.stringify(formPayload);
 
-    request.post(
-      config.webhooks.slack.webhookUrl,
-      { form: { payload: formPayload } },
-      function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-          if (body == "ok") {
-            return true;
-          } else {
-            return false;
-          }
+    request.post(config.webhooks.slack.webhookUrl, { form: { payload: formPayload } }, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        if (body == "ok") {
+          return true;
         } else {
-          console.log(error);
           return false;
         }
+      } else {
+        console.log(error);
+        return false;
       }
-    );
+    });
   };
   return exports;
 };

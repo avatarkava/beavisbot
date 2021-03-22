@@ -1,5 +1,4 @@
 module.exports = function () {
-
   correctMetadata = function () {
     var media = bot.getMedia();
 
@@ -52,5 +51,5 @@ module.exports = function () {
     //        }
     //    }
     //});
-  };  
+  };
 };

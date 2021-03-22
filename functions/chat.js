@@ -17,7 +17,7 @@ module.exports = function () {
 
     models.EventResponse.findOne({
       where: { event_type: "chat", pattern: command, is_active: true },
-      order: models.sequelize.random()
+      order: models.sequelize.random(),
     }).then(function (row) {
       if (row === null) {
         return;
@@ -26,7 +26,7 @@ module.exports = function () {
         if (row.response.indexOf("/me") === 0) {
           row.response = "@" + target + " " + S(row.response).chompLeft("/me").s;
         } else {
-          row.response = "@" + target + " " + row.response;        
+          row.response = "@" + target + " " + row.response;
         }
       }
 

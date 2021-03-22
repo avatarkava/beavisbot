@@ -106,7 +106,7 @@ module.exports = function () {
 
   uptime = new Date();
   lastRpcMessage = new Date();
-
+  roomHasActiveStaff = true;
 
   /**
  * Set default time thresholds for moment
