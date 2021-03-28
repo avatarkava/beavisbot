@@ -43,7 +43,7 @@ module.exports = function () {
         });
       })
       .then((playRecord) => {        
-        transferCustomPoints(null, userRecord.dataValues.id, roomState.snags);
+        transferCustomPoints(null, playRecord.UserId, roomState.snags);
         //writeRoomState();
       })
       .catch((err) => console.log("[ERROR]", err));
