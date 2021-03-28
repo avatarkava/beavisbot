@@ -65,8 +65,10 @@ bot.commands = [];
 bot.user = {};
 //bot.debug = config.verboseLogging;
 
-global.roomState = {};
-roomState.mentions = { lastRunAll: 0, lastRunUsers: [] };
+global.roomState = {
+  mentions: { lastRunAll : 0, lastRunUsers: [] },
+  snags: 0,
+};
 
 require("./globals.js")();
 
