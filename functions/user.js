@@ -7,7 +7,7 @@ module.exports = function () {
     });
   };
 
-  getDbUserFromUserId = function (siteUserId, callback) {    
+  getDbUserFromUserId = function (siteUserId, callback) {
     models.User.findOne({
       where: { site_id: siteUserId, site: config.site },
     }).then(function (row) {
@@ -38,7 +38,7 @@ module.exports = function () {
     */
   };
 
-  getUsers = function() {
+  getUsers = function () {
     return [];
   };
 
@@ -83,8 +83,9 @@ module.exports = function () {
     );
   };
 
-  updateDbUser = function (user) {        
-    
+  updateDbUser = function (user) {
+    if (user.name == "Guest") return;
+
     const userData = {
       site: config.site,
       site_id: user.userid,
@@ -101,26 +102,26 @@ module.exports = function () {
     })
       .then(([dbUser, created]) => {
         // Save the alias if the user has changed username
-        if (dbUser.username && userData.username != 'Guest' && userData.username != dbUser.username) {
+        if (dbUser.username && userData.username != dbUser.username) {
           console.log("[USER]", userData.username + " has changed their username from " + dbUser.username + ". Saving alias...");
           addAlias(dbUser);
         }
 
         // Reset the user's AFK timer if they've been gone for long enough (so we don't reset on disconnects)
-        if (secondsSince(dbUser.last_seen) >= 900) {                                
-            dbUser.last_active = new Date();
-            dbUser.queue_position = getWaitListPosition(user.userid);                
-        }      
-        
+        if (secondsSince(dbUser.last_seen) >= 900) {
+          dbUser.last_active = new Date();
+          dbUser.queue_position = getWaitListPosition(user.userid);
+        }
+
         dbUser.last_seen = new Date();
-        return dbUser.save();                
+        return dbUser.save();
       })
       .catch((err) => {
         console.log("[ERROR]", err);
       });
   };
 
-  addAlias = function (user) {    
+  addAlias = function (user) {
     models.UserAlias.create({
       username: user.username,
       user_id: user.id,
