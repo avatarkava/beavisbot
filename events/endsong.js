@@ -23,15 +23,15 @@ module.exports = function () {
     };
 
     models.Song.upsert(songData, { returning: true })
-    .then(() => {
-      let userRecord = models.User.findOne({ where: { site: config.site, site_id: song.djid } });
-      let songRecord = models.Song.findOne({ where: { host: song.source, host_id: song.sourceid } });
-      return Promise.all( [userRecord, songRecord]);
-    }).then(([userRecord, songRecord]) => {
-      
-        if (!userRecord) throw new Error('No user found to associate on song insertion');
-        if (!songRecord) throw new Error('No song found - maybe the insert failed?');        
-        
+      .then(() => {
+        let userRecord = models.User.findOne({ where: { site: config.site, site_id: song.djid } });
+        let songRecord = models.Song.findOne({ where: { host: song.source, host_id: song.sourceid } });
+        return Promise.all([userRecord, songRecord]);
+      })
+      .then(([userRecord, songRecord]) => {
+        if (!userRecord) throw new Error("No user found to associate on song insertion");
+        if (!songRecord) throw new Error("No song found - maybe the insert failed?");
+
         songRecord.createPlay({
           UserId: userRecord.dataValues.id,
           site: config.site,
@@ -42,10 +42,12 @@ module.exports = function () {
           skipped: false, // @FIXME any way to detect this?
         });
 
-        transferCustomPoints(null, song.djid, roomState.snags);
+        if (roomState.snags > 0) {
+          transferCustomPoints(null, song.djid, roomState.snags);
+        }
+
         //writeRoomState();
-        
-      })      
+      })
       .catch((err) => console.log("[ERROR]", err));
   });
 };
