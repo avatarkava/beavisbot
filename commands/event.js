@@ -15,9 +15,9 @@ exports.handler = function (data) {
         limit: 3
     }).then(function (rows) {
         if (rows.length === 0) {
-            bot.sendChat('No events currently scheduled.');
+            bot.speak('No events currently scheduled.');
         } else {
-            bot.sendChat(rows.map(function (row) {
+            bot.speak(rows.map(function (row) {
                 var message = row.title;
                 if (row.details !== null) {
                     message += ' - ' + row.details;

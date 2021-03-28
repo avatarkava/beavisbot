@@ -6,18 +6,20 @@ exports.cdUser = 30;
 exports.cdStaff = 10;
 exports.minRole = PERMISSIONS.RDJ_PLUS;
 exports.handler = function (data) {
-    var params = _.rest(data.message.split(' '), 1);
+    var params = _.rest(data.text.split(' '), 1);
     var ch = '';
-    var lang = 'en';
+    var lang = 'en';    
+
 
     if (params.length >= 1) {
-        username = params.join(' ').trim()
+        username = params.join(' ').trim();
         usernameFormatted = S(username).chompLeft('@').s;
-        var user = findUserInList(bot.getUsers(), usernameFormatted);
-        if (user) {
+        // Currently TT doesn't support languages in profiles
+        //var user = findUserInList(bot.getUsers(), usernameFormatted);
+        //if (user) {
             ch += '@' + usernameFormatted + ' ';
-            lang = user.language;
-        }
+            //lang = user.language;
+        //}
     }
 
     switch (lang) {
@@ -59,6 +61,6 @@ exports.handler = function (data) {
             break;
     }
 
-    bot.sendChat(ch);
+    bot.speak(ch);
 
 };
