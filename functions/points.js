@@ -31,9 +31,9 @@ module.exports = function () {
               custom_points: models.sequelize.literal("(custom_points + " + points + ")"),
             },
             { where: { site_id: toUserId } }
-          );
-          console.log("[GIFT] " + fromUser.username + " awarded " + points + " points to " + toUser.username);
-          bot.sendChat(":gift: " + fromUser.username + " awarded " + points + " " + config.customPointName + " to @" + toUser.username);
+          );          
+          console.log(`[GIFT] ${fromUser.username} awarded ${points} points to ${toUser.username}`);
+          bot.speak(`:gift: ${fromUser.username} awarded ${points} ${config.customPointName} to @${toUser.username}`);
           return;
         });
       } else {
@@ -57,8 +57,8 @@ module.exports = function () {
             { where: { site_id: toUserId } }
           );
 
-          console.log("[GIFT] " + fromUser.username + " gave " + points + " points to " + toUser.username);
-          bot.sendChat(":gift: @" + fromUser.username + " gave " + points + " " + config.customPointName + " to @" + toUser.username + " :gift:");
+          console.log(`[GIFT] ${fromUser.username} gave ${points} points to ${toUser.username}`);
+          bot.speak(`:gift: @${fromUser.username} gave ${points} ${config.customPointName} to @${toUser.username} :gift:`);
         });
       }
     });

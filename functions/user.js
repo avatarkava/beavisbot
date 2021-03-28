@@ -101,7 +101,7 @@ module.exports = function () {
     })
       .then(([dbUser, created]) => {
         // Save the alias if the user has changed username
-        if (dbUser.username && userData.username != dbUser.username) {
+        if (dbUser.username && userData.username != 'Guest' && userData.username != dbUser.username) {
           console.log("[USER]", userData.username + " has changed their username from " + dbUser.username + ". Saving alias...");
           addAlias(dbUser);
         }
@@ -120,7 +120,7 @@ module.exports = function () {
       });
   };
 
-  addAlias = function (user) {
+  addAlias = function (user) {    
     models.UserAlias.create({
       username: user.username,
       user_id: user.id,
