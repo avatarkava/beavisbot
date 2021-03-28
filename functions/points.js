@@ -24,7 +24,7 @@ module.exports = function () {
   transferCustomPoints = function (fromUser, toUser, points) {
     // Create them out of thin air!
     if (fromUser === null) {
-      fromUser = getDbUserFromSiteUser(bot.user.id);
+      fromUser = getDbUserFromUserId(bot.user.id);
 
       models.User.update(
         {
