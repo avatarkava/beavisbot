@@ -14,7 +14,7 @@ module.exports = function () {
 
     if (config.queue.upvoteSongs == "ALL" && data.room.metadata.current_song) {
       bot.bop();
-    }    
+    }
 
     // Perform automatic song metadata correction
     if (config.autoSuggestCorrections) {
@@ -30,7 +30,7 @@ module.exports = function () {
     }).then(function (row) {
       if (!row) {
         bot.speak(`This is the first time I have seen this video of ${song.metadata.artist} - ${song.metadata.song}  played!`);
-      } else {        
+      } else {
         /*
         if (song.is_banned) {
           logMessage = "[SKIP] Skipped " + data.currentDJ.username + " spinning a blacklisted song: " + data.media.name + " (id: " + data.media.id + ")";
@@ -109,7 +109,7 @@ module.exports = function () {
           });
         } else {
           */
-        bot.speak(`${row.Song.name} • last played ${timeSince(row.createdAt)} by ${row.User.username} • ${row.listeners} listeners • ${row.positive} up • ${row.grabs} grabs • ${row.negative} down`);
+        bot.speak(`${row.Song.name} • last played ${timeSince(row.createdAt)} by ${row.User.username} • ${row.listeners} :ear: • ${row.positive} :thumbsup: • ${row.negative} :thumbsdown: • ${row.grabs} :star:`);
         //}
       }
     });
@@ -226,10 +226,10 @@ module.exports = function () {
         if (songresponse.rate === 1) {
           bot.bop();
         } else if (songresponse.rate === -1) {
-          bot.vote('down');
+          bot.vote("down");
         }
       }
-    });        
+    });
     */
   });
 };
