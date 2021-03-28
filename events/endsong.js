@@ -32,7 +32,7 @@ module.exports = function () {
         if (!userRecord) throw new Error('No user found to associate on song insertion');
         if (!songRecord) throw new Error('No song found - maybe the insert failed?');        
         
-        return songRecord.createPlay({
+        songRecord.createPlay({
           UserId: userRecord.dataValues.id,
           site: config.site,
           positive: data.room.metadata.upvotes,
@@ -41,11 +41,11 @@ module.exports = function () {
           listeners: data.room.metadata.listeners,
           skipped: false, // @FIXME any way to detect this?
         });
-      })
-      .then((playRecord) => {        
-        transferCustomPoints(null, playRecord.UserId, roomState.snags);
+
+        transferCustomPoints(null, userRecord.dataValues.id, roomState.snags);
         //writeRoomState();
-      })
+        
+      })      
       .catch((err) => console.log("[ERROR]", err));
   });
 };

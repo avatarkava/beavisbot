@@ -21,23 +21,24 @@ module.exports = function () {
     return;
   };
 
-  transferCustomPoints = function (fromUser, toUser, points) {
-    // Create them out of thin air!
-    if (fromUser === null) {
-      fromUser = getDbUserFromUserId(bot.user.id);
+  transferCustomPoints = function (fromUserId, toUserId, points) {
+    toUser = getDbUserFromUserId(toUserId);
 
+    // Create them out of thin air!
+    if (fromUserId === null) {
+      fromUser = getDbUserFromUserId(bot.user.id);
       models.User.update(
         {
           custom_points: Sequelize.literal("(custom_points + " + points + ")"),
         },
-        { where: { site_id: toUser.id.toString() } }
+        { where: { site_id: toUserId } }
       );
       console.log("[GIFT] " + fromUser.username + " awarded " + points + " points to " + toUser.username);
       bot.sendChat(":gift: " + fromUser.username + " awarded " + points + " " + config.customPointName + " to @" + toUser.username);
 
       return;
     } else {
-      getDbUserFromSiteUser(fromUser, function (row) {
+      getDbUserFromUserId(fromUserId, function (row) {
         if (!row || row.custom_points < points) {
           console.log("Gift failed");
           return false;
@@ -48,13 +49,13 @@ module.exports = function () {
           {
             custom_points: Sequelize.literal("(custom_points - " + points + ")"),
           },
-          { where: { site_id: fromUser.id.toString() } }
+          { where: { site_id: fromUserId } }
         );
         models.User.update(
           {
             custom_points: Sequelize.literal("(custom_points + " + points + ")"),
           },
-          { where: { site_id: toUser.id.toString() } }
+          { where: { site_id: toUserId } }
         );
 
         console.log("[GIFT] " + fromUser.username + " gave " + points + " points to " + toUser.username);
