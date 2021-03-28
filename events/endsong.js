@@ -42,9 +42,8 @@ module.exports = function () {
           skipped: false, // @FIXME any way to detect this?
         });
       })
-      .then((playRecord) => {
-        //console.log(playRecord);
-        //transferCustomPoints(null, data.dj, data.score.grabs);
+      .then((playRecord) => {        
+        transferCustomPoints(null, userRecord.dataValues.id, roomState.snags);
         //writeRoomState();
       })
       .catch((err) => console.log("[ERROR]", err));
