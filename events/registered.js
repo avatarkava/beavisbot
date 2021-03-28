@@ -44,7 +44,7 @@ module.exports = function () {
             });
           } else {              
             models.EventResponse.findOne({
-              where: { event_type: "userJoin", pattern: user.userid, is_active: true },
+              where: { event_type: "userJoin", pattern: user.name, is_active: true },
               order: models.sequelize.random()
             })
               .then(function (eventResponse) {
