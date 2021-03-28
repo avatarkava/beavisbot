@@ -11,7 +11,7 @@ module.exports = function () {
       // Deduct the points from the sender's balance and add to the recipient
       models.User.update(
         {
-          custom_points: Sequelize.literal("(custom_points - " + points + ")"),
+          custom_points: models.sequelize.literal("(custom_points - " + points + ")"),
         },
         { where: { site_id: row.site_id } }
       );
@@ -29,7 +29,7 @@ module.exports = function () {
       fromUser = getDbUserFromUserId(bot.user.id);
       models.User.update(
         {
-          custom_points: Sequelize.literal("(custom_points + " + points + ")"),
+          custom_points: models.sequelize.literal("(custom_points + " + points + ")"),
         },
         { where: { site_id: toUserId } }
       );
