@@ -15,7 +15,7 @@ exports.handler = function (data) {
     }
     else {
         usernameRaw = params.join(' ').trim();
-        username = S.ltrim(username, '@');                
+        username = S.ltrim(usernameRaw, '@');                
     }
 
     models.User.findOne({where: {username: username }, order: [['updatedAt', 'DESC']]}).then(function (row) {
