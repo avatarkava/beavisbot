@@ -42,7 +42,7 @@ module.exports = function () {
           skipped: false, // @FIXME any way to detect this?
         });
 
-        transferCustomPoints(null, userRecord.dataValues.id, roomState.snags);
+        transferCustomPoints(null, song.djid, roomState.snags);
         //writeRoomState();
         
       })      
