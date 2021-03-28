@@ -25,7 +25,7 @@ module.exports = function () {
     getDbUserFromUserId(toUserId, function (toUser) {
       // Create them out of thin air!
       if (fromUserId === null) {
-        getDbUserFromUserId(bot.user.id, function (fromUser) {
+        getDbUserFromUserId(bot.user.userid, function (fromUser) {
           models.User.update(
             {
               custom_points: models.sequelize.literal("(custom_points + " + points + ")"),
