@@ -37,7 +37,7 @@ module.exports = function () {
           site: config.site,
           positive: data.room.metadata.upvotes,
           negative: data.room.metadata.downvotes,
-          grabs: 0, // @FIXME need to count these!
+          grabs: roomState.snags,
           listeners: data.room.metadata.listeners,
           skipped: false, // @FIXME any way to detect this?
         });

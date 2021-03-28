@@ -12,6 +12,7 @@ module.exports = function () {
     console.log("[UPTIME]", "Bot online " + timeSince(startupTimestamp, true));
     console.log(`[SONG START] ${song.djname} (${song.djid}) played: ${song.metadata.artist} - ${song.metadata.song} (${song.source}: ${song.sourceid})`);
 
+    roomState.snagged = 0;
     if (config.queue.upvoteSongs == "ALL" && data.room.metadata.current_song) {
       bot.bop();
     }

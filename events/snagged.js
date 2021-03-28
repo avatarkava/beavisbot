@@ -3,7 +3,11 @@ module.exports = function () {
     if (config.verboseLogging) {
       console.log("[SNAG] " + JSON.stringify(data, null, 2));
     } else if (data) {
-      console.log("[SNAG]", data.name + " grabbed this song");
+
+      roomState.snags++;
+      getDbUserFromUserId(data.userid, function (user) {
+        console.log("[SNAG]", user.username + " grabbed this song");
+      });
     }
   });
 };
