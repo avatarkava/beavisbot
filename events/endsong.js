@@ -42,7 +42,7 @@ module.exports = function () {
           skipped: false, // @FIXME any way to detect this?
         });
 
-        let pointsToAward = Math.floor(roomState.snags + data.room.metadata.upvotes / 10 - data.room.metadata.downvotes);
+        let pointsToAward = Math.floor(roomState.snags + (data.room.metadata.upvotes / 10) - data.room.metadata.downvotes);
         if (pointsToAward > 0) {
           transferCustomPoints(null, song.djid, pointsToAward);
         }
