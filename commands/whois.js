@@ -31,10 +31,10 @@ exports.handler = function (data) {
             }
             */
             message += ' • seen ' + timeSince(row.last_seen) + ' • joined ' + moment.utc(row.joined).calendar()
-                + ' • ID: ' + row.site_id + ' • Lvl: ' + row.site_points;
+                + ' • ID: ' + row.site_id + ' • Pts: ' + row.site_points;
 
             if (config.customPointName) {
-                message = message + ' • ' + config.customPointName + row.custom_points.toLocaleString();
+                message = message + ' • ' + config.customPointName + ' ' + row.custom_points.toLocaleString();
             }
             bot.speak(message);
         }
