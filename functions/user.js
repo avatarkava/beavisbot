@@ -104,7 +104,7 @@ module.exports = function () {
         // Save the alias if the user has changed username
         if (dbUser.username && userData.username != dbUser.username) {
           console.log("[USER]", userData.username + " has changed their username from " + dbUser.username + ". Saving alias...");
-          addAlias(dbUser);
+          addAlias(dbUser.dataValues);
         }
 
         // Reset the user's AFK timer if they've been gone for long enough (so we don't reset on disconnects)
