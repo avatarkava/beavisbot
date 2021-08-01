@@ -123,7 +123,7 @@ module.exports = function () {
   };
 
   addAlias = function (user) {
-    models.UserAlias.create({
+    models.UserAlias.upsert({
       username: user.username,
       user_id: user.id,
     }).catch(function (err) {
