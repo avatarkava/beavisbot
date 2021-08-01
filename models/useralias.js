@@ -8,6 +8,9 @@ module.exports = function (sequelize, DataTypes) {
     {
       underscored: true,
       tableName: "user_aliases",
+      indexes: [
+        { unique: true, fields: ['username', 'user_id'] }
+      ]
     }
   );
 
