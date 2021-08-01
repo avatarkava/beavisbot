@@ -1,6 +1,7 @@
 const { writeFile } = require("fs");
 
 module.exports = function () {
+  console.log('Updating config state...');
   writeConfigState = function () {    
     writeFile(
       "../configState.json",
@@ -26,6 +27,7 @@ module.exports = function () {
   };
 
   writeRoomState = function (permalink) {
+    console.log('Updating room state...');
     // Writes current room state to outfile so it can be used for the web
     if (config.roomStateFile) {
       var JSONstats = {};
