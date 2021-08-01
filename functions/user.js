@@ -107,13 +107,13 @@ module.exports = function () {
           addAlias(dbUser.dataValues);
         }
 
-        // Reset the user's AFK timer if they've been gone for long enough (so we don't reset on disconnects)
-        // @FIXME - Currently another bot is handling timeouts and this is not working properly
-        // if (secondsSince(dbUser.last_seen) >= 900) {
-        //   dbUser.last_active = new Date();
-        //   dbUser.queue_position = getWaitListPosition(user.userid);
-        // }
+        // Reset the user's AFK timer if they've been gone for long enough (so we don't reset on disconnects)        
+        if (secondsSince(dbUser.last_seen) >= 900) {
+          dbUser.last_active = new Date();
+          dbUser.queue_position = getWaitListPosition(user.userid);
+        }
 
+        dbUser.username = userData.username;
         dbUser.last_seen = new Date();
         return dbUser.save();
       })
