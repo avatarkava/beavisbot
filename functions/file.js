@@ -1,9 +1,7 @@
 const { writeFile } = require("fs");
 
 module.exports = function () {
-  writeConfigState = function () {
-    // commenting out temporarily for debugging
-    /*
+  writeConfigState = function () {    
     writeFile(
       "../configState.json",
       JSON.stringify(
@@ -24,8 +22,7 @@ module.exports = function () {
           return console.log(err);
         }
       }
-    );
-    */
+    );    
   };
 
   writeRoomState = function (permalink) {

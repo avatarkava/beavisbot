@@ -3,6 +3,6 @@ module.exports = function () {
     console.log("[EVENT] Ready: Connected...");
     bot.roomRegister(config.roomId);
 
-    //writeConfigState();
+    writeConfigState();
   });
 };
